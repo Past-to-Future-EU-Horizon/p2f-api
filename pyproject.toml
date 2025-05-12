@@ -1,0 +1,12 @@
+[project]
+name = "p2f-api"
+version = "0.0.1"
+description = "FastAPI based API for the Past to Future project."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.115.12",
+    "psycopg>=3.2.8",
+    "python-dotenv>=1.1.0",
+    "sqlalchemy>=2.0.40",
+]
