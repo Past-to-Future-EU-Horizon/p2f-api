@@ -1,33 +1,39 @@
 # Local libraries
 from ..apilogs import logger
+from ..service import datasets
+from p2f_pydantic.datasets import Datasets
 # Third Party Libraries
 from fastapi import Body, APIRouter, Request
 # Batteries included libraries
 import uuid
-from typing import Optional
+from typing import Optional, List
 
 router = APIRouter(prefix="/datasets")
 
-#List 
+# List 
 @router.get("/")
-def list_() ->:
-    pass
+def list_() -> List[Datasets]:
+    return datasets.list_datasets
 
-#Get Single
+# Get Single
 @router.get("/")
-def get_() ->:
-    pass
+def get_() -> Datasets:
+    return datasets.get_dataset
 
-#Create
+# Create
 @router.post("/")
-def create_() ->:
-    pass
+def create_(dataset: Datasets) -> Datasets:
+    return datasets.create_dataset(dataset)
 
-#Update 
+# Update 
 @router.put("/")
-def update_() ->:
-    pass
+def update_(dataset_updates: Datasets) -> Datasets:
+    return datasets.update_dataset(dataset_updates)
 
+# Delete
 @router.delete("/")
-def delete_() ->:
-    pass
+def delete_(existing_pk: int | Datasets) -> None:
+    if type(existing_pk) == int:
+        return datasets.delete_dataset(existing_pk)
+    elif type(existing_pk) == Datasets:
+        return datasets.delete_dataset(existing_pk.pk_datasets)

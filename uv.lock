@@ -96,7 +96,7 @@ requires-dist = [
 [[package]]
 name = "p2f-pydantic"
 version = "0.0.1"
-source = { git = "https://github.com/Past-to-Future-EU-Horizon/p2f-pydantic#1055e2e5bf02940cea7305717c5a310b6f0ba2bf" }
+source = { git = "https://github.com/Past-to-Future-EU-Horizon/p2f-pydantic#39f7b01868e77f15250fa8189f41016f4ffe5330" }
 dependencies = [
     { name = "pydantic" },
     { name = "python-dotenv" },
