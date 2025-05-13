@@ -6,7 +6,11 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115.12",
+    "p2f-pydantic",
     "psycopg>=3.2.8",
     "python-dotenv>=1.1.0",
     "sqlalchemy>=2.0.40",
 ]
+
+[tool.uv.sources]
+p2f-pydantic = { git = "https://github.com/Past-to-Future-EU-Horizon/p2f-pydantic" }

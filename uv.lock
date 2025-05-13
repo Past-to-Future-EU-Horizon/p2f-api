@@ -78,6 +78,7 @@ version = "0.0.1"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi" },
+    { name = "p2f-pydantic" },
     { name = "psycopg" },
     { name = "python-dotenv" },
     { name = "sqlalchemy" },
@@ -86,9 +87,19 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115.12" },
+    { name = "p2f-pydantic", git = "https://github.com/Past-to-Future-EU-Horizon/p2f-pydantic" },
     { name = "psycopg", specifier = ">=3.2.8" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "sqlalchemy", specifier = ">=2.0.40" },
+]
+
+[[package]]
+name = "p2f-pydantic"
+version = "0.0.1"
+source = { git = "https://github.com/Past-to-Future-EU-Horizon/p2f-pydantic#1055e2e5bf02940cea7305717c5a310b6f0ba2bf" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "python-dotenv" },
 ]
 
 [[package]]
