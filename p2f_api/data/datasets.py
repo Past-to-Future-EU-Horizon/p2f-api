@@ -29,5 +29,6 @@ class datasets(baseSQL):
 class dataset_datacite(baseSQL):
     __tablename__ = "p2f_dataset_datacite"
     pk_datacite_metadata: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    doi: Mapped[str] = mapped_column(Text, index=True, unique=False)
     datacite_json: Mapped[str] = mapped_column(JSON, nullable=True)
     datacite_xml: Mapped[str] = mapped_column(Text, nullable=True)
