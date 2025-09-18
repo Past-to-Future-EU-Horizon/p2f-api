@@ -17,8 +17,10 @@ class harm_locations(baseSQL):
     pk_harm_location: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     location_identifier: Mapped[UUID] = mapped_column(Uuid, default=func.gen_random_uuid(), unique=True)
     location_name: Mapped[str] = mapped_column(Text, nullable=True)
+    location_code: Mapped[str] = mapped_column(Text, nullable=True)
     latitude: Mapped[float] = mapped_column(Double)
     longitude: Mapped[float] = mapped_column(Double)
+    elevation: Mapped[float] = mapped_column(Double)
     location_age: Mapped[int] = mapped_column(BigInteger)
 
 class harm_location_to_record(baseSQL):
