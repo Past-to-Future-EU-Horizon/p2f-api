@@ -3,6 +3,7 @@ from ..apilogs import logger
 from data.db_connection import engine
 from data.harm_data_numerical import harmonized_float_confidence, harmonized_float
 from data.harm_data_numerical import harmonized_int_confidence, harmonized_int
+from data.harm_data_numerical import harmonized_numeric_id_map
 from p2f_pydantic.harm_numerical import harmonized_float_confidence as Harmonized_float_confidence
 from p2f_pydantic.harm_numerical import harmonized_int_confidence as Harmonized_int_confidence
 from p2f_pydantic.harm_numerical import harmonized_float as Harmonized_float
@@ -13,6 +14,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 from typing import List, Union, Literal, Optional
+from uuid import UUID
 
 Harm_numerical_union = Union[Harmonized_float_confidence, 
                              Harmonized_float,
@@ -26,7 +28,31 @@ harm_table_matching = {
     "int":  {"db": harmonized_int, "pydantic": Harmonized_int}, 
 }
 
+def get_numeric_table_by_uuid(numeric_id: UUID):
+    with Session(engine) as session:
+        stmt = select(harmonized_numeric_id_map)
+        stmt = stmt.where(harmonized_numeric_id_map.fk_harm_num == numeric_id)
+        result = session.execute(stmt)
+    numeric_class = result[0].tuple().table_class
+    if numeric_class == "INT_CONFIDENCE":
+        numeric_table = harmonized_int_confidence
+        pydantic_class = Harmonized_int_confidence
+    elif numeric_class == "INT":
+        numeric_table = harmonized_int
+        pydantic_class = Harmonized_int
+    elif numeric_class == "FLOAT_CONFIDENCE":
+        numeric_table = harmonized_float_confidence
+        pydantic_class = Harmonized_float_confidence
+    elif numeric_class == "FLOAT":
+        numeric_table = harmonized_float
+        pydantic_class = Harmonized_float
+    return (numeric_table, pydantic_class)
+
 def list_numerics(record_hash: Optional[str]=None,
+                  numeric_type: Optional[Literal["float_confidence", 
+                                               "float", 
+                                               "int_confidence", 
+                                               "int"]]=None, 
                   data_type: Optional[int]=None) -> List[Harm_numerical_union]:
     logger.debug("📃 service/harm_numerical.py list_numerics()")
     results_collection = []
@@ -40,40 +66,29 @@ def list_numerics(record_hash: Optional[str]=None,
             results_collection += [harm_table_matching[table]["pydantic"](**x.tuple()) for x in results]
     return results_collection
 
-def get_numeric(numeric_type: Optional[Literal["float_confidence", 
-                                               "float", 
-                                               "int_confidence", 
-                                               "int"]]=None, 
-                data_type: Optional[int]=None) -> Harm_numerical_union:
+def get_numeric(numeric_id: UUID) -> Harm_numerical_union:
     logger.debug("🔎 service/harm_numerical.py get_numeric()")
-    if numeric_type:
-        numerical_table = harm_table_matching[numeric_type]["db"]
-        with Session(engine) as session:
-            logger.debug("\tCreated session")
-            stmt = select(numerical_table)
-            results = session.execute(stmt)
-    else:
-        results_collection = []
-        with Session(engine) as session:
-            logger.debug("\tCreated session")
-            for table in harm_table_matching.keys():
-                logger.debug(f"\t\tRunning table search for: {table}")
-                stmt = select(harm_table_matching[table]["db"])
-                results = session.execute(stmt).all()
-                logger.debug(f"\tFound {len(results)} results")
-                results_collection += [harm_table_matching[table]["pydantic"](**x.tuple()) for x in results]
-        return results_collection
+    numeric_table, pydantic_class = get_numeric_table_by_uuid(numeric_id=numeric_id)
+    with Session(engine) as session:
+        stmt = select(numeric_table)
+        stmt = stmt.where(numeric_table.pk_harm_num == numeric_id)
+        result = session.execute(stmt)
+    numeric_object = pydantic_class(**result[0].tuple())
+    return numeric_object
 
 
-def create_numeric(new_dataset: Insert_harm_numerical) -> Harm_numerical_union:
+def create_numeric(new_numeric: Insert_harm_numerical) -> Harm_numerical_union:
     logger.debug("🆕 service/harm_numerical.py create_numeric()")
-    if new_dataset.numerical_type == "INT":
-        if new_dataset.upper_conf_value and new_dataset.lower_conf_value:
+    numeric_class = new_numeric.numerical_type
+    if numeric_class == "INT":
+        if new_numeric.upper_conf_value and new_numeric.lower_conf_value:
+            numeric_class = numeric_class + "_CONFIDENCE"
             numerical_table = harmonized_int_confidence
         else: 
             numerical_table = harmonized_int
-    elif new_dataset.numerical_type == "FLOAT":
-        if new_dataset.upper_conf_value and new_dataset.lower_conf_value:
+    elif numeric_class == "FLOAT":
+        if new_numeric.upper_conf_value and new_numeric.lower_conf_value:
+            numeric_class = numeric_class + "_CONFIDENCE"
             numerical_table = harmonized_float_confidence
         else:
             numerical_table = harmonized_float
@@ -82,38 +97,36 @@ def create_numeric(new_dataset: Insert_harm_numerical) -> Harm_numerical_union:
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = insert(numerical_table)
-        stmt = stmt.values()
+        stmt = stmt.values(**new_numeric)
         execute = session.execute(stmt)
         commit = session.commit()
-    return_dataset = new_dataset
-    return_dataset.pk_harm_data_record = execute.inserted_primary_key
-    return return_dataset
+    return_numeric = new_numeric
+    return_numeric.pk_harm_num = execute.inserted_primary_key
+    with Session(engine) as session:
+        stmt = insert(harmonized_numeric_id_map)
+        stmt = stmt.values(**{"fk_harm_num": execute.inserted_primary_key, "table_class": numeric_class})
+        execute = session.execute(stmt)
+        commit = session.commit()
+    return return_numeric
 
-def update_numeric(dataset_update: Harm_numerical_union) -> Harm_numerical_union:
+def update_numeric(numerical_update: Harm_numerical_union) -> Harm_numerical_union:
     logger.debug("✏️ service/harm_numerical.py update_numeric()")
-    #  numerical_table just below needs an explanation of what is happening. 
-    ## We take the incoming update object and need to figure out which db table it goes in. 
-    ## To do this, we can iterate through our pydantic objects and figure out which
-    ##  pydantic object the incoming object matches. 
-    ## Instead of writing several lines of iterator, I use a list comprehension to get
-    ##  the db table value from the above dictionary, then use a conditional statement
-    ##  in the comprehension to only take the matching isinstance table. 
-    numerical_table = [harm_table_matching[x]["db"] for x in harm_table_matching.keys() if isinstance(dataset_update, harm_table_matching[x]["pydantic"])][0]
+    numeric_table, pydantic_class = get_numeric_table_by_uuid(numeric_id=numerical_update.pk_harm_num)
     with Session(engine) as session:
         logger.debug("\tCreated session")
-        stmt = update(numerical_table)
-        stmt = stmt.where(numerical_table.pk_harm_num == dataset_update.pk_harm_data_record)
+        stmt = update(numeric_table)
+        stmt = stmt.where(numeric_table.pk_harm_num == numerical_update.pk_harm_num)
         stmt = stmt.values()
         execute = session.execute(stmt)
         commit = session.commit()
 
-def delete_numeric(existing_pk: int, 
-                   numeric_type: Literal["float_confidence", "float", "int_confidence", "int"]) -> None:
+def delete_numeric(numeric_id: UUID) -> None:
     logger.debug("🗑️ service/harm_numerical.py delete_numeric()")
+    numeric_table, pydantic_class = get_numeric_table_by_uuid(numeric_id=numeric_id)
     with Session(engine) as session:
         logger.debug("\tCreated session")
-        numerical_table = harm_table_matching[numeric_type]["db"]
-        stmt = delete(numerical_table).where(numerical_table.pk_harm_num == existing_pk)
+        stmt = delete(numeric_table)
+        stmt = stmt.where(numeric_table.pk_harm_num == numeric_id)
         execute = session.execute(stmt)
         commit = session.commit()
     return None

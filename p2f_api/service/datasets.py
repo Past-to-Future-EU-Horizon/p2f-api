@@ -7,15 +7,13 @@ from p2f_pydantic.datasets import Datasets
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
-from typing import List
+from typing import List, Optional
 
-def list_datasets() -> List[Datasets]:
-    """Returns a list of p2f-pydantic Datasets
-
-    Returns:
-        Datasets: p2f_pydantic.datasets.Datasets object
-    """
-    logger.debug("📃 service/datasets.py list_datasets()")
+def list_datasets(
+        is_new_p2f: Optional[bool]=None,
+        is_sub_dataset: Optional[bool]=None
+    ) -> List[Datasets]:
+    logger.debug("💾📃 service/datasets.py list_datasets()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = select(datasets)
@@ -26,14 +24,18 @@ def list_datasets() -> List[Datasets]:
         datasets_list.append(Datasets(**result[0]))
     return datasets_list
 
-def get_dataset() -> Datasets:
-    logger.debug("🔎 service/datasets.py get_dataset()")
+def get_dataset(dataset_id) -> Datasets:
+    logger.debug("💾🔎 service/datasets.py get_dataset()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = select(datasets)
+        stmt = stmt.where(datasets.dataset_identifier==dataset_id)
+        result = session.execute(stmt)
+        if len(result) == 1:
+            return Datasets(**result[0].tuple())
 
 def create_dataset(new_dataset: Datasets) -> Datasets:
-    logger.debug("🆕 service/datasets.py create_dataset()")
+    logger.debug("💾🆕 service/datasets.py create_dataset()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = insert(datasets)
@@ -45,17 +47,17 @@ def create_dataset(new_dataset: Datasets) -> Datasets:
     return return_dataset
 
 def update_dataset(dataset_update: Datasets) -> Datasets:
-    logger.debug("✏️ service/datasets.py create_dataset()")
+    logger.debug("💾✏️ service/datasets.py update_dataset()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = update(datasets)
-        stmt = stmt.where(datasets.pk_datasets == dataset_update.pk_datasets)
+        stmt = stmt.where(datasets.dataset_identifier == dataset_update.dataset_identifier)
         stmt = stmt.values()
         execute = session.execute(stmt)
         commit = session.commit()
 
 def delete_dataset(existing_pk: int) -> None:
-    logger.debug("🗑️ service/datasets.py create_dataset()")
+    logger.debug("💾🗑️ service/datasets.py delete_dataset()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = delete(datasets).where(datasets.pk_datasets == existing_pk)

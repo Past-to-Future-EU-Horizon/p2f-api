@@ -12,28 +12,36 @@ router = APIRouter(prefix="/datasets")
 
 # List 
 @router.get("/")
-def list_() -> List[Datasets]:
-    return datasets.list_datasets
+def list_datasets(
+    is_new_p2f: Optional[bool]=None,
+    is_sub_dataset: Optional[bool]=None
+    ) -> List[Datasets]:
+    logger.debug("🕸️📃 web/datasets.py list_datasets()")
+    return datasets.list_datasets()
 
 # Get Single
-@router.get("/")
-def get_() -> Datasets:
-    return datasets.get_dataset
+@router.get("/{dataset_id}")
+def get_dataset(dataset_id) -> Datasets:
+    logger.debug("🕸️🔎 web/datasets.py get_dataset()")
+    return datasets.get_dataset(dataset_id=dataset_id)
 
 # Create
 @router.post("/")
-def create_(dataset: Datasets) -> Datasets:
+def create_dataset(dataset: Datasets) -> Datasets:
+    logger.debug("🕸️🆕 web/datasets.py create_dataset()")
     return datasets.create_dataset(dataset)
 
 # Update 
 @router.put("/")
-def update_(dataset_updates: Datasets) -> Datasets:
+def update_dataset(dataset_updates: Datasets) -> Datasets:
+    logger.debug("🕸️✏️ web/datasets.py update_dataset()")
     return datasets.update_dataset(dataset_updates)
 
 # Delete
-@router.delete("/")
-def delete_(existing_pk: int | Datasets) -> None:
-    if type(existing_pk) == int:
-        return datasets.delete_dataset(existing_pk)
-    elif type(existing_pk) == Datasets:
-        return datasets.delete_dataset(existing_pk.pk_datasets)
+@router.delete("/{dataset_id}")
+def delete_dataset(dataset_id: str | Datasets) -> None:
+    logger.debug("🕸️🗑️ web/datasets.py delete_dataset()")
+    if type(dataset_id) == str:
+        return datasets.delete_dataset(dataset_id)
+    elif type(dataset_id) == Datasets:
+        return datasets.delete_dataset(dataset_id.dataset_identifier)
