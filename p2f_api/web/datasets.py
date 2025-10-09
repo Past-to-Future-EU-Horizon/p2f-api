@@ -14,10 +14,13 @@ router = APIRouter(prefix="/datasets")
 @router.get("/")
 def list_datasets(
     is_new_p2f: Optional[bool]=None,
-    is_sub_dataset: Optional[bool]=None
+    is_sub_dataset: Optional[bool]=None, 
+    doi: Optional[str]=None
     ) -> List[Datasets]:
     logger.debug("🕸️📃 web/datasets.py list_datasets()")
-    return datasets.list_datasets()
+    return datasets.list_datasets(is_new_p2f=is_new_p2f,
+                                  is_sub_dataset=is_sub_dataset,
+                                  doi=doi)
 
 # Get Single
 @router.get("/{dataset_id}")
@@ -43,5 +46,3 @@ def delete_dataset(dataset_id: str) -> None:
     logger.debug("🕸️🗑️ web/datasets.py delete_dataset()")
     if type(dataset_id) == str:
         return datasets.delete_dataset(dataset_id)
-    elif type(dataset_id) == Datasets:
-        return datasets.delete_dataset(dataset_id.dataset_identifier)
