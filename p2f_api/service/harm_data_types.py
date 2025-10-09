@@ -1,8 +1,8 @@
 # Local libraries
 from ..apilogs import logger
-from service.harm_numerical import list_numerics
-from data.db_connection import engine
-from data.harm_data_types import harm_data_type
+from ..service.harm_numerical import list_numerics
+from ..data.db_connection import engine
+from ..data.harm_data_types import harm_data_type
 from p2f_pydantic.harm_data_types import harm_data_type as Harm_data_type
 # Third Party Libraries
 from sqlalchemy.orm import Session

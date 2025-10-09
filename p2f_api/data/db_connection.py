@@ -1,9 +1,21 @@
 # Local libraries
 from ..apilogs import logger
+# from .create_metadata import create_metadata
+from .p2f_decbase import baseSQL
 # Third Party Libraries
 from sqlalchemy import create_engine
+from dotenv import load_dotenv
 # Batteries included libraries
 import os
+import pathlib
+
+p = pathlib.Path(os.getcwd())
+print(p)
+
+logger.debug("LOADING dotenv")
+de = load_dotenv(override=True)
+print(de)
+logger.debug("dotenv LOADED")
 
 PG_USER = os.getenv("PG_USER")
 PG_PASS = os.getenv("PG_PASS")
@@ -15,3 +27,4 @@ connection_str = f"postgresql+psycopg://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/
 logger.debug("Database connection url:" + connection_str.replace(PG_PASS, "♦" * len(PG_PASS)))
 
 engine = create_engine(connection_str)
+baseSQL.metadata.create_all(engine)

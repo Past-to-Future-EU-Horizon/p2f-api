@@ -39,7 +39,7 @@ def update_dataset(dataset_updates: Datasets) -> Datasets:
 
 # Delete
 @router.delete("/{dataset_id}")
-def delete_dataset(dataset_id: str | Datasets) -> None:
+def delete_dataset(dataset_id: str) -> None:
     logger.debug("🕸️🗑️ web/datasets.py delete_dataset()")
     if type(dataset_id) == str:
         return datasets.delete_dataset(dataset_id)

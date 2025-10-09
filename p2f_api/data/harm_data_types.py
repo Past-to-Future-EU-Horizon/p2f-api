@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 # Batteries included libraries
 
 class harm_data_type(baseSQL):
-    __tablname__ = "p2f_harm_data_types"
+    __tablename__ = "p2f_harm_data_types"
     pk_harm_data_type: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     measure: Mapped[str] = mapped_column(Text, index=True)
     unit_of_measurement: Mapped[str] = mapped_column(Text)

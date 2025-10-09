@@ -1,7 +1,7 @@
 # Local libraries
 from ..apilogs import logger
-from data.db_connection import engine
-from data.datasets import datasets
+from ..data.db_connection import engine
+from ..data.datasets import datasets
 from p2f_pydantic.datasets import Datasets
 # Third Party Libraries
 from sqlalchemy.orm import Session

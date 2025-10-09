@@ -1,5 +1,5 @@
-from data.db_connection import engine
-from data.datasets import dataset_datacite
+from ..data.db_connection import engine
+from ..data.datasets import dataset_datacite
 import requests
 import furl
 from sqlalchemy import select, insert

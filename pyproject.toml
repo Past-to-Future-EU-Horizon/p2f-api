@@ -7,9 +7,10 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115.12",
     "furl>=2.1.4",
-    "p2f-pydantic",
+    "p2f-pydantic>=0.0.2",
     "psycopg>=3.2.8",
     "python-dotenv>=1.1.0",
+    "pytz>=2025.2",
     "requests>=2.32.5",
     "sqlalchemy>=2.0.40",
 ]

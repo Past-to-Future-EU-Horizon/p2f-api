@@ -1,7 +1,6 @@
 from ..apilogs import logger
-from service.harm_numerical import list_numerics
-from data.db_connection import engine
-from data.harm_data_metadata import harm_location_to_record, harm_locations
+from ..data.db_connection import engine
+from ..data.harm_data_metadata import harm_location_to_record, harm_locations
 from p2f_pydantic.harm_data_metadata import harm_location as Harm_location
 from p2f_pydantic.harm_data_metadata import harm_bounding_box as Harm_bounding_box
 # Third Party Libraries

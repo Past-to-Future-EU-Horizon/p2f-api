@@ -22,7 +22,7 @@ class datasets(baseSQL):
     doi: Mapped[str] = mapped_column(Text, index=True, unique=False)
     title: Mapped[str] = mapped_column(Text, index=True)
     sub_dataset_name: Mapped[str] = mapped_column(Text, nullable=True)
-    publication_date: Mapped[date] = mapped_column(Date(timezone=pytz.utc))
+    publication_date: Mapped[date] = mapped_column(Date)
     is_new_p2f: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_sub_dataset: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 

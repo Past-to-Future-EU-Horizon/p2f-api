@@ -42,7 +42,7 @@ def update_dataset(update_data_record) -> Harm_data_record:
 
 # Delete
 @router.delete("/{record_hash}")
-def delete_dataset(record_hash: str | Harm_data_record) -> None:
+def delete_dataset(record_hash: str) -> None:
     logger.debug("🕸️🗑️ web/harm_data_record.py delete_harm_data_record()")
     if type(record_hash) == str:
         return harm_data_record.delete_harm_data_record(record_hash)
