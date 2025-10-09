@@ -39,14 +39,19 @@ def list_harm_metadata_location(
         if max_location_age:
             stmt = stmt.where(harm_locations.location_age <= max_location_age)
         results = session.execute(stmt)
-    return [Harm_location(**x[0].tuple()) for x in results]
+    return [Harm_location(**x[0].__dict__) for x in results]
 
-def get_location(location_identifier: UUID) -> Harm_location:
+def get_location(location_identifier: Optional[UUID]=None,
+                 pk_harm_location: Optional[int]=None) -> Harm_location:
     with Session(engine) as session:
         stmt = select(harm_locations)
-        stmt = stmt.where(harm_locations.location_identifier == location_identifier)
-        result = session.execute(stmt)
-    return Harm_location(**result[0].tuple())
+        if location_identifier:
+            stmt = stmt.where(harm_locations.location_identifier == location_identifier)
+        if pk_harm_location:
+            stmt = stmt.where(harm_locations.pk_harm_location==pk_harm_location)
+        result = session.execute(stmt).first()
+    result = result.tuple()[0]
+    return Harm_location(**result.__dict__)
 
 def create_location(new_location: Harm_location) -> Harm_location:
     with Session(engine) as session:
@@ -54,14 +59,7 @@ def create_location(new_location: Harm_location) -> Harm_location:
         stmt = stmt.values(**new_location)
         execute = session.execute(stmt)
         commit = session.commit()
-    new_pk = execute.inserted_primary_key
-    with Session(engine) as session:
-        stmt = select(harm_locations.location_identifier)
-        stmt = stmt.where(harm_locations.pk_harm_location == new_pk)
-        result = session.execute(stmt)
-    return_location = new_location
-    return_location.location_identifier = result[0]
-    return return_location
+    return get_location(pk_harm_location=execute.inserted_primary_key[0])
 
 def update_location(update_location: Harm_location) -> Harm_location:
     with Session(engine) as session:
@@ -70,7 +68,7 @@ def update_location(update_location: Harm_location) -> Harm_location:
         stmt = stmt.values(update_location)
         execute = session.execute(stmt)
         commit = session.commit()
-    return update_location
+    return get_location(update_location.pk_harm_location)
 
 def delete_location(location_identifier: UUID) -> None:
     with Session(engine) as session:

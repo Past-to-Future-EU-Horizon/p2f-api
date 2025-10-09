@@ -24,7 +24,7 @@ def list_harm_data_types(
         if method:
             stmt = stmt.where(harm_data_type.method == method)
         results = session.execute(stmt).all()
-    return [Harm_data_type(**x[0].tuple()) for x in results]
+    return [Harm_data_type(**x[0].__dict__) for x in results]
 
 def get_harm_data_type(
         pk_harm_data_type: int
@@ -32,8 +32,8 @@ def get_harm_data_type(
     with Session(engine) as session:
         stmt = select(harm_data_type)
         stmt = stmt.where(harm_data_type.pk_harm_data_type == pk_harm_data_type)
-        result = session.execute(stmt)
-    return Harm_data_type(**result[0].tuple())
+        result = session.execute(stmt).first()
+    return Harm_data_type(**result.tuple()[0].__dict__)
 
 def create_harm_data_type(
         new_harm_data_type: Harm_data_type    
@@ -43,10 +43,7 @@ def create_harm_data_type(
         stmt = stmt.values(**new_harm_data_type)
         execute = session.execute(stmt)
         commit = session.commit()
-    new_pk = execute.inserted_primary_key
-    return_harm_data_type = new_harm_data_type
-    return_harm_data_type.pk_harm_data_type = new_pk
-    return return_harm_data_type
+    return get_harm_data_type(pk_harm_data_type=commit.inserted_primary_key[0])
 
 def update_harm_data_type(
         update_harm_data_type: Harm_data_type
@@ -57,7 +54,7 @@ def update_harm_data_type(
         stmt = stmt.values(update_harm_data_type)
         execute = session.execute(stmt)
         commit = session.commit()
-    return update_harm_data_type
+    return get_harm_data_type(pk_harm_data_type=update_harm_data_type.pk_harm_data_type)
 
 def delete_harm_data_type(
         pk_harm_data_type: int
