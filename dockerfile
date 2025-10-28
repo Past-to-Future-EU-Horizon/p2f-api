@@ -7,10 +7,10 @@ ADD . .
 EXPOSE 8084
 
 ENV PG_USER=value
-ENV PG_PASS=
+ENV PG_PASS=value
 ENV PG_HOST=value
 ENV PG_PORT=value
-ENV PG_DB=
+ENV PG_DB=value
 ENV UV_LINK_MODE=copy
 
 RUN --mount=type=cache,target=/root/.cache/uv sync --locked

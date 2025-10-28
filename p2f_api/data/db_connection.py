@@ -18,7 +18,7 @@ p = pathlib.Path(os.getcwd())
 print(p)
 
 logger.debug("LOADING dotenv")
-de = load_dotenv(override=True)
+de = load_dotenv()
 print(de)
 logger.debug("dotenv LOADED")
 
