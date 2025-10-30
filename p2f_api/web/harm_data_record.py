@@ -35,10 +35,11 @@ def create_dataset(new_data_record: Harm_data_record) -> Harm_data_record:
 ## Discussion, should this method exist?
 ##   If the hash changes we should delete the old hash and re-enter 
 ##   the row data as new records in their respective tables. 
-@router.put("/")
-def update_dataset(update_data_record) -> Harm_data_record:
-    logger.debug("🕸️✏️ web/harm_data_record.py update_harm_data_record()")
-    return harm_data_record.update_harm_data_record(update_data_record)
+# @router.put("/{record_hash}")
+# def update_dataset(record_hash: str, 
+#                    update_data_record: Harm_data_record) -> Harm_data_record:
+#     logger.debug("🕸️✏️ web/harm_data_record.py update_harm_data_record()")
+#     return harm_data_record.update_harm_data_record(update_data_record)
 
 # Delete
 @router.delete("/{record_hash}")

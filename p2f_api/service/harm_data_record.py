@@ -27,7 +27,7 @@ def list_harm_data_record(
         stmt = select(harm_data_record)
         results = session.execute(stmt).all()
         logger.debug(f"\tFound {len(results)} results")
-    return [Harm_data_record(x[0].__dict__) for x in results]
+    return [Harm_data_record(**x[0].__dict__) for x in results]
 
 def get_harm_data_record(record_hash: Optional[str]=None,
                          pk_harm_data_record: Optional[int]=None) -> Harm_data_record:
@@ -47,12 +47,13 @@ def create_harm_data_record(new_dataset: Harm_data_record) -> Harm_data_record:
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = insert(harm_data_record)
-        stmt = stmt.values()
+        stmt = stmt.values(**new_dataset.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
     return get_harm_data_record(pk_harm_data_record=execute.inserted_primary_key[0])
 
-def update_harm_data_record(dataset_update: Harm_data_record) -> Harm_data_record:
+def update_harm_data_record(record_hash:str, 
+                            dataset_update: Harm_data_record) -> Harm_data_record:
     logger.debug("✏️ service/harm_data_record.py create_dataset()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
@@ -67,7 +68,7 @@ def delete_harm_data_record(record_hash: str) -> None:
     logger.debug("🗑️ service/harm_data_record.py create_dataset()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
-        stmt = delete(harm_data_record).where(harm_data_record.pk_harm_data_record == record_hash)
+        stmt = delete(harm_data_record).where(harm_data_record.record_hash == record_hash)
         execute = session.execute(stmt)
         commit = session.commit()
     return None
