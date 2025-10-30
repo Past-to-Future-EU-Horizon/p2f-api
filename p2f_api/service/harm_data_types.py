@@ -40,10 +40,10 @@ def create_harm_data_type(
     ) -> Harm_data_type:
     with Session(engine) as session:
         stmt = insert(harm_data_type)
-        stmt = stmt.values(**new_harm_data_type)
+        stmt = stmt.values(**new_harm_data_type.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
-    return get_harm_data_type(pk_harm_data_type=commit.inserted_primary_key[0])
+    return get_harm_data_type(pk_harm_data_type=execute.inserted_primary_key[0])
 
 def update_harm_data_type(
         update_harm_data_type: Harm_data_type
