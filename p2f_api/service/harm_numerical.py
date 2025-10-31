@@ -76,28 +76,28 @@ def list_numerics(record_hash: Optional[str]=None,
         match table:
             case "int":
                 if len(session_results[table]["results"]) > 0:
-                    return_results.harmonized_int = session_results[table]["results"]
-                    # return_results.harmonized_int = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
+                    return_results.data_harmonized_int = session_results[table]["results"]
+                    # return_results.data_harmonized_int = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
                 else:
-                    return_results.harmonized_int = None
+                    return_results.data_harmonized_int = None
             case "int_confidence":
                 if len(session_results[table]["results"]) > 0:
-                    return_results.harmonized_int_confidence = session_results[table]["results"]
-                    # return_results.harmonized_int_confidence = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
+                    return_results.data_harmonized_int_confidence = session_results[table]["results"]
+                    # return_results.data_harmonized_int_confidence = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
                 else:
-                    return_results.harmonized_int_confidence = None
+                    return_results.data_harmonized_int_confidence = None
             case "float":
                 if len(session_results[table]["results"]) > 0:
-                    return_results.harmonized_float = session_results[table]["results"]
-                    # return_results.harmonized_float = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
+                    return_results.data_harmonized_float = session_results[table]["results"]
+                    # return_results.data_harmonized_float = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
                 else:
-                    return_results.harmonized_float = None
+                    return_results.data_harmonized_float = None
             case "float_confidence":
                 if len(session_results[table]["results"]) > 0:
-                    return_results.harmonized_float_confidence = session_results[table]["results"]
-                    # return_results.harmonized_float_confidence = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
+                    return_results.data_harmonized_float_confidence = session_results[table]["results"]
+                    # return_results.data_harmonized_float_confidence = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
                 else:
-                    return_results.harmonized_float_confidence = None
+                    return_results.data_harmonized_float_confidence = None
     logger.debug('Results sorted and return object prepared')
     logger.debug(f"##########\n{return_results}\n\n\n")
     return return_results
