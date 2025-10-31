@@ -29,11 +29,15 @@ harm_table_matching = {
 }
 
 def get_numeric_table_by_uuid(numeric_id: UUID):
+    logger.debug("🔎 service/harm_numerical.py get_numeric_table_by_uuid()")
     with Session(engine) as session:
+        logger.debug("\tCreated session")
         stmt = select(harmonized_numeric_id_map)
         stmt = stmt.where(harmonized_numeric_id_map.fk_harm_num == numeric_id)
-        result = session.execute(stmt)
-    numeric_class = result[0].tuple().table_class
+        result = session.execute(stmt).first()
+    # logger.debug(dir())
+    numeric_class = result.tuple()[0].table_class
+    logger.debug(f"Numeric Class set as {numeric_class}")
     if numeric_class == "INT_CONFIDENCE":
         numeric_table = harmonized_int_confidence
         pydantic_class = Harmonized_int_confidence
@@ -70,14 +74,15 @@ def get_numeric(numeric_id: UUID) -> Harm_numerical_union:
     logger.debug("🔎 service/harm_numerical.py get_numeric()")
     numeric_table, pydantic_class = get_numeric_table_by_uuid(numeric_id=numeric_id)
     with Session(engine) as session:
+        logger.debug("\tCreated session")
         stmt = select(numeric_table)
         stmt = stmt.where(numeric_table.pk_harm_num == numeric_id)
-        result = session.execute(stmt)
-    numeric_object = pydantic_class(**result[0].tuple())
+        result = session.execute(stmt).first()
+    numeric_object = pydantic_class(**result.tuple()[0].__dict__)
     return numeric_object
 
 
-def create_numeric(new_numeric: Insert_harm_numerical) -> Harm_numerical_union:
+def create_numeric(new_numeric: Insert_harm_numerical) -> Insert_harm_numerical:
     logger.debug("🆕 service/harm_numerical.py create_numeric()")
     numeric_class = new_numeric.numerical_type
     if numeric_class == "INT":
@@ -94,20 +99,25 @@ def create_numeric(new_numeric: Insert_harm_numerical) -> Harm_numerical_union:
             numerical_table = harmonized_float
     else: 
         raise ValueError("New numerical object is not an INT or FLOAT")
+    logger.debug(f"✏️ NUMERIC CLASS SET AS {numeric_class}")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = insert(numerical_table)
-        stmt = stmt.values(**new_numeric)
+        model_dict = new_numeric.model_dump(exclude_unset=True)
+        del model_dict["numerical_type"]
+        stmt = stmt.values(**model_dict)
         execute = session.execute(stmt)
         commit = session.commit()
-    return_numeric = new_numeric
-    return_numeric.pk_harm_num = execute.inserted_primary_key
+        logger.debug(f"➕ Data_inserted")
+    new_key = execute.inserted_primary_key[0]
+    # return_numeric = new_numeric
+    # return_numeric.pk_harm_num = execute.inserted_primary_key[0]
     with Session(engine) as session:
         stmt = insert(harmonized_numeric_id_map)
-        stmt = stmt.values(**{"fk_harm_num": execute.inserted_primary_key, "table_class": numeric_class})
+        stmt = stmt.values(**{"fk_harm_num": new_key, "table_class": numeric_class})
         execute = session.execute(stmt)
         commit = session.commit()
-    return return_numeric
+    return get_numeric(numeric_id=new_key)
 
 def update_numeric(numerical_update: Harm_numerical_union) -> Harm_numerical_union:
     logger.debug("✏️ service/harm_numerical.py update_numeric()")

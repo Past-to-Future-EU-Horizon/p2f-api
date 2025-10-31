@@ -20,7 +20,7 @@ Harm_numerical_union = Union[Harmonized_float_confidence,
                              Harmonized_int]
 
 # List 
-@router.get("/{record_hash}")
+@router.get("/")
 def list_harm_numerical(
     record_hash: Optional[str]=None,
     numeric_type: Optional[Literal["float_confidence", 

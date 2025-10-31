@@ -52,4 +52,4 @@ class harmonized_numeric_id_map(baseSQL):
     __tablename__ = "p2f_harm_id_map"
     pk_harm_numeric_id_map: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     fk_harm_num: Mapped[UUID] = mapped_column(Uuid, index=True, unique=True, nullable=False)
-    table_class: Mapped[str] = mapped_column(Text)
+    table_class: Mapped[str] = mapped_column(Text) # TODO Make this a ENUM
