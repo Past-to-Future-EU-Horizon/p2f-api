@@ -59,16 +59,17 @@ def list_numerics(record_hash: Optional[str]=None,
                                                "int"]]=None, 
                   data_type: Optional[int]=None) -> List[Harm_numerical_union]:
     logger.debug("📃 service/harm_numerical.py list_numerics()")
-    results_collection = []
     with Session(engine) as session:
+        session_results = harm_table_matching
         logger.debug("\tCreated session")
         for table in harm_table_matching.keys():
             logger.debug(f"\t\tRunning table search for: {table}")
             stmt = select(harm_table_matching[table]["db"])
             results = session.execute(stmt).all()
             logger.debug(f"\tFound {len(results)} results")
-            results_collection += [harm_table_matching[table]["pydantic"](**x.tuple()) for x in results]
-    return results_collection
+            harm_table_matching[table]["results"] = [harm_table_matching[table]["pydantic"](**x.tuple()) for x in results]
+    
+    
 
 def get_numeric(numeric_id: UUID) -> Harm_numerical_union:
     logger.debug("🔎 service/harm_numerical.py get_numeric()")
