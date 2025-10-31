@@ -9,6 +9,7 @@ from p2f_pydantic.harm_data_numerical import harmonized_int_confidence as Harmon
 from p2f_pydantic.harm_data_numerical import harmonized_float as Harmonized_float
 from p2f_pydantic.harm_data_numerical import harmonized_int as Harmonized_int
 from p2f_pydantic.harm_data_numerical import insert_harm_numerical as Insert_harm_numerical
+from p2f_pydantic.harm_data_numerical import return_harm_numerical as Return_harm_numerical
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
@@ -57,7 +58,7 @@ def list_numerics(record_hash: Optional[str]=None,
                                                "float", 
                                                "int_confidence", 
                                                "int"]]=None, 
-                  data_type: Optional[int]=None) -> List[Harm_numerical_union]:
+                  data_type: Optional[int]=None) -> Return_harm_numerical:
     logger.debug("📃 service/harm_numerical.py list_numerics()")
     with Session(engine) as session:
         session_results = harm_table_matching
@@ -67,8 +68,39 @@ def list_numerics(record_hash: Optional[str]=None,
             stmt = select(harm_table_matching[table]["db"])
             results = session.execute(stmt).all()
             logger.debug(f"\tFound {len(results)} results")
-            harm_table_matching[table]["results"] = [harm_table_matching[table]["pydantic"](**x.tuple()) for x in results]
-    
+            session_results[table]["results"] = [session_results[table]["pydantic"](**x[0].__dict__) for x in results]
+    logger.debug("All results collected")
+    return_results = Return_harm_numerical()
+    for table in session_results.keys():
+        
+        match table:
+            case "int":
+                if len(session_results[table]["results"]) > 0:
+                    return_results.harmonized_int = session_results[table]["results"]
+                    # return_results.harmonized_int = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
+                else:
+                    return_results.harmonized_int = None
+            case "int_confidence":
+                if len(session_results[table]["results"]) > 0:
+                    return_results.harmonized_int_confidence = session_results[table]["results"]
+                    # return_results.harmonized_int_confidence = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
+                else:
+                    return_results.harmonized_int_confidence = None
+            case "float":
+                if len(session_results[table]["results"]) > 0:
+                    return_results.harmonized_float = session_results[table]["results"]
+                    # return_results.harmonized_float = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
+                else:
+                    return_results.harmonized_float = None
+            case "float_confidence":
+                if len(session_results[table]["results"]) > 0:
+                    return_results.harmonized_float_confidence = session_results[table]["results"]
+                    # return_results.harmonized_float_confidence = [x.model_dump(exclude_unset=True) for x in session_results[table]["results"]]
+                else:
+                    return_results.harmonized_float_confidence = None
+    logger.debug('Results sorted and return object prepared')
+    logger.debug(f"##########\n{return_results}\n\n\n")
+    return return_results
     
 
 def get_numeric(numeric_id: UUID) -> Harm_numerical_union:

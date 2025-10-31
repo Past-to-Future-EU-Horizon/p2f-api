@@ -6,6 +6,7 @@ from p2f_pydantic.harm_data_numerical import harmonized_float_confidence as Harm
 from p2f_pydantic.harm_data_numerical import harmonized_int as Harmonized_int
 from p2f_pydantic.harm_data_numerical import harmonized_float as Harmonized_float
 from p2f_pydantic.harm_data_numerical import insert_harm_numerical as Insert_harm_numerical
+from p2f_pydantic.harm_data_numerical import return_harm_numerical as Return_harm_numerical
 # Third Party Libraries
 from fastapi import Body, APIRouter, Request
 # Batteries included libraries
@@ -28,7 +29,7 @@ def list_harm_numerical(
                                                "int_confidence", 
                                                "int"]]=None, 
     data_type: Optional[int]=None
-    ) -> List[Harm_numerical_union]:
+    ) -> Return_harm_numerical:
     logger.debug("🕸️📃 web/harm_numerical.py list_harm_numerical()")
     return harm_numerical.list_numerics(record_hash=record_hash, data_type=data_type)
 
