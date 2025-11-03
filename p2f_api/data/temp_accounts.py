@@ -17,3 +17,8 @@ class temp_accounts(baseSQL):
     email: Mapped[str] = mapped_column(String(127), nullable=False)
     token: Mapped[str] = mapped_column(String(127), nullable=False)
     expiration: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+class permitted_domains(baseSQL):
+    __tablename__ = "TEMP_accounts_domains"
+    pk_temp_domains: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    domain: Mapped[str] = mapped_column(String(100))

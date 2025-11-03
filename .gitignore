@@ -175,3 +175,4 @@ cython_debug/
 .env
 
 uv.lock
+domain_list.py
