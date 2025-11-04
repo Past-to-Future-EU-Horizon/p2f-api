@@ -17,6 +17,8 @@ RUN --mount=type=cache,target=/root/.cache/ uv sync --locked
 
 ENV PATH="/p2f/api/.venv/bin/:$PATH"
 
+RUN uv pip install -e .
+
 WORKDIR /p2f/api/p2f_api
 
 # CMD ["/bin/bash"]
