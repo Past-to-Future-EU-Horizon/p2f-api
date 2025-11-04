@@ -17,4 +17,7 @@ RUN --mount=type=cache,target=/root/.cache/ uv sync --locked
 
 ENV PATH="/p2f/api/.venv/bin/:$PATH"
 
-CMD [ "uvicorn", "--port", "8084", "/p2f_api/." ]
+WORKDIR /p2f/api/p2f_api
+
+# CMD ["/bin/bash"]
+CMD [ "uvicorn", "--port", "8084", "main:app" ]
