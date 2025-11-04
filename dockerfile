@@ -13,7 +13,7 @@ ENV PG_PORT=value
 ENV PG_DB=value
 ENV UV_LINK_MODE=copy
 
-RUN --mount=type=cache,target=/root/.cache/uv sync --locked
+RUN --mount=type=cache,target=/root/.cache/ uv sync --locked
 
 ENV PATH="/p2f/api/.venv/bin/:$PATH"
 
