@@ -6,6 +6,7 @@ from sqlalchemy import Text
 from sqlalchemy import Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func
+from sqlalchemy import ForeignKey
 # Batteries included libraries
 from uuid import UUID
 
@@ -17,3 +18,9 @@ class harm_timeslice(baseSQL):
     timeslice_age_mean: Mapped[int] = mapped_column(BigInteger)
     timeslice_age_recent: Mapped[int] = mapped_column(BigInteger, nullable=True)
     timeslice_age_oldest: Mapped[int] = mapped_column(BigInteger, nullable=True)
+
+class harm_timeslice_to_record(baseSQL):
+    __tablename__ = "p2f_harm_timeslice_to_record"
+    pk_timeslice_to_record: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    fk_timeslice_id: Mapped[UUID] = mapped_column(ForeignKey("p2f_harm_timeslice.pk_harm_timeslice"))
+    fk_record_hash: Mapped[str] = mapped_column(ForeignKey("p2f_harm_data_record.record_hash"))
