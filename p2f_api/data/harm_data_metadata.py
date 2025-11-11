@@ -35,13 +35,21 @@ class harm_data_species(baseSQL):
     species_identifier: Mapped[UUID] = mapped_column(Uuid, default=func.gen_random_uuid(), unique=True)
     display_species: Mapped[str] = mapped_column(Text, index=True)
     common_name: Mapped[str] = mapped_column(Text, nullable=True)
+    tax_domain: Mapped[str] = mapped_column(Text, nullable=True)
     tax_kingdom: Mapped[str] = mapped_column(Text, nullable=True)
+    tax_subkingdom: Mapped[str] = mapped_column(Text, nullable=True)
+    tax_infrakingdom: Mapped[str] = mapped_column(Text, nullable=True)
     tax_phylum: Mapped[str] = mapped_column(Text, nullable=True)
     tax_class: Mapped[str] = mapped_column(Text, nullable=True)
+    tax_subclass: Mapped[str] = mapped_column(Text, nullable=True)
     tax_order: Mapped[str] = mapped_column(Text, nullable=True)
+    tax_suborder: Mapped[str] = mapped_column(Text, nullable=True)
+    tax_superfamily: Mapped[str] = mapped_column(Text, nullable=True)
     tax_family: Mapped[str] = mapped_column(Text, nullable=True)
+    tax_subfamily: Mapped[str] = mapped_column(Text, nullable=True)
     tax_genus: Mapped[str] = mapped_column(Text, nullable=True)
     tax_species: Mapped[str] = mapped_column(Text, nullable=True)
+    tax_subspecies: Mapped[str] = mapped_column(Text, nullable=True)
 
 class harm_species_to_record(baseSQL):
     __tablename__ = "p2f_harm_species_to_record"
