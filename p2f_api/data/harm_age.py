@@ -12,7 +12,7 @@ from uuid import UUID
 
 class harm_data_age(baseSQL):
     __tablename__ = "p2f_harm_data_age"
-    pk_harm_timeslice: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    pk_harm_age: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     fk_record_hash: Mapped[str] = mapped_column(ForeignKey("p2f_harm_data_record.record_hash"))
     age_mean: Mapped[int] = mapped_column(BigInteger)
     age_recent: Mapped[int] = mapped_column(BigInteger, nullable=True)
