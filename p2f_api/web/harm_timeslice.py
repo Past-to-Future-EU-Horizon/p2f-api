@@ -7,7 +7,7 @@ from fastapi import Body, APIRouter, Request
 import uuid
 from typing import Optional, List
 
-router = APIRouter(prefix="/harm-data-types")
+router = APIRouter(prefix="/harm-timeslice")
 
 router.get("/")
 def list_harm_timeslices(
