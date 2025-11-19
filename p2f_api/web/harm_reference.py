@@ -18,7 +18,7 @@ def list_references() -> List[Harm_reference]:
 # Get Single
 @router.get("/{reference_id}")
 def get_reference(doi: Optional[str]=None, 
-                  reference_id: Optional[str]=None) -> Harm_reference:
+                  reference_id: Optional[uuid.UUID]=None) -> Harm_reference:
     return harm_reference.get_reference(doi=doi, reference_id=reference_id)
 
 # Create
@@ -27,8 +27,18 @@ def create_reference(new_reference: Harm_reference) -> Harm_reference:
     return harm_reference.create_reference(new_reference=new_reference)
 
 # Delete
-@router.delete("/{record_hash}")
+@router.delete("/{reference_id}")
+def delete_reference(reference_id: uuid.UUID) -> None:
+    return harm_reference.delete_reference(reference_id=reference_id)
 
 # Assign
+def assign_reference(reference_id: uuid.UUID, 
+                     record_hash: str) -> None:
+    return harm_reference.assign_reference(reference_id=reference_id,
+                                           record_hash=record_hash)
 
 # Remove
+def remove_reference(reference_id: uuid.UUID, 
+                     record_hash: str) -> None:
+    return harm_reference.remove_reference(reference_id=reference_id,
+                                           record_hash=record_hash)

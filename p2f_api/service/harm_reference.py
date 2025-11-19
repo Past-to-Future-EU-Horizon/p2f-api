@@ -54,7 +54,8 @@ def delete_reference(reference_id: UUID) -> None:
     return None
 
 # Assign
-def assign_reference(reference_id: UUID, record_hash: str) -> None:
+def assign_reference(reference_id: UUID, 
+                     record_hash: str) -> None:
     with Session(engine) as session:
         stmt = insert(harm_reference_to_record)
         stmt = stmt.values(fk_harm_reference=reference_id,
@@ -63,7 +64,8 @@ def assign_reference(reference_id: UUID, record_hash: str) -> None:
         commit = session.commit()
 
 # Remove
-def remove_reference(reference_id: UUID, record_hash: str) -> None:
+def remove_reference(reference_id: UUID, 
+                     record_hash: str) -> None:
     with Session(engine) as session: 
         stmt = delete(harm_reference_to_record)
         stmt = stmt.where(harm_reference_to_record.fk_harm_reference==reference_id)
