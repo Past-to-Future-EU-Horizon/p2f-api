@@ -19,11 +19,11 @@ def list_harm_data_types(
                                                 unit_of_measure=unit_of_measure,
                                                 method=method)
 
-@router.get("/{data_type_id}")
+@router.get("/{datatype_id}")
 def get_harm_data_type(
-        data_type_id: int
+        datatype_id: uuid.UUID
     ) -> Harm_data_type:
-    return harm_data_types.get_harm_data_type(pk_harm_data_type=data_type_id)
+    return harm_data_types.get_harm_data_type(pk_harm_data_type=datatype_id)
 
 @router.post("/")
 def insert_harm_data_type(
@@ -37,8 +37,8 @@ def insert_harm_data_type(
 #     ) -> Harm_data_type:
 #     return harm_data_types.update_harm_data_type(update_harm_data_type=update_harm_data_type)
 
-@router.delete("/{data_type_id}")
+@router.delete("/{datatype_id}")
 def delete_harm_data_record(
-        data_type_id: int
+        datatype_id: uuid.UUID
     ) -> None:
-    return harm_data_types.delete_harm_data_type(pk_harm_data_type=data_type_id)
+    return harm_data_types.delete_harm_data_type(datatype_id==datatype_id)
