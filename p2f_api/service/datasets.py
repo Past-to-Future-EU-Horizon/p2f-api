@@ -1,5 +1,5 @@
 # Local libraries
-from ..apilogs import logger
+from p2f_api.apilogs import logger
 from ..data.db_connection import engine
 from ..data.datasets import datasets
 from p2f_pydantic.datasets import Datasets

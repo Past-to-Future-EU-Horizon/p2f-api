@@ -1,5 +1,5 @@
 # Local libraries
-from ..apilogs import logger
+from p2f_api.apilogs import logger
 from ..data.db_connection import engine
 from ..data.harm_age import harm_data_age
 from p2f_pydantic.harm_age import harm_data_age as Harm_data_age

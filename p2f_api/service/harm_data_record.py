@@ -1,5 +1,5 @@
 # Local libraries
-from ..apilogs import logger
+from p2f_api.apilogs import logger
 from ..service.harm_numerical import list_numerics
 from ..data.db_connection import engine
 from ..data.harm_data_record import harm_data_record

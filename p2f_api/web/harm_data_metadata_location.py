@@ -1,5 +1,5 @@
 # Local libraries
-from ..apilogs import logger
+from p2f_api.apilogs import logger
 from ..service import harm_data_metadata_location
 from p2f_pydantic.harm_data_metadata import harm_location as Harm_location
 from p2f_pydantic.harm_data_metadata import harm_bounding_box as Harm_bounding_box

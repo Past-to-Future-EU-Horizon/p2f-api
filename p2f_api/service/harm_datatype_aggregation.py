@@ -1,5 +1,5 @@
 # Local libraries
-from ..apilogs import logger
+from p2f_api.apilogs import logger
 from data.harm_data_types import harm_data_type
 from data.datasets import datasets
 from data.harm_data_numerical import harmonized_float, harmonized_float_confidence

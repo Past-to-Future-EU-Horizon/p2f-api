@@ -1,5 +1,5 @@
 # Local libraries
-from ..apilogs import logger
+from p2f_api.apilogs import logger
 from ..service import harm_reference
 from p2f_pydantic.harm_reference import harm_reference as Harm_reference
 # Third Party Libraries

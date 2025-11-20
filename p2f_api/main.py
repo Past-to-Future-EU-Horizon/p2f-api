@@ -9,6 +9,7 @@ from p2f_api.web import harm_timeslice
 from p2f_api.web import harm_metadata_species
 from p2f_api.web import harm_age
 from p2f_api.web import harm_reference
+from p2f_api.web import export_clean_ddl
 # Third Party Libraries
 from fastapi import FastAPI
 # Batteries included libraries
@@ -29,6 +30,9 @@ app.include_router(harm_timeslice.router)
 app.include_router(harm_metadata_species.router)
 app.include_router(harm_age.router)
 app.include_router(harm_reference.router)
+
+## Remember to remove in the future
+app.include_router(export_clean_ddl.router)
 
 if __name__ == "__main__":
     import uvicorn

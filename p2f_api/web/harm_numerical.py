@@ -1,5 +1,5 @@
 # Local libraries
-from ..apilogs import logger
+from p2f_api.apilogs import logger
 from ..service import harm_numerical
 from p2f_pydantic.harm_data_numerical import harmonized_int_confidence as Harmonized_int_confidence
 from p2f_pydantic.harm_data_numerical import harmonized_float_confidence as Harmonized_float_confidence

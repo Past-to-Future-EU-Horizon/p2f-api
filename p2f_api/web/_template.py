@@ -1,5 +1,5 @@
 # Local libraries
-from ..apilogs import logger
+from p2f_api.apilogs import logger
 # Third Party Libraries
 from fastapi import Body, APIRouter, Request
 # Batteries included libraries

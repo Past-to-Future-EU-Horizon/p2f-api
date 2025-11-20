@@ -1,4 +1,4 @@
-from ..apilogs import logger
+from p2f_api.apilogs import logger
 from .p2f_decbase import baseSQL
 # Third Party Libraries
 from sqlalchemy import BigInteger

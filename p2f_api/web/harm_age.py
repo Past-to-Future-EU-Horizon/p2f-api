@@ -1,4 +1,4 @@
-from ..apilogs import logger
+from p2f_api.apilogs import logger
 from ..service import harm_age
 from p2f_pydantic.harm_age import harm_data_age as Harm_data_age
 # Third Party Libraries

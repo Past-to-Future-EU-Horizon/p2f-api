@@ -1,4 +1,4 @@
-from ..apilogs import logger
+from p2f_api.apilogs import logger
 from ..service import harm_timeslice
 from p2f_pydantic.harm_timeslices import harm_timeslice as Harm_timeslice
 # Third Party Libraries
