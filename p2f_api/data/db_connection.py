@@ -39,7 +39,8 @@ logger.debug("Database connection url:" + connection_str.replace(PG_PASS, "♦" 
 
 engine = create_engine(connection_str)
 baseSQL.metadata.create_all(engine)
-# logger.debug(dir(baseSQL.metadata))
+logger.debug(dir(baseSQL.metadata))
+# logger.debug(baseSQL.metadata.naming_convention)
 # logger.debug(baseSQL.metadata.info)
 # logger.debug(baseSQL.metadata.tables)
 # for table in baseSQL.metadata.tables.items():

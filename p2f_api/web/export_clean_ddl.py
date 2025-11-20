@@ -9,7 +9,8 @@ from fastapi.responses import PlainTextResponse
 router = APIRouter(prefix="/ddl")
 
 @router.get("/")
-def web_get_clean_ddl() -> str:
-    logger.debug(Request)
-    logger.debug(dir(Request))
+def web_get_clean_ddl(request: Request) -> str:
+    logger.debug(f"RECEIVED DDL REQUEST FROM {request.client.host}")
+    # logger.debug(f"{request.headers.keys()}")
+    # logger.debug(dir(request.headers))
     return PlainTextResponse(get_clean_ddl())
