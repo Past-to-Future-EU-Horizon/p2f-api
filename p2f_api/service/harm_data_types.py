@@ -66,6 +66,7 @@ def delete_harm_data_type(
     ) -> None:
     with Session(engine) as session:
         stmt = delete(harm_data_type)
+        logger.debug(datatype_id)
         stmt = stmt.where(harm_data_type.datatype_id == datatype_id)
         execute = session.execute(stmt)
         commit = session.commit()

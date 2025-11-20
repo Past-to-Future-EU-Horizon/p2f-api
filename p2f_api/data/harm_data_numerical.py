@@ -21,14 +21,14 @@ class harmonized_int_confidence(baseSQL):
     upper_conf_value: Mapped[int] = mapped_column(BigInteger)
     lower_conf_value: Mapped[int] = mapped_column(BigInteger)
     fk_data_record: Mapped[str] = mapped_column(ForeignKey("p2f_harm_data_record.record_hash"))
-    fk_data_type: Mapped[int] = mapped_column(ForeignKey("p2f_harm_data_types.pk_harm_data_type"))
+    fk_data_type: Mapped[UUID] = mapped_column(ForeignKey("p2f_harm_data_types.datatype_id"))
 
 class harmonized_int(baseSQL):
     __tablename__ = "p2f_harm_integer"
     pk_harm_num: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=func.gen_random_uuid())
     value: Mapped[int] = mapped_column(BigInteger)
     fk_data_record: Mapped[str] = mapped_column(ForeignKey("p2f_harm_data_record.record_hash"))
-    fk_data_type: Mapped[int] = mapped_column(ForeignKey("p2f_harm_data_types.pk_harm_data_type"))
+    fk_data_type: Mapped[UUID] = mapped_column(ForeignKey("p2f_harm_data_types.datatype_id"))
 
 class harmonized_float_confidence(baseSQL):
     __tablename__ = "p2f_harm_float_confidence"
@@ -39,14 +39,14 @@ class harmonized_float_confidence(baseSQL):
     upper_conf_value: Mapped[float] = mapped_column(Double)
     lower_conf_value: Mapped[float] = mapped_column(Double)
     fk_data_record: Mapped[str] = mapped_column(ForeignKey("p2f_harm_data_record.record_hash"))
-    fk_data_type: Mapped[int] = mapped_column(ForeignKey("p2f_harm_data_types.pk_harm_data_type"))
+    fk_data_type: Mapped[UUID] = mapped_column(ForeignKey("p2f_harm_data_types.datatype_id"))
 
 class harmonized_float(baseSQL):
     __tablename__ = "p2f_harm_float"
     pk_harm_num: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=func.gen_random_uuid())
     value: Mapped[float] = mapped_column(Double)
     fk_data_record: Mapped[str] = mapped_column(ForeignKey("p2f_harm_data_record.record_hash"))
-    fk_data_type: Mapped[int] = mapped_column(ForeignKey("p2f_harm_data_types.pk_harm_data_type"))
+    fk_data_type: Mapped[UUID] = mapped_column(ForeignKey("p2f_harm_data_types.datatype_id"))
 
 class harmonized_numeric_id_map(baseSQL):
     __tablename__ = "p2f_harm_id_map"

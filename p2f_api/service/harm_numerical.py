@@ -138,7 +138,9 @@ def create_numeric(new_numeric: Insert_harm_numerical) -> Insert_harm_numerical:
         stmt = insert(numerical_table)
         model_dict = new_numeric.model_dump(exclude_unset=True)
         del model_dict["numerical_type"]
+        logger.debug(f"Model dict for inserting values: \n{model_dict}")
         stmt = stmt.values(**model_dict)
+        logger.debug(f"Generated Statement: \n{stmt}")
         execute = session.execute(stmt)
         commit = session.commit()
         logger.debug(f"➕ Data_inserted")
@@ -146,6 +148,7 @@ def create_numeric(new_numeric: Insert_harm_numerical) -> Insert_harm_numerical:
     # return_numeric = new_numeric
     # return_numeric.pk_harm_num = execute.inserted_primary_key[0]
     with Session(engine) as session:
+        logger.debug("Created second session")
         stmt = insert(harmonized_numeric_id_map)
         stmt = stmt.values(**{"fk_harm_num": new_key, "table_class": numeric_class})
         execute = session.execute(stmt)

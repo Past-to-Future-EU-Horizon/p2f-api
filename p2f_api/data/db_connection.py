@@ -7,6 +7,11 @@ from .harm_data_metadata import *
 from .harm_data_numerical import *
 from .harm_data_record import *
 from .harm_data_types import *
+from .harm_age import *
+from .harm_reference import *
+from .harm_text import *
+from .harm_timeslice import *
+
 # Third Party Libraries
 from sqlalchemy import create_engine
 from dotenv import load_dotenv

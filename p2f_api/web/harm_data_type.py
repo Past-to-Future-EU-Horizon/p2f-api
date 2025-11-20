@@ -23,7 +23,7 @@ def list_harm_data_types(
 def get_harm_data_type(
         datatype_id: uuid.UUID
     ) -> Harm_data_type:
-    return harm_data_types.get_harm_data_type(pk_harm_data_type=datatype_id)
+    return harm_data_types.get_harm_data_type(datatype_id=datatype_id)
 
 @router.post("/")
 def insert_harm_data_type(
@@ -41,4 +41,4 @@ def insert_harm_data_type(
 def delete_harm_data_record(
         datatype_id: uuid.UUID
     ) -> None:
-    return harm_data_types.delete_harm_data_type(datatype_id==datatype_id)
+    return harm_data_types.delete_harm_data_type(datatype_id=datatype_id)

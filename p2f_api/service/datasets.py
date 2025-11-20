@@ -74,7 +74,7 @@ def update_dataset(dataset_update: Datasets) -> Datasets:
         stmt = stmt.values(**dataset_update.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
-    return get_dataset(pk_datasets=dataset_update.pk_datasets)
+    return get_dataset(dataset_id=dataset_update.dataset_identifier)
 
 def delete_dataset(dataset_identifier) -> None:
     logger.debug("💾🗑️ service/datasets.py delete_dataset()")
