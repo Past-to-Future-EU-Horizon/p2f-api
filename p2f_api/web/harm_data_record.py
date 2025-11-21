@@ -17,7 +17,7 @@ def list_harm_data_records(
     data_type: Optional[int]=None,
     ) -> List[Harm_data_record]:
     logger.debug("🕸️📃 web/harm_data_record.py list_harm_data_records()")
-    return harm_data_record.list_harm_data_record(dataset=dataset)
+    return harm_data_record.list_harm_data_record(dataset=dataset, data_type=data_type)
 
 # Get Single
 @router.get("/{record_hash}")
