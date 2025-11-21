@@ -58,6 +58,8 @@ def delete_dataset(location_identifier: uuid.UUID) -> None:
 def assign_location_to_record(
     location_identifier: uuid.UUID,
     record_hash: str):
+    logger.debug(f"🕸️✍️ harm_data_metadata_location.py assign_location_to_record()")
+    logger.debug(f"Received {location_identifier}, {record_hash}")
     return harm_data_metadata_location.assign_location_to_record(
         location_identifier=location_identifier,
         record_hash=record_hash

@@ -56,7 +56,7 @@ def get_location(location_identifier: Optional[UUID]=None,
 def create_location(new_location: Harm_location) -> Harm_location:
     with Session(engine) as session:
         stmt = insert(harm_locations)
-        stmt = stmt.values(**new_location)
+        stmt = stmt.values(**new_location.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
     return get_location(pk_harm_location=execute.inserted_primary_key[0])
@@ -82,12 +82,15 @@ def assign_location_to_record(
         location_identifier: UUID,
         record_hash: str
     ): 
+    logger.debug("harm_data_metadata_location.py assign_location_to_record()")
     with Session(engine) as session:
+        logger.debug("Session created")
         stmt = insert(harm_location_to_record)
         stmt = stmt.values(
             {"fk_harm_location": location_identifier,
              "fk_data_record": record_hash}
         )
+        logger.debug(stmt)
         execute = session.execute(stmt)
         commit = session.commit()
     return None
