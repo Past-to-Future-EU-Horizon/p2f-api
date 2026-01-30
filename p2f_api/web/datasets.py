@@ -18,6 +18,7 @@ def list_datasets(
     doi: Optional[str]=None
     ) -> List[Datasets]:
     logger.debug("🕸️📃 web/datasets.py list_datasets()")
+    # logger.debug(f"Parameters: {is_new_p2f}, {is_sub_dataset}, {doi}")
     return datasets.list_datasets(is_new_p2f=is_new_p2f,
                                   is_sub_dataset=is_sub_dataset,
                                   doi=doi)

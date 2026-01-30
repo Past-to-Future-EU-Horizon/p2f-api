@@ -17,12 +17,13 @@ def list_datasets(
     logger.debug("💾📃 service/datasets.py list_datasets()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
+        # logger.debug(f"Parameters: {is_new_p2f}, {is_sub_dataset}, {doi}")
         stmt = select(datasets)
-        if is_new_p2f:
+        if is_new_p2f is not None:
             stmt=stmt.where(datasets.is_new_p2f==is_new_p2f)
-        if is_sub_dataset:
+        if is_sub_dataset is not None:
             stmt=stmt.where(datasets.is_sub_dataset==is_sub_dataset)
-        if doi:
+        if doi is not None:
             stmt=stmt.where(datasets.doi==doi)
         results = session.execute(stmt).all()
         logger.debug(f"\tFound {len(results)} results")
