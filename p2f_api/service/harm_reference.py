@@ -24,11 +24,11 @@ def get_reference(doi: Optional[str]=None,
                   pk_harm_reference: Optional[int]=None) -> Harm_reference:
     with Session(engine) as session:
         stmt = select(harm_reference)
-        if doi:
+        if doi is not None:
             stmt = stmt.where(harm_reference.doi==doi)
-        if reference_id:
+        if reference_id is not None:
             stmt = stmt.where(harm_reference.reference_id==reference_id)
-        if pk_harm_reference:
+        if pk_harm_reference is not None:
             stmt = stmt.where(harm_reference.pk_harm_reference==pk_harm_reference)
         result = session.execute(stmt).first()
     return Harm_reference(**result.tuple()[0].__dict__)

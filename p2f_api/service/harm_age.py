@@ -14,9 +14,9 @@ def list_harm_ages(recent_year_search: Optional[int]=None,
                    older_year_search: Optional[int]=None) -> List[Harm_data_age]:
     with Session(engine) as session:
         stmt = select(harm_data_age)
-        if recent_year_search:
+        if recent_year_search is not None:
             stmt = stmt.where(harm_data_age.age_mean >= recent_year_search)
-        if older_year_search:
+        if older_year_search is not None:
             stmt = stmt.where(harm_data_age.age_mean <= older_year_search)
         results = session.execute(harm_data_age).all()
     return [Harm_data_age(**x[0].__dict__) for x in results]
@@ -27,9 +27,9 @@ def get_harm_age(
     ) -> Harm_data_age:
     with Session(engine) as session:
         stmt = select(harm_data_age)
-        if record_hash:
+        if record_hash is not None:
             stmt = stmt.where(harm_data_age.fk_record_hash == record_hash)
-        if pk_age:
+        if pk_age is not None:
             stmt = stmt.where(harm_data_age.pk_harm_age == pk_age)
         result = session.execute(stmt)
     return Harm_data_age(**result.tuple()[0].__dict__)

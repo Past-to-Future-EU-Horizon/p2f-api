@@ -18,11 +18,11 @@ def list_harm_data_types(
     ) -> List[Harm_data_type]:
     with Session(engine) as session:
         stmt = select(harm_data_type)
-        if measure:
+        if measure is not None:
             stmt = stmt.where(harm_data_type.measure == measure)
-        if unit_of_measure:
+        if unit_of_measure is not None:
             stmt = stmt.where(harm_data_type.unit_of_measurement == unit_of_measure)
-        if method:
+        if method is not None:
             stmt = stmt.where(harm_data_type.method == method)
         results = session.execute(stmt).all()
     return [Harm_data_type(**x[0].__dict__) for x in results]
@@ -33,9 +33,9 @@ def get_harm_data_type(
     ) -> Harm_data_type:
     with Session(engine) as session:
         stmt = select(harm_data_type)
-        if datatype_id:
+        if datatype_id is not None:
             stmt = stmt.where(harm_data_type.datatype_id == datatype_id)
-        if pk_harm_data_type:
+        if pk_harm_data_type is not None:
             stmt = stmt.where(harm_data_type.pk_harm_data_type == pk_harm_data_type)
         result = session.execute(stmt).first()
     return Harm_data_type(**result.tuple()[0].__dict__)

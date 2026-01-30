@@ -21,22 +21,22 @@ def list_harm_metadata_location(
     ) -> List[Harm_location]:
     with Session(engine) as session:
         stmt = select(harm_locations)
-        if bounding_box:
+        if bounding_box is not None:
             stmt = stmt.where(harm_locations.latitude <= bounding_box.north)
             stmt = stmt.where(harm_locations.latitude >= bounding_box.south)
             stmt = stmt.where(harm_locations.longitude <= bounding_box.east)
             stmt = stmt.where(harm_locations.longitude >= bounding_box.west)
-        if location_name:
+        if location_name is not None:
             stmt = stmt.where(harm_locations.location_name == location_name)
-        if location_code:
+        if location_code is not None:
             stmt = stmt.where(harm_locations.location_code == location_code)
-        if minimum_elevation:
+        if minimum_elevation is not None:
             stmt = stmt.where(harm_locations.elevation >= minimum_elevation)
-        if maximum_elevation:
+        if maximum_elevation is not None:
             stmt = stmt.where(harm_locations.elevation <= maximum_elevation)
-        if min_location_age:
+        if min_location_age is not None:
             stmt = stmt.where(harm_locations.location_age >= min_location_age)
-        if max_location_age:
+        if max_location_age is not None:
             stmt = stmt.where(harm_locations.location_age <= max_location_age)
         results = session.execute(stmt)
     return [Harm_location(**x[0].__dict__) for x in results]
@@ -45,9 +45,9 @@ def get_location(location_identifier: Optional[UUID]=None,
                  pk_harm_location: Optional[int]=None) -> Harm_location:
     with Session(engine) as session:
         stmt = select(harm_locations)
-        if location_identifier:
+        if location_identifier is not None:
             stmt = stmt.where(harm_locations.location_identifier == location_identifier)
-        if pk_harm_location:
+        if pk_harm_location is not None:
             stmt = stmt.where(harm_locations.pk_harm_location==pk_harm_location)
         result = session.execute(stmt).first()
     result = result.tuple()[0]

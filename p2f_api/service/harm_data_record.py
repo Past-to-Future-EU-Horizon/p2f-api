@@ -35,9 +35,9 @@ def get_harm_data_record(record_hash: Optional[str]=None,
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = select(harm_data_record)
-        if record_hash:
+        if record_hash is not None:
             stmt = stmt.where(harm_data_record.record_hash == record_hash)
-        if pk_harm_data_record:
+        if pk_harm_data_record is not None:
             stmt = stmt.where(harm_data_record.pk_harm_data_record==pk_harm_data_record)
         result = session.execute(stmt).first()
     return Harm_data_record(**result.tuple()[0].__dict__)

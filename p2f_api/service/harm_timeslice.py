@@ -19,9 +19,9 @@ def list_harm_timeslices(
         stmt = select(harm_timeslice)
         # if named_time_period:
         #     stmt = stmt.where(harm_timeslice.)
-        if older_search_age:
+        if older_search_age is not None:
             stmt = stmt.where(harm_timeslice.timeslice_age_mean <= older_search_age)
-        if recent_search_age:
+        if recent_search_age is not None:
             stmt = stmt.where(harm_timeslice.timeslice_age_mean >= recent_search_age)
         results = session.execute(stmt).all()
     return [Harm_timeslice(**x[0].__dict__) for x in results]
@@ -32,9 +32,9 @@ def get_harm_timeslice(
     ) -> Harm_timeslice:
     with Session(engine) as session:
         stmt = select(harm_timeslice)
-        if timeslice_id:
+        if timeslice_id is not None:
             stmt = stmt.where(harm_timeslice.timeslice_id == timeslice_id)
-        if pk_timeslice:
+        if pk_timeslice is not None:
             stmt = stmt.where(harm_timeslice.pk_harm_timeslice == pk_timeslice)
         result = session.execute(stmt)
     return Harm_timeslice(**result.tuple()[0].__dict__)

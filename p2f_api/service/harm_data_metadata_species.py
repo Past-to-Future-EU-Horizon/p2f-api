@@ -30,39 +30,40 @@ def list_harm_metadata_species(
     ) -> List[Harm_data_species]:
     with Session(engine) as session:
         stmt = select(harm_data_species)
-        if tax_domain:
+        tax_values = {x:y for x, y in dict(locals()).items() if x.startswith("tax_") and y != None}
+        if tax_domain is not None:
             stmt = stmt.where(harm_data_species.tax_domain == tax_domain)
-        if tax_kingdom:
+        if tax_kingdom is not None:
             stmt = stmt.where(harm_data_species.tax_kingdom == tax_kingdom)
-        if tax_subkingdom:
+        if tax_subkingdom is not None:
             stmt = stmt.where(harm_data_species.tax_kingdom == tax_subkingdom)
-        if tax_infrakingdom:
+        if tax_infrakingdom is not None:
             stmt = stmt.where(harm_data_species.tax_kingdom == tax_infrakingdom)
-        if tax_phylum:
+        if tax_phylum is not None:
             stmt = stmt.where(harm_data_species.tax_phylum == tax_phylum)
-        if tax_class:
+        if tax_class is not None:
             stmt = stmt.where(harm_data_species.tax_class == tax_class)
-        if tax_subclass:
+        if tax_subclass is not None:
             stmt = stmt.where(harm_data_species.tax_class == tax_subclass)
-        if tax_order:
+        if tax_order is not None:
             stmt = stmt.where(harm_data_species.tax_order == tax_order)
-        if tax_suborder:
+        if tax_suborder is not None:
             stmt = stmt.where(harm_data_species.tax_order == tax_suborder)
-        if tax_superfamily:
+        if tax_superfamily is not None:
             stmt = stmt.where(harm_data_species.tax_family == tax_superfamily)
-        if tax_family:
+        if tax_family is not None:
             stmt = stmt.where(harm_data_species.tax_family == tax_family)
-        if tax_subfamily:
+        if tax_subfamily is not None:
             stmt = stmt.where(harm_data_species.tax_family == tax_subfamily)
-        if tax_genus:
+        if tax_genus is not None:
             stmt = stmt.where(harm_data_species.tax_genus == tax_genus)
-        if tax_species:
+        if tax_species is not None:
             stmt = stmt.where(harm_data_species.tax_species == tax_species)
-        if tax_subspecies:
+        if tax_subspecies is not None:
             stmt = stmt.where(harm_data_species.tax_species == tax_subspecies)
-        if common_name:
+        if common_name is not None:
             stmt = stmt.where(harm_data_species.common_name == common_name)
-        if display_species:
+        if display_species is not None:
             stmt = stmt.where(harm_data_species.display_species == display_species)
         results = session.execute(stmt).all()
     return [Harm_data_species(**x[0].tuple()) for x in results]

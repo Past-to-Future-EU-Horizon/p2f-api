@@ -41,9 +41,9 @@ def get_dataset(dataset_id=None,
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = select(datasets)
-        if dataset_id:
+        if dataset_id is not None:
             stmt = stmt.where(datasets.dataset_identifier==dataset_id)
-        if pk_datasets:
+        if pk_datasets is not None:
             stmt = stmt.where(datasets.pk_datasets==pk_datasets)
         result = session.execute(stmt).first()
     result = result.tuple()[0]
