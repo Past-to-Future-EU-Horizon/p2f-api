@@ -1,6 +1,7 @@
 # Local libraries
 from p2f_api.apilogs import logger
 from ..service.harm_numerical import list_numerics
+from ..service.harm_data_record import list_harm_data_record
 from ..data.db_connection import engine
 from ..data.harm_data_types import harm_data_type
 from p2f_pydantic.harm_data_types import harm_data_type as Harm_data_type
@@ -10,11 +11,33 @@ from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 from typing import List, Optional
 from uuid import UUID
+from pprint import pprint
+
+def list_harm_data_types_by_dataset_id(dataset_id: Optional[UUID]=None) -> List[UUID]:
+    data_records = list_harm_data_record(dataset=dataset_id) 
+    numeric_records = []
+    for data_record in data_records:
+        listed_numerics = list_numerics(record_hash=data_record)
+        if listed_numerics.data_harmonized_int is not None:
+            for record in listed_numerics.data_harmonized_int:
+                numeric_records.append(record)
+        if listed_numerics.data_harmonized_int_confidence is not None:
+            for record in listed_numerics.data_harmonized_int_confidence:
+                numeric_records.append(record)
+        if listed_numerics.data_harmonized_float is not None:
+            for record in listed_numerics.data_harmonized_float:
+                numeric_records.append(record)
+        if listed_numerics.data_harmonized_float_confidence is not None:
+            for record in listed_numerics.data_harmonized_float_confidence:
+                numeric_records.append(record)
+    numeric_records = {x.fk_data_type for x in numeric_records} # yes this is a set
+    return numeric_records
 
 def list_harm_data_types(
         measure: Optional[str]=None, 
         unit_of_measure: Optional[str]=None,
-        method: Optional[str]=None
+        method: Optional[str]=None,
+        dataset_id: Optional[UUID]=None
     ) -> List[Harm_data_type]:
     with Session(engine) as session:
         stmt = select(harm_data_type)
@@ -25,7 +48,13 @@ def list_harm_data_types(
         if method is not None:
             stmt = stmt.where(harm_data_type.method == method)
         results = session.execute(stmt).all()
-    return [Harm_data_type(**x[0].__dict__) for x in results]
+    results = [Harm_data_type(**x[0].__dict__) for x in results]
+    if dataset_id is not None:
+        dataset_datatypes = list_harm_data_types_by_dataset_id()
+        logger.debug(dataset_datatypes)
+        results = [x for x in results if x.datatype_id in dataset_datatypes]
+    logger.debug(results)
+    return results
 
 def get_harm_data_type(
         datatype_id: Optional[UUID]=None,

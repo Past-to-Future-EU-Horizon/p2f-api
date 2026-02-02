@@ -13,11 +13,13 @@ router = APIRouter(prefix="/harm-data-types")
 def list_harm_data_types(
         measure: Optional[str]=None, 
         unit_of_measure: Optional[str]=None,
-        method: Optional[str]=None
+        method: Optional[str]=None,
+        dataset_id: Optional[uuid.UUID]=None
     ) -> List[Harm_data_type]:
     return harm_data_types.list_harm_data_types(measure=measure,
                                                 unit_of_measure=unit_of_measure,
-                                                method=method)
+                                                method=method, 
+                                                dataset_id=dataset_id)
 
 @router.get("/{datatype_id}")
 def get_harm_data_type(

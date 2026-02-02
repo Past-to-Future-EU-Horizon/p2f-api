@@ -99,7 +99,7 @@ def list_numerics(record_hash: Optional[str]=None,
                 else:
                     return_results.data_harmonized_float_confidence = None
     logger.debug('Results sorted and return object prepared')
-    logger.debug(f"##########\n{return_results}\n\n\n")
+    # logger.debug(f"##########\n{return_results}\n\n\n")
     return return_results
     
 
