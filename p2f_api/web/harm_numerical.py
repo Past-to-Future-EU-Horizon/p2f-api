@@ -28,10 +28,15 @@ def list_harm_numerical(
                                                "float", 
                                                "int_confidence", 
                                                "int"]]=None, 
-    data_type: Optional[int]=None
+    data_type: Optional[uuid.UUID]=None, 
+    dataset_id: Optional[uuid.UUID]=None
     ) -> Return_harm_numerical:
     logger.debug("🕸️📃 web/harm_numerical.py list_harm_numerical()")
-    return harm_numerical.list_numerics(record_hash=record_hash, data_type=data_type)
+    logger.debug(f"Received params: {locals()}")
+    return harm_numerical.list_numerics(record_hash=record_hash,
+                                        numeric_type=numeric_type, 
+                                        data_type=data_type,
+                                        dataset_id=dataset_id)
 
 # Get Single
 @router.get("/{numeric_id}")

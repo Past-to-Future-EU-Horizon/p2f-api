@@ -1,6 +1,6 @@
 # Local libraries
 from p2f_api.apilogs import logger
-from ..service.harm_numerical import list_numerics
+# from ..service.harm_numerical import list_numerics
 from ..data.db_connection import engine
 from ..data.harm_data_record import harm_data_record
 from p2f_pydantic.harm_data_record import harm_data_record as Harm_data_record
@@ -16,12 +16,6 @@ def list_harm_data_record(
         data_type: Optional[int]=None,  ## LOL TODO this is gonna be rough
                     ) -> List[Harm_data_record]:
     logger.debug("📃 service/harm_data_record.py list_harm_data_record()")
-    if data_type:
-        #! This may not be the most SQL way to do this search, there may be a better way with ForeignKey relations
-        ## Currently implemented this method using the service from the service.harm_numerical module
-        ## The list comprehension will get the data record IDs for the matching data types
-        ## the list(set()) run on the list comprehension will produce a list of unique values
-        matching_numerics = list(set([x.fk_data_record for x in list_numerics(data_type=data_type)]))
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = select(harm_data_record)
