@@ -13,12 +13,18 @@ from uuid import UUID
 
 def list_harm_data_record(
         dataset: Optional[UUID]=None, 
-        data_type: Optional[int]=None,  ## LOL TODO this is gonna be rough
+        # data_type: Optional[int]=None,  ## Disabling this for now
+                                          ## I would need to duplicate the code in the numerical service
+                                          ## as this is currently causing circular import issues. 
                     ) -> List[Harm_data_record]:
     logger.debug("📃 service/harm_data_record.py list_harm_data_record()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = select(harm_data_record)
+        if dataset is not None:
+            stmt = stmt.where(harm_data_record.fk_dataset == dataset)
+        # if data_type is not None: ### Disabled
+        #     subqry = (select().subquery())
         results = session.execute(stmt).all()
         logger.debug(f"\tFound {len(results)} results")
     return [Harm_data_record(**x[0].__dict__) for x in results]

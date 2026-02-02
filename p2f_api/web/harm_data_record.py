@@ -14,7 +14,7 @@ router = APIRouter(prefix="/harm-data-records")
 @router.get("/")
 def list_harm_data_records(
     dataset: Optional[str]=None, 
-    data_type: Optional[int]=None,
+    # data_type: Optional[int]=None, ### Disabled for now, see note in service
     ) -> List[Harm_data_record]:
     logger.debug("🕸️📃 web/harm_data_record.py list_harm_data_records()")
     return harm_data_record.list_harm_data_record(dataset=dataset, data_type=data_type)
