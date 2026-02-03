@@ -10,6 +10,7 @@ from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 from typing import List, Optional
 from uuid import UUID
+from inspect import stack
 
 def list_harm_metadata_location(
         bounding_box: Optional[Harm_bounding_box]=None,
@@ -21,37 +22,47 @@ def list_harm_metadata_location(
         max_location_age: Optional[float]=None,
         dataset_id: Optional[float]=None,
     ) -> List[Harm_location]:
-    logger.debug(f"{fa.service}{fa.list} {__name__}")
+    logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     if dataset_id is not None:
-        logger.debug(dataset_id)
+        logger.debug(f"•  Dataset_id is not None: {dataset_id}")
         data_record_list = list_harm_data_record(dataset=dataset_id)
-        logger.debug(data_record_list)
+        logger.debug(f"•• Data records found for dataset_id: {data_record_list}")
         data_record_list = [x.record_hash for x in data_record_list]
-        logger.debug(data_record_list)
+        logger.debug(f"•• Reformatted records list: {data_record_list}")
     with Session(engine) as session:
+        logger.debug("•  Created session")
         stmt = select(harm_locations)
         if bounding_box is not None:
+            logger.debug("•• Bounding box is not none")
             stmt = stmt.where(harm_locations.latitude <= bounding_box.north)
             stmt = stmt.where(harm_locations.latitude >= bounding_box.south)
             stmt = stmt.where(harm_locations.longitude <= bounding_box.east)
             stmt = stmt.where(harm_locations.longitude >= bounding_box.west)
         if location_name is not None:
+            logger.debug("•• Location name is not none")
             stmt = stmt.where(harm_locations.location_name == location_name)
         if location_code is not None:
+            logger.debug("•• Location code is not none")
             stmt = stmt.where(harm_locations.location_code == location_code)
         if minimum_elevation is not None:
+            logger.debug("•• Minimum elevation is not none")
             stmt = stmt.where(harm_locations.elevation >= minimum_elevation)
         if maximum_elevation is not None:
+            logger.debug("•• Maximum elevation is not none")
             stmt = stmt.where(harm_locations.elevation <= maximum_elevation)
         if min_location_age is not None:
+            logger.debug("•• Minimum location age is not none")
             stmt = stmt.where(harm_locations.location_age >= min_location_age)
         if max_location_age is not None:
+            logger.debug("•• Maximum location age is not none")
             stmt = stmt.where(harm_locations.location_age <= max_location_age)
         if dataset_id is not None:
+            logger.debug("•• Dataset id is not none")
             subqry = (select(harm_location_to_record.fk_harm_location).where(harm_location_to_record.fk_data_record.in_(data_record_list)))
-            stmt.where(harm_locations.location_identifier.in_(subqry))
-            logger.debug(f"Dataset identifier statement alteration: {stmt}")
+            stmt = stmt.where(harm_locations.location_identifier.in_(subqry))
+            logger.debug(f"•• Dataset identifier statement alteration: {stmt}")
         results = session.execute(stmt).all()
+        logger.debug(f"• Found {len(results)} results. ")
     return [Harm_location(**x[0].__dict__) for x in results]
 
 def get_location(location_identifier: Optional[UUID]=None,
