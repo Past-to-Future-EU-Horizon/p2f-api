@@ -1,1 +1,1 @@
-__all__ = ["settings", "data", "service", "web", "apilogs"]
+__all__ = ["settings", "data", "service", "web", "apilogs", "doi"]
