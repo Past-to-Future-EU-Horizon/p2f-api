@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from ..service import harm_data_metadata_location
 from p2f_pydantic.harm_data_metadata import harm_location as Harm_location
 from p2f_pydantic.harm_data_metadata import harm_bounding_box as Harm_bounding_box
@@ -21,7 +21,9 @@ def list_harm_data_records(
         maximum_elevation: Optional[float]=None,
         min_location_age: Optional[float]=None,
         max_location_age: Optional[float]=None,
+        dataset_id: Optional[uuid.UUID]=None
     ) -> List[Harm_location]:
+    logger.debug(f"{fa.web}{fa.list} {__name__}")
     return harm_data_metadata_location.list_harm_metadata_location(
         bounding_box=bounding_box,
         location_name=location_name,
@@ -29,36 +31,41 @@ def list_harm_data_records(
         minimum_elevation=minimum_elevation,
         maximum_elevation=maximum_elevation,
         min_location_age=min_location_age,
-        max_location_age=max_location_age
+        max_location_age=max_location_age,
+        dataset_id=dataset_id
     )
     
 
 # Get Single
 @router.get("/{location_identifier}")
 def get_harm_data_record(location_identifier: uuid.UUID) -> Harm_location:
+    logger.debug(f"{fa.web}{fa.get} {__name__}")
     return harm_data_metadata_location.get_location(location_identifier=location_identifier)
 
 # Create
 @router.post("/")
 def create_dataset(new_location: Harm_location) -> Harm_location:
+    logger.debug(f"{fa.web}{fa.create} {__name__}")
     return harm_data_metadata_location.create_location(new_location=new_location)
     
 
 @router.put("/")
 def update_dataset(update_location: Harm_location) -> Harm_location:
+    logger.debug(f"{fa.web}{fa.update} {__name__}")
     return harm_data_metadata_location.update_location(update_location=update_location)
 
 
 # Delete
 @router.delete("/{location_identifier}")
 def delete_dataset(location_identifier: uuid.UUID) -> None:
+    logger.debug(f"{fa.web}{fa.delete} {__name__}")
     return harm_data_metadata_location.delete_location(location_identifier=location_identifier)
     
 @router.post("/assign")
 def assign_location_to_record(
     location_identifier: uuid.UUID,
     record_hash: str):
-    logger.debug(f"🕸️✍️ harm_data_metadata_location.py assign_location_to_record()")
+    logger.debug(f"{fa.web}{fa.assign} {__name__}")
     logger.debug(f"Received {location_identifier}, {record_hash}")
     return harm_data_metadata_location.assign_location_to_record(
         location_identifier=location_identifier,
@@ -69,6 +76,7 @@ def assign_location_to_record(
 def remove_location_from_record(
     location_identifier: uuid.UUID,
     record_hash: str):
+    logger.debug(f"{fa.web}{fa.remove} {__name__}")
     return harm_data_metadata_location.remove_location_from_record(
         location_identifier=location_identifier,
         record_hash=record_hash

@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -14,6 +14,8 @@ import pytz
 # Batteries included libraries
 from datetime import date
 from uuid import UUID
+
+logger.debug(f"{fa.data} {__name__}")
 
 class datasets(baseSQL):
     __tablename__ = "p2f_datasets"

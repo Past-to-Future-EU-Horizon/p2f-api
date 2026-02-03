@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from p2f_api.web import datasets
 from p2f_api.web import harm_data_record
 from p2f_api.web import harm_numerical
@@ -20,6 +20,7 @@ app = FastAPI(
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
     version="0.0.1"
 )
+logger.debug(f"{fa.background} {__name__}")
 logger.debug("▶️  FastAPI() Started")
 
 app.include_router(datasets.router)

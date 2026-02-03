@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 # from .create_metadata import create_metadata
 from .p2f_decbase import baseSQL
 from .datasets import *
@@ -20,6 +20,8 @@ from dotenv import load_dotenv
 import os
 import pathlib
 
+logger.debug(f"{fa.data} {__name__}")
+
 p = pathlib.Path(os.getcwd())
 print(p)
 
@@ -39,7 +41,7 @@ logger.debug("Database connection url:" + connection_str.replace(PG_PASS, "♦" 
 
 engine = create_engine(connection_str)
 baseSQL.metadata.create_all(engine)
-logger.debug(dir(baseSQL.metadata))
+# logger.debug(dir(baseSQL.metadata))
 # logger.debug(baseSQL.metadata.naming_convention)
 # logger.debug(baseSQL.metadata.info)
 # logger.debug(baseSQL.metadata.tables)

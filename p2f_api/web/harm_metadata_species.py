@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from ..service import harm_data_metadata_species
 from p2f_pydantic.harm_data_metadata import harm_data_species as Harm_data_species
 # Third Party Libraries
@@ -31,6 +31,7 @@ def list_harm_metadata_species(
         common_name: Optional[str]=None,
         display_species: Optional[str]=None,
     ) -> List[Harm_data_species]:
+    logger.debug(f"{fa.web}{fa.list} {__name__}")
     return harm_data_metadata_species.list_harm_metadata_species(
         tax_domain=tax_domain, 
         tax_kingdom=tax_kingdom,
@@ -55,11 +56,13 @@ def list_harm_metadata_species(
 # Get Single
 @router.get("/{species_identifier}")
 def get_harm_metadata_species(species_identifier: UUID):
+    logger.debug(f"{fa.web}{fa.get} {__name__}")
     return harm_data_metadata_species.get_harm_metadata_species(species_id=species_identifier)
 
 # Create
 @router.post("/")
 def create_harm_metadata_species(new_species: Harm_data_species) -> Harm_data_species:
+    logger.debug(f"{fa.web}{fa.create} {__name__}")
     return harm_data_metadata_species.create_harm_metadata_species(new_species=new_species)
     
 # # Update
@@ -69,16 +72,19 @@ def create_harm_metadata_species(new_species: Harm_data_species) -> Harm_data_sp
 # Delete
 @router.delete("/{species_identifier}")
 def delete_harm_species(species_identifier: UUID) -> None:
+    logger.debug(f"{fa.web}{fa.delete} {__name__}")
     return harm_data_metadata_species.delete_harm_species(species_identifier)
     
 @router.post("/assign")
 def assign_species_to_record_hash(species_id: UUID, 
                                   record_hash: str):
+    logger.debug(f"{fa.web}{fa.assign} {__name__}")
     return harm_data_metadata_species.assign_species_to_record_hash(species_id=species_id,
                                                                     record_hash=record_hash)
 
 @router.delete("/remove")
 def remove_specied_to_record_assignment(species_id: UUID, 
                                         record_hash: str):
+    logger.debug(f"{fa.web}{fa.remove} {__name__}")
     return harm_data_metadata_species.remove_specied_to_record_assignment(species_id=species_id,
                                                                           record_hash=record_hash)

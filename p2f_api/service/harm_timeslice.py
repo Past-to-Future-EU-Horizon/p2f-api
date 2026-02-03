@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
 from ..data.harm_timeslice import harm_timeslice
 from p2f_pydantic.harm_timeslices import harm_timeslice as Harm_timeslice
@@ -15,6 +15,7 @@ def list_harm_timeslices(
     older_search_age: Optional[int]=None,
     recent_search_age: Optional[int]=None,
     ) -> List[Harm_timeslice]:
+    logger.debug(f"{fa.service}{fa.list} {__name__}")
     with Session(engine) as session:
         stmt = select(harm_timeslice)
         # if named_time_period:
@@ -30,6 +31,7 @@ def get_harm_timeslice(
     timeslice_id: Optional[UUID]=None,
     pk_timeslice: Optional[int]=None,
     ) -> Harm_timeslice:
+    logger.debug(f"{fa.service}{fa.get} {__name__}")
     with Session(engine) as session:
         stmt = select(harm_timeslice)
         if timeslice_id is not None:
@@ -42,6 +44,7 @@ def get_harm_timeslice(
 def create_new_timeslice(
     new_harm_timeslice: Harm_timeslice
     ) -> Harm_timeslice:
+    logger.debug(f"{fa.service}{fa.create} {__name__}")
     with Session(engine) as session:
         stmt = insert(harm_timeslice)
         stmt = stmt.values(**new_harm_timeslice)
@@ -50,6 +53,7 @@ def create_new_timeslice(
     return get_harm_timeslice(pk_timeslice=commit.inserted_primary_key[0])
 
 def update_timeslice(update_harm_timeslice: Harm_timeslice) -> Harm_timeslice:
+    logger.debug(f"{fa.service}{fa.update} {__name__}")
     with Session(engine) as session:
         stmt = update(harm_timeslice)
         stmt = stmt.where(harm_timeslice.timeslice_id == update_harm_timeslice.timeslice_id)
@@ -59,6 +63,7 @@ def update_timeslice(update_harm_timeslice: Harm_timeslice) -> Harm_timeslice:
     return get_harm_timeslice(timeslice_id=update_harm_timeslice.timeslice_id)
 
 def delete_timeslice(timeslice_id: UUID) -> None:
+    logger.debug(f"{fa.service}{fa.delete} {__name__}")
     with Session(engine) as session:
         stmt = delete(harm_timeslice)
         stmt = stmt.where(harm_timeslice.timeslice_id == timeslice_id)

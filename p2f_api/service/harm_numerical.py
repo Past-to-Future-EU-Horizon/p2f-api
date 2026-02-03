@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from .harm_data_record import list_harm_data_record
 from ..data.db_connection import engine
 from ..data.harm_data_numerical import harmonized_float_confidence, harmonized_float
@@ -31,7 +31,7 @@ harm_table_matching = {
 }
 
 def get_numeric_table_by_uuid(numeric_id: UUID):
-    logger.debug("🔎 service/harm_numerical.py get_numeric_table_by_uuid()")
+    logger.debug(f"{fa.service}{fa.get} {__name__}")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = select(harmonized_numeric_id_map)
@@ -61,7 +61,7 @@ def list_numerics(record_hash: Optional[str]=None,
                                                "int"]]=None, 
                   data_type: Optional[UUID]=None, 
                   dataset_id: Optional[UUID]=None) -> Return_harm_numerical:
-    logger.debug("📃 service/harm_numerical.py list_numerics()")
+    logger.debug(f"{fa.service}{fa.list} {__name__}")
     if dataset_id is not None:
         # We are doing this out of the Session and lower iteration
         filtered_dataset_record_hashes = list_harm_data_record(dataset=dataset_id)
@@ -125,7 +125,7 @@ def list_numerics(record_hash: Optional[str]=None,
     
 
 def get_numeric(numeric_id: UUID) -> Harm_numerical_union:
-    logger.debug("🔎 service/harm_numerical.py get_numeric()")
+    logger.debug(f"{fa.service}{fa.get} {__name__}")
     numeric_table, pydantic_class = get_numeric_table_by_uuid(numeric_id=numeric_id)
     with Session(engine) as session:
         logger.debug("\tCreated session")
@@ -137,7 +137,7 @@ def get_numeric(numeric_id: UUID) -> Harm_numerical_union:
 
 
 def create_numeric(new_numeric: Insert_harm_numerical) -> Insert_harm_numerical:
-    logger.debug("🆕 service/harm_numerical.py create_numeric()")
+    logger.debug(f"{fa.service}{fa.create} {__name__}")
     numeric_class = new_numeric.numerical_type
     if numeric_class == "INT":
         if new_numeric.upper_conf_value and new_numeric.lower_conf_value:
@@ -177,7 +177,7 @@ def create_numeric(new_numeric: Insert_harm_numerical) -> Insert_harm_numerical:
     return get_numeric(numeric_id=new_key)
 
 def update_numeric(numerical_update: Harm_numerical_union) -> Harm_numerical_union:
-    logger.debug("✏️ service/harm_numerical.py update_numeric()")
+    logger.debug(f"{fa.service}{fa.update} {__name__}")
     numeric_table, pydantic_class = get_numeric_table_by_uuid(numeric_id=numerical_update.pk_harm_num)
     with Session(engine) as session:
         logger.debug("\tCreated session")
@@ -188,7 +188,7 @@ def update_numeric(numerical_update: Harm_numerical_union) -> Harm_numerical_uni
         commit = session.commit()
 
 def delete_numeric(numeric_id: UUID) -> None:
-    logger.debug("🗑️ service/harm_numerical.py delete_numeric()")
+    logger.debug(f"{fa.service}{fa.delete} {__name__}")
     numeric_table, pydantic_class = get_numeric_table_by_uuid(numeric_id=numeric_id)
     with Session(engine) as session:
         logger.debug("\tCreated session")

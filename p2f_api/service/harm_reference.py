@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
 from ..data.harm_reference import harm_reference, harm_reference_to_record
 from p2f_pydantic.harm_reference import harm_reference as Harm_reference
@@ -13,6 +13,7 @@ from uuid import UUID
 
 # List
 def list_references() -> List[Harm_reference]:
+    logger.debug(f"{fa.service}{fa.list} {__name__}")
     with Session(engine) as session:
         stmt = select(harm_reference)
         results = session.execute(stmt).all()
@@ -22,6 +23,7 @@ def list_references() -> List[Harm_reference]:
 def get_reference(doi: Optional[str]=None, 
                   reference_id: Optional[str]=None,
                   pk_harm_reference: Optional[int]=None) -> Harm_reference:
+    logger.debug(f"{fa.service}{fa.get} {__name__}")
     with Session(engine) as session:
         stmt = select(harm_reference)
         if doi is not None:
@@ -35,6 +37,7 @@ def get_reference(doi: Optional[str]=None,
 
 # Create
 def create_reference(new_reference: Harm_reference) -> Harm_reference:
+    logger.debug(f"{fa.service}{fa.create} {__name__}")
     with Session(engine) as session:
         stmt = insert(harm_reference)
         stmt = stmt.values(**new_reference.model_dump(exclude_unset=True))
@@ -46,6 +49,7 @@ def create_reference(new_reference: Harm_reference) -> Harm_reference:
 
 # Delete
 def delete_reference(reference_id: UUID) -> None:
+    logger.debug(f"{fa.service}{fa.delete} {__name__}")
     with Session(engine) as session:
         stmt = delete(harm_reference)
         stmt = stmt.where(reference_id == reference_id)
@@ -56,6 +60,7 @@ def delete_reference(reference_id: UUID) -> None:
 # Assign
 def assign_reference(reference_id: UUID, 
                      record_hash: str) -> None:
+    logger.debug(f"{fa.service}{fa.assign} {__name__}")
     with Session(engine) as session:
         stmt = insert(harm_reference_to_record)
         stmt = stmt.values(fk_harm_reference=reference_id,
@@ -66,6 +71,7 @@ def assign_reference(reference_id: UUID,
 # Remove
 def remove_reference(reference_id: UUID, 
                      record_hash: str) -> None:
+    logger.debug(f"{fa.service}{fa.remove} {__name__}")
     with Session(engine) as session: 
         stmt = delete(harm_reference_to_record)
         stmt = stmt.where(harm_reference_to_record.fk_harm_reference==reference_id)

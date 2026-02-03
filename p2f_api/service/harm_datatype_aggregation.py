@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from data.harm_data_types import harm_data_type
 from data.datasets import datasets
 from data.harm_data_numerical import harmonized_float, harmonized_float_confidence
@@ -16,6 +16,7 @@ from uuid import UUID
 from typing import List
 
 def get_datasets_by_data_type_APISIDE(datatype_id: UUID) -> List[UUID]:
+    logger.debug(f"{fa.service}{fa.get} {__name__} get_datasets_by_data_type_APISIDE()")
     # Select unique record hashes from numerical types where datatype == datatype_id
     # Select unique datasets from above record hashes
     with Session(engine) as session:
@@ -51,6 +52,7 @@ def get_datasets_by_data_type_APISIDE(datatype_id: UUID) -> List[UUID]:
         return [x[0] for x in execute]
 
 def get_datasets_by_data_type_POSTGRESIDE(datatype_id: UUID) -> List[UUID]:
+    logger.debug(f"{fa.service}{fa.get} {__name__} get_datasets_by_data_type_POSTGRESIDE()")
     with Session(engine) as session:
         sq_hi = (select(harmonized_int.fk_data_record)
                  .where(harmonized_int.fk_data_type==datatype_id)
@@ -88,5 +90,6 @@ def get_datasets_by_data_type_POSTGRESIDE(datatype_id: UUID) -> List[UUID]:
         return ex_all
     
 def get_dataset_objs_by_datatype_id(datatype_id: UUID) -> List[Datasets]:
+    logger.debug(f"{fa.service}{fa.get} {__name__} get_dataset_objs_by_datatype_id()")
     dataset_ids = get_datasets_by_data_type_POSTGRESIDE(datatype_id=datatype_id)
     return [service_datasets.get_dataset(dataset_id=x) for x in dataset_ids]

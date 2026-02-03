@@ -1,4 +1,4 @@
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
 from ..data.harm_data_metadata import harm_species_to_record, harm_data_species
 from p2f_pydantic.harm_data_metadata import harm_data_species as Harm_data_species
@@ -28,6 +28,7 @@ def list_harm_metadata_species(
         common_name: Optional[str]=None,
         display_species: Optional[str]=None,
     ) -> List[Harm_data_species]:
+    logger.debug(f"{fa.service}{fa.list} {__name__}")
     with Session(engine) as session:
         stmt = select(harm_data_species)
         tax_values = {x:y for x, y in dict(locals()).items() if x.startswith("tax_") and y != None}
@@ -69,6 +70,7 @@ def list_harm_metadata_species(
     return [Harm_data_species(**x[0].tuple()) for x in results]
 
 def get_harm_metadata_species(species_id: UUID):
+    logger.debug(f"{fa.service}{fa.get} {__name__}")
     with Session(engine) as session:
         stmt = select(harm_data_species)
         stmt = stmt.where(harm_data_species.species_identifier == species_id)
@@ -76,6 +78,7 @@ def get_harm_metadata_species(species_id: UUID):
     return Harm_data_species(**result[0].tuple())
 
 def create_harm_metadata_species(new_species: Harm_data_species) -> Harm_data_species:
+    logger.debug(f"{fa.service}{fa.create} {__name__}")
     with Session(engine) as session:
         stmt = insert(harm_data_species)
         stmt = stmt.values(**new_species)
@@ -89,6 +92,7 @@ def create_harm_metadata_species(new_species: Harm_data_species) -> Harm_data_sp
     new_species_id = result[0].tuple().species_identifier
 
 def delete_harm_species(species_id: UUID) -> None:
+    logger.debug(f"{fa.service}{fa.delete} {__name__}")
     with Session(engine) as session:
         stmt = delete(harm_data_species)
         stmt = stmt.where(harm_data_species.species_identifier==species_id)
@@ -97,6 +101,7 @@ def delete_harm_species(species_id: UUID) -> None:
 
 def assign_species_to_record_hash(species_id: UUID, 
                                   record_hash: str):
+    logger.debug(f"{fa.service}{fa.assign} {__name__}")
     with Session(engine) as session:
         stmt = insert(harm_species_to_record)
         stmt = stmt.values(fk_species_identifier=species_id, 
@@ -106,6 +111,7 @@ def assign_species_to_record_hash(species_id: UUID,
 
 def remove_specied_to_record_assignment(species_id: UUID, 
                                         record_hash: str):
+    logger.debug(f"{fa.service}{fa.remove} {__name__}")
     with Session(engine) as session:
         stmt = delete(harm_species_to_record)
         stmt = stmt.where(harm_species_to_record.fk_species_identifier==species_id)

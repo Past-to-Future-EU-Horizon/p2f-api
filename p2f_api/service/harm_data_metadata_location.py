@@ -1,4 +1,5 @@
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
+from .harm_data_record import list_harm_data_record
 from ..data.db_connection import engine
 from ..data.harm_data_metadata import harm_location_to_record, harm_locations
 from p2f_pydantic.harm_data_metadata import harm_location as Harm_location
@@ -18,7 +19,15 @@ def list_harm_metadata_location(
         maximum_elevation: Optional[float]=None,
         min_location_age: Optional[float]=None,
         max_location_age: Optional[float]=None,
+        dataset_id: Optional[float]=None,
     ) -> List[Harm_location]:
+    logger.debug(f"{fa.service}{fa.list} {__name__}")
+    if dataset_id is not None:
+        logger.debug(dataset_id)
+        data_record_list = list_harm_data_record(dataset=dataset_id)
+        logger.debug(data_record_list)
+        data_record_list = [x.record_hash for x in data_record_list]
+        logger.debug(data_record_list)
     with Session(engine) as session:
         stmt = select(harm_locations)
         if bounding_box is not None:
@@ -38,11 +47,16 @@ def list_harm_metadata_location(
             stmt = stmt.where(harm_locations.location_age >= min_location_age)
         if max_location_age is not None:
             stmt = stmt.where(harm_locations.location_age <= max_location_age)
-        results = session.execute(stmt)
+        if dataset_id is not None:
+            subqry = (select(harm_location_to_record.fk_harm_location).where(harm_location_to_record.fk_data_record.in_(data_record_list)))
+            stmt.where(harm_locations.location_identifier.in_(subqry))
+            logger.debug(f"Dataset identifier statement alteration: {stmt}")
+        results = session.execute(stmt).all()
     return [Harm_location(**x[0].__dict__) for x in results]
 
 def get_location(location_identifier: Optional[UUID]=None,
                  pk_harm_location: Optional[int]=None) -> Harm_location:
+    logger.debug(f"{fa.service}{fa.get} {__name__}")
     with Session(engine) as session:
         stmt = select(harm_locations)
         if location_identifier is not None:
@@ -54,6 +68,7 @@ def get_location(location_identifier: Optional[UUID]=None,
     return Harm_location(**result.__dict__)
 
 def create_location(new_location: Harm_location) -> Harm_location:
+    logger.debug(f"{fa.service}{fa.create} {__name__}")
     with Session(engine) as session:
         stmt = insert(harm_locations)
         stmt = stmt.values(**new_location.model_dump(exclude_unset=True))
@@ -62,6 +77,7 @@ def create_location(new_location: Harm_location) -> Harm_location:
     return get_location(pk_harm_location=execute.inserted_primary_key[0])
 
 def update_location(update_location: Harm_location) -> Harm_location:
+    logger.debug(f"{fa.service}{fa.update} {__name__}")
     with Session(engine) as session:
         stmt = update(harm_locations)
         stmt = stmt.where(update_location.location_identifier)
@@ -71,6 +87,7 @@ def update_location(update_location: Harm_location) -> Harm_location:
     return get_location(update_location.pk_harm_location)
 
 def delete_location(location_identifier: UUID) -> None:
+    logger.debug(f"{fa.service}{fa.delete} {__name__}")
     with Session(engine) as session:
         stmt = delete(harm_locations)
         stmt = stmt.where(harm_locations.location_identifier == location_identifier)
@@ -82,7 +99,7 @@ def assign_location_to_record(
         location_identifier: UUID,
         record_hash: str
     ): 
-    logger.debug("harm_data_metadata_location.py assign_location_to_record()")
+    logger.debug(f"{fa.service}{fa.assign} {__name__}")
     with Session(engine) as session:
         logger.debug("Session created")
         stmt = insert(harm_location_to_record)
@@ -99,6 +116,7 @@ def remove_location_from_record(
         location_identifier: UUID,
         record_hash: str
     ): 
+    logger.debug(f"{fa.service}{fa.remove} {__name__}")
     with Session(engine) as session:
         stmt = delete(harm_location_to_record)
         stmt = stmt.where(harm_location_to_record.fk_data_record == record_hash)

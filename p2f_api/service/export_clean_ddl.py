@@ -1,10 +1,11 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from data.db_connection import engine
 from data.db_connection import baseSQL
 from sqlalchemy.schema import CreateTable
 
-def get_clean_ddl():
+def get_clean_ddl() -> str:
+    logger.debug(f"{fa.service}{fa.get} {__name__}")
     sql = ""
     for table in baseSQL.metadata.sorted_tables:
         # logger.debug(repr(table))

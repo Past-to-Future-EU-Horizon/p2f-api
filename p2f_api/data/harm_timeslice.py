@@ -1,4 +1,4 @@
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -9,6 +9,8 @@ from sqlalchemy import func
 from sqlalchemy import ForeignKey
 # Batteries included libraries
 from uuid import UUID
+
+logger.debug(f"{fa.data} {__name__}")
 
 class harm_timeslice(baseSQL):
     __tablename__ = "p2f_harm_timeslice"

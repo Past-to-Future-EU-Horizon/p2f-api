@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from ..service import harm_data_record
 from p2f_pydantic.harm_data_record import harm_data_record as Harm_data_record
 # Third Party Libraries
@@ -16,19 +16,19 @@ def list_harm_data_records(
     dataset: Optional[str]=None, 
     # data_type: Optional[int]=None, ### Disabled for now, see note in service
     ) -> List[Harm_data_record]:
-    logger.debug("🕸️📃 web/harm_data_record.py list_harm_data_records()")
-    return harm_data_record.list_harm_data_record(dataset=dataset, data_type=data_type)
+    logger.debug(f"{fa.web}{fa.list} {__name__}")
+    return harm_data_record.list_harm_data_record(dataset=dataset)
 
 # Get Single
 @router.get("/{record_hash}")
 def get_harm_data_record(record_hash: str) -> Harm_data_record:
-    logger.debug("🕸️🔎 web/harm_data_records.py get_harm_data_record()")
+    logger.debug(f"{fa.web}{fa.get} {__name__}")
     return harm_data_record.get_harm_data_record(record_hash=record_hash)
 
 # Create
 @router.post("/")
 def create_dataset(new_data_record: Harm_data_record) -> Harm_data_record:
-    logger.debug("🕸️🆕 web/harm_data_record.py create_harm_data_record()")
+    logger.debug(f"{fa.web}{fa.create} {__name__}")
     return harm_data_record.create_harm_data_record(new_data_record)
 
 # Update 
@@ -44,6 +44,6 @@ def create_dataset(new_data_record: Harm_data_record) -> Harm_data_record:
 # Delete
 @router.delete("/{record_hash}")
 def delete_dataset(record_hash: str) -> None:
-    logger.debug("🕸️🗑️ web/harm_data_record.py delete_harm_data_record()")
+    logger.debug(f"{fa.web}{fa.delete} {__name__}")
     if type(record_hash) == str:
         return harm_data_record.delete_harm_data_record(record_hash)

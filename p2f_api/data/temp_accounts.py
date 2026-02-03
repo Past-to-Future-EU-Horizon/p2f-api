@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -10,6 +10,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func
 # Batteries included libraries
 from datetime import datetime
+
+logger.debug(f"{fa.data} {__name__}")
 
 class temp_accounts(baseSQL):
     __tablename__ = "TEMP_accounts_NOV2025CONGRESS"

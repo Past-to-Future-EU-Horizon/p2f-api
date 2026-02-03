@@ -1,4 +1,4 @@
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -14,6 +14,8 @@ from sqlalchemy import ForeignKey
 ## sha512   128
 ## md5       32
 #### TODO Make this into a real dictionary and config option
+
+logger.debug(f"{fa.data} {__name__}")
 
 class harm_data_record(baseSQL):
     __tablename__ = "p2f_harm_data_record"
