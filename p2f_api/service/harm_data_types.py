@@ -11,24 +11,31 @@ from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 from typing import List, Optional
 from uuid import UUID
+from inspect import stack
 
 def list_harm_data_types_by_dataset_id(dataset_id: Optional[UUID]=None) -> List[UUID]:
-    logger.debug(f"{fa.service}{fa.get} {__name__} list_harm_data_types_by_dataset_id()")
+    logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     data_records = list_harm_data_record(dataset=dataset_id) 
-    logger.debug(data_records)
+    logger.debug(f"•  data records {data_records}")
     numeric_records = []
     for data_record in data_records:
-        listed_numerics = list_numerics(record_hash=data_record)
+        logger.debug("•  Iterating through data records")
+        listed_numerics = list_numerics(record_hash=data_record.record_hash, 
+                                        dataset_id=dataset_id)
         if listed_numerics.data_harmonized_int is not None:
+            logger.debug("•• listed_numerics.data_harmonized_int")
             for record in listed_numerics.data_harmonized_int:
                 numeric_records.append(record)
         if listed_numerics.data_harmonized_int_confidence is not None:
+            logger.debug("•• listed_numerics.data_harmonized_int_confidence")
             for record in listed_numerics.data_harmonized_int_confidence:
                 numeric_records.append(record)
         if listed_numerics.data_harmonized_float is not None:
+            logger.debug("•• listed_numerics.data_harmonized_float")
             for record in listed_numerics.data_harmonized_float:
                 numeric_records.append(record)
         if listed_numerics.data_harmonized_float_confidence is not None:
+            logger.debug("•• listed_numerics.data_harmonized_float_confidence")
             for record in listed_numerics.data_harmonized_float_confidence:
                 numeric_records.append(record)
     numeric_records = {x.fk_data_type for x in numeric_records} # yes this is a set
@@ -40,19 +47,24 @@ def list_harm_data_types(
         method: Optional[str]=None,
         dataset_id: Optional[UUID]=None
     ) -> List[Harm_data_type]:
-    logger.debug(f"{fa.service}{fa.get} {__name__} {__name__}")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
+        logger.debug("•  Created session")
         stmt = select(harm_data_type)
         if measure is not None:
+            logger.debug("•• measure is not none")
             stmt = stmt.where(harm_data_type.measure == measure)
         if unit_of_measure is not None:
+            logger.debug("•• unit of measure is not none")
             stmt = stmt.where(harm_data_type.unit_of_measurement == unit_of_measure)
         if method is not None:
+            logger.debug("•• method is not none")
             stmt = stmt.where(harm_data_type.method == method)
         results = session.execute(stmt).all()
+    logger.debug(f"• Found {len(results)} results")
     results = [Harm_data_type(**x[0].__dict__) for x in results]
     if dataset_id is not None:
-        logger.debug("dataset_id is not None")
+        logger.debug("•  dataset_id is not None")
         dataset_datatypes = list_harm_data_types_by_dataset_id()
         logger.debug(dataset_datatypes)
         results = [x for x in results if x.datatype_id in dataset_datatypes]

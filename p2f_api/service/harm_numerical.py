@@ -17,6 +17,7 @@ from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 from typing import List, Union, Literal, Optional
 from uuid import UUID
+from inspect import stack
 
 Harm_numerical_union = Union[Harmonized_float_confidence, 
                              Harmonized_float,
@@ -31,15 +32,15 @@ harm_table_matching = {
 }
 
 def get_numeric_table_by_uuid(numeric_id: UUID):
-    logger.debug(f"{fa.service}{fa.get} {__name__}")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
-        logger.debug("\tCreated session")
+        logger.debug("•  Created session")
         stmt = select(harmonized_numeric_id_map)
         stmt = stmt.where(harmonized_numeric_id_map.fk_harm_num == numeric_id)
         result = session.execute(stmt).first()
     # logger.debug(dir())
     numeric_class = result.tuple()[0].table_class
-    logger.debug(f"Numeric Class set as {numeric_class}")
+    logger.debug(f"•• Numeric Class set as {numeric_class}")
     if numeric_class == "INT_CONFIDENCE":
         numeric_table = harmonized_int_confidence
         pydantic_class = Harmonized_int_confidence
@@ -61,36 +62,39 @@ def list_numerics(record_hash: Optional[str]=None,
                                                "int"]]=None, 
                   data_type: Optional[UUID]=None, 
                   dataset_id: Optional[UUID]=None) -> Return_harm_numerical:
-    logger.debug(f"{fa.service}{fa.list} {__name__}")
+    logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
+    logger.debug(f"{locals()}")
     if dataset_id is not None:
+        logger.debug("•  dataset_id is not none")
         # We are doing this out of the Session and lower iteration
         filtered_dataset_record_hashes = list_harm_data_record(dataset=dataset_id)
-        filtered_dataset_record_hashes = list({x.record_hash for x in filtered_dataset_record_hashes})
+        filtered_dataset_record_hashes = tuple({x.record_hash for x in filtered_dataset_record_hashes})
+        logger.debug(f"• {filtered_dataset_record_hashes}")
     with Session(engine) as session:
         session_results = harm_table_matching # Copy the global table above 
-        logger.debug("\tCreated session")
+        logger.debug("•  Created session")
         table_match = list(harm_table_matching.keys()) # Create a list to iterate through just below
         if numeric_type is not None:
             # overwrite the above list if numeric type
             table_match = [numeric_type]
         for table in table_match: # iterated list
-            logger.debug(f"\t\tRunning table search for: {table}")
+            logger.debug(f"•• Running table search for: {table}")
             stmt = select(harm_table_matching[table]["db"])
             if record_hash is not None:
-                logger.debug("Condition added: record_hash")
+                logger.debug("••• Condition added: record_hash")
                 stmt = stmt.where(harm_table_matching[table]["db"].fk_data_record == record_hash)
             if dataset_id is not None:
-                logger.debug("Condition added: dataset_id")
+                logger.debug("••• Condition added: dataset_id")
                 # reliant on the above dataset_id if statement
                 stmt = stmt.where(harm_table_matching[table]["db"].fk_data_record.in_(filtered_dataset_record_hashes))
             if data_type is not None:
-                logger.debug("Condition added: data_type")
+                logger.debug("••• Condition added: data_type")
                 stmt = stmt.where(harm_table_matching[table]["db"].fk_data_type == data_type)
-            logger.debug(f"Generated statement: {stmt}")
+            logger.debug(f"•• Generated statement: {stmt}")
             results = session.execute(stmt).all()
-            logger.debug(f"\tFound {len(results)} results")
+            logger.debug(f"•• Found {len(results)} results")
             session_results[table]["results"] = [session_results[table]["pydantic"](**x[0].__dict__) for x in results]
-    logger.debug("All results collected")
+    logger.debug("•  All results collected")
     return_results = Return_harm_numerical()
     for table in session_results.keys():
         
