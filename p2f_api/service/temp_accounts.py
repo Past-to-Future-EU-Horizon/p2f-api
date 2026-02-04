@@ -1,25 +1,26 @@
 # Local libraries
 from p2f_api.apilogs import logger
+from .account_permissions_json import Account_Permissions
 from ..data.db_connection import engine
-from ..data.temp_accounts import temp_accounts, permitted_domains
+from ..data.temp_accounts import temp_tokens, permitted_addresses, email_history
 from p2f_pydantic.temp_accounts import temp_accounts as Temp_account
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
 from pydantic import EmailStr
 # Batteries included libraries
-from typing import List, Optional
+from typing import List, Optional, Literal
 from datetime import datetime, timedelta
 from secrets import token_urlsafe
 from functools import wraps
+from zoneinfo import ZoneInfo
 
-
-def insert_token_record(email: str,
+def insert_token_record(email: EmailStr,
                   generated_token: str, 
                   expiration: datetime) -> str:
     logger.debug("➡️Inserting Token Record")
     with Session(engine) as session:
-        stmt = insert(temp_accounts)
+        stmt = insert(temp_tokens)
         stmt = stmt.values(
             email=email,
             token=generated_token, 
@@ -28,10 +29,17 @@ def insert_token_record(email: str,
         execute = session.execute(stmt)
         commit = session.commit()
 
+def invalidate_current_token(
+        email: EmailStr
+    ):
+    pass
+
 def send_email_information(email: EmailStr, 
                            generated_token: str, 
                            expiration: datetime):
     logger.debug("📩Sending token to email")
+    with Session(engine) as session:
+        pass
     
 
 def token_request(email: EmailStr):
@@ -47,29 +55,21 @@ def token_request(email: EmailStr):
                            expiration=expiration)
     logger.debug('🌐📩Email sent')
 
-def get_token(
-    email: Optional[str]=None,
-    token: Optional[str]=None,
-    ) -> Temp_account:
+def evaluate_token(
+    email: EmailStr, 
+    token: str
+    ) -> Literal["Authorized", "Expired", "NotFound"]:
     with Session(engine) as session:
-        stmt = select(temp_accounts)
-        if email:
-            stmt = stmt.where(temp_accounts.email==email)
-        if token:
-            stmt = stmt.where(temp_accounts.token==token)
+        stmt = select(temp_tokens)
+        stmt = stmt.where(temp_tokens.email==email)
+        stmt = stmt.where(temp_tokens.token==token)
         result = session.execute(stmt).first()
-    return Temp_account(**result.tuple()[0].__dict__)
+    if result is None:
+        return "NotFound"
+    else:
+        if result[0].expiration < datetime.now():
+            return "Expired"
 
-def list_permitted_domains() -> List[str]:
-    with Session(engine) as session:
-        stmt = select(permitted_domains.domain)
-        results = session.execute(stmt)
-    return results
-
-def insert_permitted_domain(domain):
-    with Session(engine) as session:
-        stmt = insert(permitted_domains)
-        stmt = stmt.values(domain)
-        execute = session.execute(stmt)
-        commit = session.commit()
-
+def insert_permitted_address(email: EmailStr,
+                             permissions: Account_Permissions):
+    pass 

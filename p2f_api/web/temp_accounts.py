@@ -10,16 +10,18 @@ import uuid
 from typing import Optional, List
 from datetime import datetime
 
-router = APIRouter(prefix="/nov-2025-congress")
+router = APIRouter(prefix="/token")
 
 router.post("/request")
 def request_token(email: EmailStr) -> str:
     temp_accounts.token_request(email)
-    msg = "Your token request has been received, you will an email with a valid 2 hour token. "
+    msg = "Your token request has been received, if your email is valid, you will receive a token through your email soon."
     return msg
 
-def authorization(token):
-    token_match = temp_accounts.get_token(token=token)
+def authorization(email: EmailStr, 
+                  token: str):
+    token_match = temp_accounts.evaluate_token(email=email, 
+                                          token=token)
     if token_match == None:
         return HTTPException(status_code=400, detail="Token not found")
     else:
