@@ -19,3 +19,16 @@ class Account_Permissions(BaseModel):
     harm_reference: Aspect_Permissions
     harm_timeslice: Aspect_Permissions
     link_git: Aspect_Permissions
+
+default_consortium_permissions = Account_Permissions(
+    dataset=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
+    harm_age=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
+    harm_location=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
+    harm_data_records=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
+    harm_data_type=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
+    harm_species=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
+    harm_numerical=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
+    harm_reference=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
+    harm_timeslice=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
+    link_git=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
+)

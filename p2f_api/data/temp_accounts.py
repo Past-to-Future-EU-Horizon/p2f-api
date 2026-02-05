@@ -18,14 +18,14 @@ logger.debug(f"{fa.data} {__name__}")
 class temp_tokens(baseSQL):
     __tablename__ = "p2f_account_tokens"
     pk_temp_accounts: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    email: Mapped[str] = mapped_column(String(127), nullable=False)
+    email_address: Mapped[str] = mapped_column(String(127), nullable=False)
     token: Mapped[str] = mapped_column(String(127), nullable=False)
     expiration: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
 class permitted_addresses(baseSQL):
     __tablename__ = "p2f_accounts"
     pk_accounts: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    email_address: Mapped[str] = mapped_column(String(100), nullable=False)
+    email_address: Mapped[str] = mapped_column(String(127), nullable=False)
     permissions: Mapped[str] = mapped_column(Text, nullable=False)
     timezone: Mapped[str] = mapped_column(String, nullable=True, default="Europe/Amsterdam")
 
@@ -33,7 +33,10 @@ class  email_history(baseSQL):
     __tablename__ = "p2f_account_email_history"
     pk_email_history: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     email_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
-    status: Mapped[str] = mapped_column(String(10), default="Created", nullable=False)
+    status: Mapped[str] = mapped_column(String(10), default="Created", nullable=False) # Created, Sent, Failure
     sending_time: Mapped[datetime] = mapped_column(DateTime(ZoneInfo("UTC")),)
-    creation: Mapped[datetime] = mapped_column(DateTime(ZoneInfo("UTC")),)
-    update: Mapped[datetime] = mapped_column(DateTime(ZoneInfo("UTC")),)
+    email_meta_sender: Mapped[str] = mapped_column(Text, nullable=False)
+    email_meta_receiver: Mapped[str] = mapped_column(Text, nullable=False)
+    email_meta_subject: Mapped[str] = mapped_column(Text, nullable=False)
+    creation_timestamp: Mapped[datetime] = mapped_column(DateTime(ZoneInfo("UTC")),)
+    update_timestamp: Mapped[datetime] = mapped_column(DateTime(ZoneInfo("UTC")),)

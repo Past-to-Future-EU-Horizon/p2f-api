@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from pydantic import EmailStr
 # Batteries included libraries
 import uuid
-from typing import Optional, List
+from typing import Literal
 from datetime import datetime
 
 router = APIRouter(prefix="/token")
@@ -15,16 +15,23 @@ router = APIRouter(prefix="/token")
 router.post("/request")
 def request_token(email: EmailStr) -> str:
     temp_accounts.token_request(email)
+    # We always return the same message. 
+    ## For security reasons do not reveal permitted email addresses. 
     msg = "Your token request has been received, if your email is valid, you will receive a token through your email soon."
     return msg
 
-def authorization(email: EmailStr, 
+def authentication(email: EmailStr, 
                   token: str):
     token_match = temp_accounts.evaluate_token(email=email, 
                                           token=token)
-    if token_match == None:
-        return HTTPException(status_code=400, detail="Token not found")
+    if token_match == "NotFound":
+        raise HTTPException(status_code=401, detail="Unauthorized: Token not found")
+    elif token_match == "Expired":
+        raise HTTPException(status_code=401, detail="Unauthorized: Token expired")
     else:
-        if datetime.now() > token_match.expiration:
-            raise HTTPException(status_code=400, detail="Token expired")
+        return True
     
+def authorization(email: EmailStr, 
+                  endpoint: str,
+                  operation: Literal["get", "insert", "update", "delete"]):
+    pass
