@@ -9,7 +9,7 @@ from typing import Optional, List
 
 router = APIRouter(prefix="/harm-timeslice")
 
-router.get("/")
+@router.get("/")
 def list_harm_timeslices(
     named_time_period: Optional[str]=None, 
     older_search_age: Optional[int]=None,
@@ -21,26 +21,40 @@ def list_harm_timeslices(
                     older_search_age=older_search_age,
                     recent_search_age=recent_search_age)
 
-router.get("/")
+@router.get("/")
 def get_harm_timeslice(
     timeslice_id: uuid.UUID,
     ) -> Harm_timeslice:
     logger.debug(f"{fa.web}{fa.get} {__name__}")
     return harm_timeslice.get_harm_timeslice(timeslice_id=timeslice_id)
 
-router.post('/')
+@router.post('/')
 def create_new_timeslice(
     new_harm_timeslice: Harm_timeslice
     ) -> Harm_timeslice:
     logger.debug(f"{fa.web}{fa.create} {__name__}")
     return harm_timeslice.create_new_timeslice(new_harm_timeslice=new_harm_timeslice)
 
-router.put("/")
+@router.put("/")
 def update_timeslice(update_harm_timeslice: Harm_timeslice) -> Harm_timeslice:
     logger.debug(f"{fa.web}{fa.update} {__name__}")
     return harm_timeslice.update_timeslice(update_harm_timeslice=update_harm_timeslice)
 
-router.delete("/{timeslice_id}")
+@router.delete("/{timeslice_id}")
 def delete_timeslice(timeslice_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__}")
     return harm_timeslice.delete_timeslice(timeslice_id=timeslice_id)
+
+@router.post("/assign")
+def assign_timeslice(timeslice_id: uuid.UUID,
+                     record_hash: str) -> None:
+    logger.debug(f"{fa.web}{fa.delete} {__name__}")
+    return harm_timeslice.assign_timeslice(timeslice_id=timeslice_id, 
+                                           record_hash=record_hash)
+
+@router.delete("/remove")
+def remove_timeslice(timeslice_id: uuid.UUID,
+                     record_hash: str) -> None:
+    logger.debug(f"{fa.web}{fa.delete} {__name__}")
+    return harm_timeslice.remove_timeslice(timeslice_id=timeslice_id, 
+                                           record_hash=record_hash)

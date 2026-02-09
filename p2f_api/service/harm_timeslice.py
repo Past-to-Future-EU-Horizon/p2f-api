@@ -1,7 +1,7 @@
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
-from ..data.harm_timeslice import harm_timeslice
+from ..data.harm_timeslice import harm_timeslice, harm_timeslice_to_record
 from p2f_pydantic.harm_timeslices import harm_timeslice as Harm_timeslice
 # Third Party Libraries
 from sqlalchemy.orm import Session
@@ -69,3 +69,25 @@ def delete_timeslice(timeslice_id: UUID) -> None:
         stmt = stmt.where(harm_timeslice.timeslice_id == timeslice_id)
         execute = session.execute(stmt)
         commit = session.commit()
+
+def assign_timeslice(timeslice_id: UUID, 
+                     record_hash: str):
+    logger.debug(f"{fa.service}{fa.delete} {__name__}")
+    with Session(engine) as session:
+        stmt = insert(harm_timeslice_to_record)
+        stmt = stmt.values(
+            fk_timeslice_id=timeslice_id, 
+            fk_record_hash=record_hash
+        )
+        execute = session.execute(stmt)
+        commit = session.commit(stmt)
+
+def remove_timeslice(timeslice_id: UUID, 
+                     record_hash: str):
+    logger.debug(f"{fa.service}{fa.delete} {__name__}")
+    with Session(engine) as session:
+        stmt = delete(harm_timeslice_to_record)
+        stmt = stmt.where(harm_timeslice_to_record.fk_timeslice_id == timeslice_id)
+        stmt = stmt.where(harm_timeslice_to_record.fk_record_hash == record_hash)
+        execute = session.execute(stmt)
+        commit = session.commit(stmt)
