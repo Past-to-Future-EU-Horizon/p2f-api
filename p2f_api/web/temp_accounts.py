@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from pydantic import EmailStr
 # Batteries included libraries
 import uuid
-from typing import Literal
+from typing import Literal, overload
 from datetime import datetime
 
 router = APIRouter(prefix="/token")
@@ -28,10 +28,10 @@ def authentication(email: EmailStr,
         raise HTTPException(status_code=401, detail="Unauthorized: Token not found")
     elif token_match == "Expired":
         raise HTTPException(status_code=401, detail="Unauthorized: Token expired")
-    else:
+    elif token_match == "Authorized":
         return True
-    
+
 def authorization(email: EmailStr, 
                   endpoint: str,
                   operation: Literal["get", "insert", "update", "delete"]):
-    pass
+    return temp_accounts.is_action_authorized(email, endpoint, operation)

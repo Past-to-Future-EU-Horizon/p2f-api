@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
 from pydantic import EmailStr
 # Batteries included libraries
-from typing import List, Optional, Literal
+from typing import List, Optional, Literal, Union
 from datetime import datetime, timedelta
 from secrets import token_urlsafe
 from functools import wraps
@@ -129,5 +129,18 @@ def is_permitted_address(email: EmailStr) -> bool:
         result = session.execute(stmt).first()
     if result:
         return True
+    else: 
+        return False
+
+def is_action_authorized(email: EmailStr, 
+                         endpoint: str, 
+                         operation: Literal["get", "insert", "update", "delete"]) -> bool:
+    with Session(engine) as session:
+        stmt = select(permitted_addresses)
+        stmt = stmt.where(permitted_addresses.email_address == email)
+        result = session.execute(stmt).first()
+    if result:
+        permissions = Account_Permissions(**result[0]).model_dump(exclude_unset=True)
+        return permissions[endpoint][operation]
     else: 
         return False
