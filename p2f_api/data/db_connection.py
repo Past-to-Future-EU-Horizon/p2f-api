@@ -13,7 +13,7 @@ from .harm_text import *
 from .harm_timeslice import *
 from .link_git import *
 from .temp_accounts import *
-
+from .doi import *
 # Third Party Libraries
 from sqlalchemy import create_engine
 from sqlalchemy.schema import CreateTable
