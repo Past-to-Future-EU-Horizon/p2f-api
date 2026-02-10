@@ -27,6 +27,7 @@ def get_reference(doi: Optional[str]=None,
 @router.post("/")
 def create_reference(new_reference: Harm_reference) -> Harm_reference:
     logger.debug(f"{fa.web}{fa.create} {__name__}")
+    logger.debug(f"• new_reference: {new_reference.model_dump(exclude_unset=True)}")
     return harm_reference.create_reference(new_reference=new_reference)
 
 # Delete
