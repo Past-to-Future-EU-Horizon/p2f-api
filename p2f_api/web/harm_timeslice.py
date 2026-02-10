@@ -6,6 +6,7 @@ from fastapi import Body, APIRouter, Request
 # Batteries included libraries
 import uuid
 from typing import Optional, List
+from inspect import stack
 
 router = APIRouter(prefix="/harm-timeslice")
 
@@ -15,7 +16,7 @@ def list_harm_timeslices(
     older_search_age: Optional[int]=None,
     recent_search_age: Optional[int]=None,
     ) -> List[Harm_timeslice]:
-    logger.debug(f"{fa.web}{fa.list} {__name__}")
+    logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     return harm_timeslice.list_harm_timeslices(
                     named_time_period=named_time_period,
                     older_search_age=older_search_age,
@@ -25,36 +26,36 @@ def list_harm_timeslices(
 def get_harm_timeslice(
     timeslice_id: uuid.UUID,
     ) -> Harm_timeslice:
-    logger.debug(f"{fa.web}{fa.get} {__name__}")
+    logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_timeslice.get_harm_timeslice(timeslice_id=timeslice_id)
 
 @router.post('/')
 def create_new_timeslice(
     new_harm_timeslice: Harm_timeslice
     ) -> Harm_timeslice:
-    logger.debug(f"{fa.web}{fa.create} {__name__}")
+    logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_timeslice.create_new_timeslice(new_harm_timeslice=new_harm_timeslice)
 
 @router.put("/")
 def update_timeslice(update_harm_timeslice: Harm_timeslice) -> Harm_timeslice:
-    logger.debug(f"{fa.web}{fa.update} {__name__}")
+    logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
     return harm_timeslice.update_timeslice(update_harm_timeslice=update_harm_timeslice)
 
 @router.delete("/{timeslice_id}")
 def delete_timeslice(timeslice_id: uuid.UUID) -> None:
-    logger.debug(f"{fa.web}{fa.delete} {__name__}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_timeslice.delete_timeslice(timeslice_id=timeslice_id)
 
 @router.post("/assign")
 def assign_timeslice(timeslice_id: uuid.UUID,
                      record_hash: str) -> None:
-    logger.debug(f"{fa.web}{fa.delete} {__name__}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_timeslice.assign_timeslice(timeslice_id=timeslice_id, 
                                            record_hash=record_hash)
 
 @router.delete("/remove")
 def remove_timeslice(timeslice_id: uuid.UUID,
                      record_hash: str) -> None:
-    logger.debug(f"{fa.web}{fa.delete} {__name__}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_timeslice.remove_timeslice(timeslice_id=timeslice_id, 
                                            record_hash=record_hash)

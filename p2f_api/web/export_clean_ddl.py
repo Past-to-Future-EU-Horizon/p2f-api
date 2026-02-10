@@ -5,12 +5,13 @@ from service.export_clean_ddl import get_clean_ddl
 from fastapi import Body, APIRouter, Request
 from fastapi.responses import PlainTextResponse
 # Batteries included libraries
+from inspect import stack
 
 router = APIRouter(prefix="/ddl")
 
 @router.get("/")
 def web_get_clean_ddl(request: Request) -> str:
-    logger.debug(f"{fa.web}{fa.get} {__name__}")
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     logger.debug(f"RECEIVED DDL REQUEST FROM {request.client.host}")
     # logger.debug(f"{request.headers.keys()}")
     # logger.debug(dir(request.headers))

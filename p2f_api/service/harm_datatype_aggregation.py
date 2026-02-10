@@ -14,9 +14,10 @@ from sqlalchemy.orm import Session
 # Batteries included libraries
 from uuid import UUID
 from typing import List
+from inspect import stack
 
 def get_datasets_by_data_type_APISIDE(datatype_id: UUID) -> List[UUID]:
-    logger.debug(f"{fa.service}{fa.get} {__name__} get_datasets_by_data_type_APISIDE()")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     # Select unique record hashes from numerical types where datatype == datatype_id
     # Select unique datasets from above record hashes
     with Session(engine) as session:
@@ -52,7 +53,7 @@ def get_datasets_by_data_type_APISIDE(datatype_id: UUID) -> List[UUID]:
         return [x[0] for x in execute]
 
 def get_datasets_by_data_type_POSTGRESIDE(datatype_id: UUID) -> List[UUID]:
-    logger.debug(f"{fa.service}{fa.get} {__name__} get_datasets_by_data_type_POSTGRESIDE()")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         sq_hi = (select(harmonized_int.fk_data_record)
                  .where(harmonized_int.fk_data_type==datatype_id)
@@ -90,6 +91,6 @@ def get_datasets_by_data_type_POSTGRESIDE(datatype_id: UUID) -> List[UUID]:
         return ex_all
     
 def get_dataset_objs_by_datatype_id(datatype_id: UUID) -> List[Datasets]:
-    logger.debug(f"{fa.service}{fa.get} {__name__} get_dataset_objs_by_datatype_id()")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     dataset_ids = get_datasets_by_data_type_POSTGRESIDE(datatype_id=datatype_id)
     return [service_datasets.get_dataset(dataset_id=x) for x in dataset_ids]

@@ -9,13 +9,14 @@ from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 from typing import List, Optional
 from uuid import UUID
+from inspect import stack
 
 def list_harm_timeslices(
     named_time_period: Optional[str]=None, 
     older_search_age: Optional[int]=None,
     recent_search_age: Optional[int]=None,
     ) -> List[Harm_timeslice]:
-    logger.debug(f"{fa.service}{fa.list} {__name__}")
+    logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_timeslice)
         # if named_time_period:
@@ -31,7 +32,7 @@ def get_harm_timeslice(
     timeslice_id: Optional[UUID]=None,
     pk_timeslice: Optional[int]=None,
     ) -> Harm_timeslice:
-    logger.debug(f"{fa.service}{fa.get} {__name__}")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_timeslice)
         if timeslice_id is not None:
@@ -44,7 +45,7 @@ def get_harm_timeslice(
 def create_new_timeslice(
     new_harm_timeslice: Harm_timeslice
     ) -> Harm_timeslice:
-    logger.debug(f"{fa.service}{fa.create} {__name__}")
+    logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_timeslice)
         stmt = stmt.values(**new_harm_timeslice)
@@ -53,7 +54,7 @@ def create_new_timeslice(
     return get_harm_timeslice(pk_timeslice=commit.inserted_primary_key[0])
 
 def update_timeslice(update_harm_timeslice: Harm_timeslice) -> Harm_timeslice:
-    logger.debug(f"{fa.service}{fa.update} {__name__}")
+    logger.debug(f"{fa.service}{fa.update} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = update(harm_timeslice)
         stmt = stmt.where(harm_timeslice.timeslice_id == update_harm_timeslice.timeslice_id)
@@ -63,7 +64,7 @@ def update_timeslice(update_harm_timeslice: Harm_timeslice) -> Harm_timeslice:
     return get_harm_timeslice(timeslice_id=update_harm_timeslice.timeslice_id)
 
 def delete_timeslice(timeslice_id: UUID) -> None:
-    logger.debug(f"{fa.service}{fa.delete} {__name__}")
+    logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_timeslice)
         stmt = stmt.where(harm_timeslice.timeslice_id == timeslice_id)
@@ -72,7 +73,7 @@ def delete_timeslice(timeslice_id: UUID) -> None:
 
 def assign_timeslice(timeslice_id: UUID, 
                      record_hash: str):
-    logger.debug(f"{fa.service}{fa.delete} {__name__}")
+    logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_timeslice_to_record)
         stmt = stmt.values(
@@ -84,7 +85,7 @@ def assign_timeslice(timeslice_id: UUID,
 
 def remove_timeslice(timeslice_id: UUID, 
                      record_hash: str):
-    logger.debug(f"{fa.service}{fa.delete} {__name__}")
+    logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_timeslice_to_record)
         stmt = stmt.where(harm_timeslice_to_record.fk_timeslice_id == timeslice_id)

@@ -10,6 +10,7 @@ from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 from typing import List, Optional
 from uuid import UUID
+from inspect import stack
 
 def list_harm_data_record(
         dataset: Optional[UUID]=None, 
@@ -17,7 +18,7 @@ def list_harm_data_record(
                                           ## I would need to duplicate the code in the numerical service
                                           ## as this is currently causing circular import issues. 
                     ) -> List[Harm_data_record]:
-    logger.debug(f"{fa.service}{fa.list} {__name__} list_harm_data_record()")
+    logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = select(harm_data_record)
@@ -31,7 +32,7 @@ def list_harm_data_record(
 
 def get_harm_data_record(record_hash: Optional[str]=None,
                          pk_harm_data_record: Optional[int]=None) -> Harm_data_record:
-    logger.debug(f"{fa.service}{fa.get} {__name__} get_dataset()")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = select(harm_data_record)
@@ -43,7 +44,7 @@ def get_harm_data_record(record_hash: Optional[str]=None,
     return Harm_data_record(**result.tuple()[0].__dict__)
 
 def create_harm_data_record(new_dataset: Harm_data_record) -> Harm_data_record:
-    logger.debug(f"{fa.service}{fa.create} {__name__} create_dataset()")
+    logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = insert(harm_data_record)
@@ -54,7 +55,7 @@ def create_harm_data_record(new_dataset: Harm_data_record) -> Harm_data_record:
 
 def update_harm_data_record(record_hash:str, 
                             dataset_update: Harm_data_record) -> Harm_data_record:
-    logger.debug(f"{fa.service}{fa.update} {__name__} create_dataset()")
+    logger.debug(f"{fa.service}{fa.update} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = update(harm_data_record)
@@ -65,7 +66,7 @@ def update_harm_data_record(record_hash:str,
     return get_harm_data_record(pk_harm_data_record=dataset_update.pk_harm_data_record)
 
 def delete_harm_data_record(record_hash: str) -> None:
-    logger.debug(f"{fa.service}{fa.delete} {__name__} create_dataset()")
+    logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = delete(harm_data_record).where(harm_data_record.record_hash == record_hash)

@@ -1,4 +1,4 @@
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from ..service import temp_accounts
 from p2f_pydantic.harm_data_types import harm_data_type as Harm_data_type
 # Third Party Libraries
@@ -9,11 +9,13 @@ from pydantic import EmailStr
 import uuid
 from typing import Literal, overload
 from datetime import datetime
+from inspect import stack
 
 router = APIRouter(prefix="/token")
 
 router.post("/request")
 def request_token(email: EmailStr) -> str:
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     temp_accounts.token_request(email)
     # We always return the same message. 
     ## For security reasons do not reveal permitted email addresses. 
@@ -22,6 +24,7 @@ def request_token(email: EmailStr) -> str:
 
 def authentication(email: EmailStr, 
                   token: str):
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     token_match = temp_accounts.evaluate_token(email=email, 
                                           token=token)
     if token_match == "NotFound":

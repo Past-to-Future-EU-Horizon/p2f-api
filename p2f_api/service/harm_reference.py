@@ -9,11 +9,12 @@ from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 from typing import List, Optional
 from uuid import UUID
+from inspect import stack
 
 
 # List
 def list_references() -> List[Harm_reference]:
-    logger.debug(f"{fa.service}{fa.list} {__name__}")
+    logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_reference)
         results = session.execute(stmt).all()
@@ -23,7 +24,7 @@ def list_references() -> List[Harm_reference]:
 def get_reference(doi: Optional[str]=None, 
                   reference_id: Optional[str]=None,
                   pk_harm_reference: Optional[int]=None) -> Harm_reference:
-    logger.debug(f"{fa.service}{fa.get} {__name__}")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_reference)
         if doi is not None:
@@ -37,7 +38,7 @@ def get_reference(doi: Optional[str]=None,
 
 # Create
 def create_reference(new_reference: Harm_reference) -> Harm_reference:
-    logger.debug(f"{fa.service}{fa.create} {__name__}")
+    logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_reference)
         stmt = stmt.values(**new_reference.model_dump(exclude_unset=True))
@@ -49,7 +50,7 @@ def create_reference(new_reference: Harm_reference) -> Harm_reference:
 
 # Delete
 def delete_reference(reference_id: UUID) -> None:
-    logger.debug(f"{fa.service}{fa.delete} {__name__}")
+    logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_reference)
         stmt = stmt.where(reference_id == reference_id)
@@ -60,7 +61,7 @@ def delete_reference(reference_id: UUID) -> None:
 # Assign
 def assign_reference(reference_id: UUID, 
                      record_hash: str) -> None:
-    logger.debug(f"{fa.service}{fa.assign} {__name__}")
+    logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_reference_to_record)
         stmt = stmt.values(fk_harm_reference=reference_id,
@@ -71,7 +72,7 @@ def assign_reference(reference_id: UUID,
 # Remove
 def remove_reference(reference_id: UUID, 
                      record_hash: str) -> None:
-    logger.debug(f"{fa.service}{fa.remove} {__name__}")
+    logger.debug(f"{fa.service}{fa.remove} {__name__} {stack()[0][3]}()")
     with Session(engine) as session: 
         stmt = delete(harm_reference_to_record)
         stmt = stmt.where(harm_reference_to_record.fk_harm_reference==reference_id)

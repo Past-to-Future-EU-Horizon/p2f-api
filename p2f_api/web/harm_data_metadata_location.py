@@ -8,6 +8,7 @@ from fastapi import Body, APIRouter, Request
 # Batteries included libraries
 import uuid
 from typing import Optional, List
+from inspect import stack
 
 router = APIRouter(prefix="/harm-data-locations")
 
@@ -23,7 +24,7 @@ def list_harm_data_records(
         max_location_age: Optional[float]=None,
         dataset_id: Optional[uuid.UUID]=None
     ) -> List[Harm_location]:
-    logger.debug(f"{fa.web}{fa.list} {__name__}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_location.list_harm_metadata_location(
         bounding_box=bounding_box,
         location_name=location_name,
@@ -39,34 +40,33 @@ def list_harm_data_records(
 # Get Single
 @router.get("/{location_identifier}")
 def get_harm_data_record(location_identifier: uuid.UUID) -> Harm_location:
-    logger.debug(f"{fa.web}{fa.get} {__name__}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_location.get_location(location_identifier=location_identifier)
 
 # Create
 @router.post("/")
 def create_dataset(new_location: Harm_location) -> Harm_location:
-    logger.debug(f"{fa.web}{fa.create} {__name__}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_location.create_location(new_location=new_location)
     
 
 @router.put("/")
 def update_dataset(update_location: Harm_location) -> Harm_location:
-    logger.debug(f"{fa.web}{fa.update} {__name__}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_location.update_location(update_location=update_location)
 
 
 # Delete
 @router.delete("/{location_identifier}")
 def delete_dataset(location_identifier: uuid.UUID) -> None:
-    logger.debug(f"{fa.web}{fa.delete} {__name__}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_location.delete_location(location_identifier=location_identifier)
     
 @router.post("/assign")
 def assign_location_to_record(
     location_identifier: uuid.UUID,
     record_hash: str):
-    logger.debug(f"{fa.web}{fa.assign} {__name__}")
-    logger.debug(f"Received {location_identifier}, {record_hash}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}({location_identifier}, {record_hash})")
     return harm_data_metadata_location.assign_location_to_record(
         location_identifier=location_identifier,
         record_hash=record_hash
@@ -76,7 +76,7 @@ def assign_location_to_record(
 def remove_location_from_record(
     location_identifier: uuid.UUID,
     record_hash: str):
-    logger.debug(f"{fa.web}{fa.remove} {__name__}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_location.remove_location_from_record(
         location_identifier=location_identifier,
         record_hash=record_hash

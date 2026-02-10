@@ -8,6 +8,7 @@ from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 from typing import List, Optional
 from uuid import UUID
+from inspect import stack
 
 def list_harm_metadata_species(
         tax_domain: Optional[str]=None,
@@ -28,7 +29,7 @@ def list_harm_metadata_species(
         common_name: Optional[str]=None,
         display_species: Optional[str]=None,
     ) -> List[Harm_data_species]:
-    logger.debug(f"{fa.service}{fa.list} {__name__}")
+    logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_data_species)
         tax_values = {x:y for x, y in dict(locals()).items() if x.startswith("tax_") and y != None}
@@ -71,7 +72,7 @@ def list_harm_metadata_species(
 
 def get_harm_metadata_species(species_id: Optional[UUID]=None, 
                               pk_harm_species: Optional[int]=None):
-    logger.debug(f"{fa.service}{fa.get} {__name__}")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_data_species)
         if species_id is not None:
@@ -83,7 +84,7 @@ def get_harm_metadata_species(species_id: Optional[UUID]=None,
     return Harm_data_species(**result[0].__dict__)
 
 def create_harm_metadata_species(new_species: Harm_data_species) -> Harm_data_species:
-    logger.debug(f"{fa.service}{fa.create} {__name__}")
+    logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_data_species)
         stmt = stmt.values(**new_species.model_dump(exclude_unset=True))
@@ -93,7 +94,7 @@ def create_harm_metadata_species(new_species: Harm_data_species) -> Harm_data_sp
     return get_harm_metadata_species(pk_harm_species=new_pk[0])
 
 def delete_harm_species(species_id: UUID) -> None:
-    logger.debug(f"{fa.service}{fa.delete} {__name__}")
+    logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_data_species)
         stmt = stmt.where(harm_data_species.species_identifier==species_id)
@@ -102,7 +103,7 @@ def delete_harm_species(species_id: UUID) -> None:
 
 def assign_species_to_record_hash(species_id: UUID, 
                                   record_hash: str):
-    logger.debug(f"{fa.service}{fa.assign} {__name__}")
+    logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_species_to_record)
         stmt = stmt.values(fk_species_identifier=species_id, 
@@ -112,7 +113,7 @@ def assign_species_to_record_hash(species_id: UUID,
 
 def remove_specied_to_record_assignment(species_id: UUID, 
                                         record_hash: str):
-    logger.debug(f"{fa.service}{fa.remove} {__name__}")
+    logger.debug(f"{fa.service}{fa.remove} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_species_to_record)
         stmt = stmt.where(harm_species_to_record.fk_species_identifier==species_id)

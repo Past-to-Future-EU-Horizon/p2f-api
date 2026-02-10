@@ -7,6 +7,7 @@ from fastapi import Body, APIRouter, Request
 # Batteries included libraries
 import uuid
 from typing import Optional, List
+from inspect import stack
 
 router = APIRouter(prefix="/harm-data-records")
 
@@ -16,19 +17,19 @@ def list_harm_data_records(
     dataset: Optional[str]=None, 
     # data_type: Optional[int]=None, ### Disabled for now, see note in service
     ) -> List[Harm_data_record]:
-    logger.debug(f"{fa.web}{fa.list} {__name__}")
+    logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     return harm_data_record.list_harm_data_record(dataset=dataset)
 
 # Get Single
 @router.get("/{record_hash}")
 def get_harm_data_record(record_hash: str) -> Harm_data_record:
-    logger.debug(f"{fa.web}{fa.get} {__name__}")
+    logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_data_record.get_harm_data_record(record_hash=record_hash)
 
 # Create
 @router.post("/")
 def create_dataset(new_data_record: Harm_data_record) -> Harm_data_record:
-    logger.debug(f"{fa.web}{fa.create} {__name__}")
+    logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_data_record.create_harm_data_record(new_data_record)
 
 # Update 
@@ -44,6 +45,6 @@ def create_dataset(new_data_record: Harm_data_record) -> Harm_data_record:
 # Delete
 @router.delete("/{record_hash}")
 def delete_dataset(record_hash: str) -> None:
-    logger.debug(f"{fa.web}{fa.delete} {__name__}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     if type(record_hash) == str:
         return harm_data_record.delete_harm_data_record(record_hash)

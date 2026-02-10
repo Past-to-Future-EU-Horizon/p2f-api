@@ -77,7 +77,7 @@ def get_harm_data_type(
         datatype_id: Optional[UUID]=None,
         pk_harm_data_type: Optional[int]=None
     ) -> Harm_data_type:
-    logger.debug(f"{fa.service}{fa.get} {__name__} get_harm_data_type()")
+    logger.debug(f"{fa.service}{fa.get} {__name__}  {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_data_type)
         if datatype_id is not None:
@@ -90,7 +90,7 @@ def get_harm_data_type(
 def create_harm_data_type(
         new_harm_data_type: Harm_data_type    
     ) -> Harm_data_type:
-    logger.debug(f"{fa.service}{fa.create} {__name__} create_harm_data_type()")
+    logger.debug(f"{fa.service}{fa.create} {__name__}  {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_data_type)
         stmt = stmt.values(**new_harm_data_type.model_dump(exclude_unset=True))
@@ -115,7 +115,7 @@ def create_harm_data_type(
 def update_harm_data_type(
         update_harm_data_type: Harm_data_type
     ) -> Harm_data_type:
-    logger.debug(f"{fa.service}{fa.update} {__name__} update_harm_data_type()")
+    logger.debug(f"{fa.service}{fa.update} {__name__}  {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = update(harm_data_type)
         stmt = stmt.where(harm_data_type.datatype_id == update_harm_data_type.datatype_id)
@@ -127,7 +127,7 @@ def update_harm_data_type(
 def delete_harm_data_type(
         datatype_id: UUID
     ) -> None:
-    logger.debug(f"{fa.service}{fa.delete} {__name__} delete_harm_data_type()")
+    logger.debug(f"{fa.service}{fa.delete} {__name__}  {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_data_type)
         logger.debug(datatype_id)

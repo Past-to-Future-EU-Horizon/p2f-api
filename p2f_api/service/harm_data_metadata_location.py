@@ -67,7 +67,7 @@ def list_harm_metadata_location(
 
 def get_location(location_identifier: Optional[UUID]=None,
                  pk_harm_location: Optional[int]=None) -> Harm_location:
-    logger.debug(f"{fa.service}{fa.get} {__name__}")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_locations)
         if location_identifier is not None:
@@ -79,7 +79,7 @@ def get_location(location_identifier: Optional[UUID]=None,
     return Harm_location(**result.__dict__)
 
 def create_location(new_location: Harm_location) -> Harm_location:
-    logger.debug(f"{fa.service}{fa.create} {__name__}")
+    logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_locations)
         stmt = stmt.values(**new_location.model_dump(exclude_unset=True))
@@ -88,7 +88,7 @@ def create_location(new_location: Harm_location) -> Harm_location:
     return get_location(pk_harm_location=execute.inserted_primary_key[0])
 
 def update_location(update_location: Harm_location) -> Harm_location:
-    logger.debug(f"{fa.service}{fa.update} {__name__}")
+    logger.debug(f"{fa.service}{fa.update} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = update(harm_locations)
         stmt = stmt.where(update_location.location_identifier)
@@ -98,7 +98,7 @@ def update_location(update_location: Harm_location) -> Harm_location:
     return get_location(update_location.pk_harm_location)
 
 def delete_location(location_identifier: UUID) -> None:
-    logger.debug(f"{fa.service}{fa.delete} {__name__}")
+    logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_locations)
         stmt = stmt.where(harm_locations.location_identifier == location_identifier)
@@ -110,7 +110,7 @@ def assign_location_to_record(
         location_identifier: UUID,
         record_hash: str
     ): 
-    logger.debug(f"{fa.service}{fa.assign} {__name__}")
+    logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("Session created")
         stmt = insert(harm_location_to_record)
@@ -127,7 +127,7 @@ def remove_location_from_record(
         location_identifier: UUID,
         record_hash: str
     ): 
-    logger.debug(f"{fa.service}{fa.remove} {__name__}")
+    logger.debug(f"{fa.service}{fa.remove} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_location_to_record)
         stmt = stmt.where(harm_location_to_record.fk_data_record == record_hash)

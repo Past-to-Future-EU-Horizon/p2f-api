@@ -7,6 +7,7 @@ from fastapi import HTTPException
 # Batteries included libraries
 import uuid
 from typing import Optional, List
+from inspect import stack
 
 router = APIRouter(prefix="/doi")
 
@@ -14,6 +15,7 @@ router = APIRouter(prefix="/doi")
 def get(dataset_id: Optional[uuid.UUID]=None,
         doi_prefix: Optional[str]=None, 
         doi_suffix: Optional[str]=None):
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     if doi_prefix is not None:
         if doi_suffix is None:
             return HTTPException(400, "DOI Suffix and Prefix must be supplied together.")

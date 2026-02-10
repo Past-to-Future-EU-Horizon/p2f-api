@@ -6,6 +6,7 @@ from fastapi import Body, APIRouter, Request
 # Batteries included libraries
 import uuid
 from typing import Optional, List
+from inspect import stack
 
 router = APIRouter(prefix="/harm-data-types")
 
@@ -16,7 +17,7 @@ def list_harm_data_types(
         method: Optional[str]=None,
         dataset_id: Optional[uuid.UUID]=None
     ) -> List[Harm_data_type]:
-    logger.debug(f"🕸️📃 {__name__}/list_harm_data_types({measure}, {unit_of_measure}, {method}, {dataset_id})")
+    logger.debug(f"🕸️📃 {__name__} {stack()[0][3]}({measure}, {unit_of_measure}, {method}, {dataset_id})")
     return harm_data_types.list_harm_data_types(measure=measure,
                                                 unit_of_measure=unit_of_measure,
                                                 method=method, 
@@ -26,14 +27,14 @@ def list_harm_data_types(
 def get_harm_data_type(
         datatype_id: uuid.UUID
     ) -> Harm_data_type:
-    logger.debug(f"🕸️🔎 {__name__}/get_harm_data_types({datatype_id})")
+    logger.debug(f"🕸️🔎 {__name__} {stack()[0][3]}({datatype_id})")
     return harm_data_types.get_harm_data_type(datatype_id=datatype_id)
 
 @router.post("/")
 def insert_harm_data_type(
         new_harm_data_type: Harm_data_type
     ) -> Harm_data_type:
-    logger.debug(f"🕸️✍️ {__name__}/insert_harm_data_type()")
+    logger.debug(f"🕸️✍️ {__name__} {stack()[0][3]}()")
     return harm_data_types.create_harm_data_type(new_harm_data_type=new_harm_data_type)
 
 # @router.put("/")
@@ -47,5 +48,5 @@ def insert_harm_data_type(
 def delete_harm_data_record(
         datatype_id: uuid.UUID
     ) -> None:
-    logger.debug(f"🕸️🗑️ {__name__}/delete_harm_data_record({datatype_id})")
+    logger.debug(f"🕸️🗑️ {__name__} {stack()[0][3]}({datatype_id})")
     return harm_data_types.delete_harm_data_type(datatype_id=datatype_id)

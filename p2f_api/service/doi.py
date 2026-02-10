@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from base64 import b64decode
 from xml.dom import minidom as xdmd
+from inspect import stack
 
 datacite_api_url = "https://api.datacite.org/"
 crossref_api_url = "https://api.crossref.org/"
@@ -28,6 +29,7 @@ def insert_doi_metadata(doi: str,
                         metadata_json: Optional[str]=None, 
                         metadata_xml: Optional[str]=None,
                         request_time: datetime=datetime.now(tz=ZoneInfo("UTC"))):
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     doi = DOI(doi)
     with Session(engine) as session:
         stmt = insert(doi_metadata)
@@ -42,7 +44,7 @@ def insert_doi_metadata(doi: str,
         commit = session.commit()
 
 def request_insert_datacite_doi(doi: str) -> str:
-    logger.debug(f"{fa.background}{fa.get} {__name__}")
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     doi_url = datacite_api_furl / "dois" / doi
     r = requests.get(doi_url)
     if r.ok:
@@ -68,7 +70,7 @@ def request_insert_datacite_doi(doi: str) -> str:
         return None
     
 def request_insert_crossref_doi(doi: str) -> str:
-    logger.debug(f"{fa.background}{fa.get} {__name__}")
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     doi_url = crossref_api_furl / "works" / doi
     r = requests.get(doi_url)
     if r.ok:
@@ -84,13 +86,13 @@ def request_insert_zenodo_doi(doi: str) -> str:
     pass
 
 def request_insert_doi_metadata(doi: str):
-    logger.debug(f"{fa.background}{fa.get} {__name__}")
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     
 
 def get_doi(dataset_id: Optional[UUID]=None,
             doi_prefix: Optional[str]=None, 
             doi_suffix: Optional[str]=None):
-    logger.debug(f"{fa.service}{fa.get} {__name__}")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     # TODO Add protection here for anti-DDOSing our friends at DataCite, Crossref, Zenodo    
     # TODO Add check here if DOI within our database
     if dataset_id is not None:

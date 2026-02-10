@@ -9,9 +9,10 @@ from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 import uuid
 from typing import List, Optional
+from inspect import stack
 
 def list_git_repositories(dataset_id: Optional[uuid.UUID]=None) -> List[Git_Repository]:
-    logger.debug(f"{fa.service}{fa.list} {__name__}")
+    logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(git_repository)
         if dataset_id is not None:
@@ -22,7 +23,7 @@ def list_git_repositories(dataset_id: Optional[uuid.UUID]=None) -> List[Git_Repo
 
 def get_git_repo(git_repo_id: Optional[uuid.UUID]=None,
                  pk_git_repo: Optional[int]=None) -> Git_Repository:
-    logger.debug(f"{fa.service}{fa.get} {__name__}")
+    logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(git_repository)
         if git_repo_id is not None:
@@ -34,7 +35,7 @@ def get_git_repo(git_repo_id: Optional[uuid.UUID]=None,
 
 def create_git_repo(new_git_repo: Git_Repository,
                     dataset_id: Optional[uuid.UUID]=None) -> Git_Repository:
-    logger.debug(f"{fa.service}{fa.create} {__name__}")
+    logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(git_repository)
         stmt = stmt.values(git_repo_url=new_git_repo.git_repo_id,
@@ -53,7 +54,7 @@ def delete_git_repo(git_repo_id: Optional[uuid.UUID]=None) -> None:
 
 def assign_git_repo(git_repo_id: uuid.UUID,
                     dataset_id: uuid.UUID):
-    logger.debug(f"{fa.service}{fa.assign} {__name__}")
+    logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(git_repository_to_dataset)
         stmt = stmt.values(fk_git_repository=git_repo_id,
@@ -63,7 +64,7 @@ def assign_git_repo(git_repo_id: uuid.UUID,
 
 def unlink_git_repo(git_repo_id: uuid.UUID,
                     dataset_id: uuid.UUID):
-    logger.debug(f"{fa.service}{fa.remove} {__name__}")
+    logger.debug(f"{fa.service}{fa.remove} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(git_repository_to_dataset)
         stmt = stmt.where(git_repository_to_dataset.fk_dataset_id == dataset_id)

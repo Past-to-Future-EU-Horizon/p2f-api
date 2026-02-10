@@ -8,13 +8,14 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 from typing import List, Optional
+from inspect import stack
 
 def list_datasets(
         is_new_p2f: Optional[bool]=None,
         is_sub_dataset: Optional[bool]=None,
         doi: Optional[str]=None
     ) -> List[Datasets]:
-    logger.debug(f"{fa.service}{fa.list} service/datasets.py list_datasets()")
+    logger.debug(f"{fa.service}{fa.list} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
         # logger.debug(f"Parameters: {is_new_p2f}, {is_sub_dataset}, {doi}")
@@ -33,7 +34,7 @@ def list_datasets(
 
 def get_dataset(dataset_id=None,
                 pk_datasets=None) -> Datasets:
-    logger.debug(f"{fa.service}{fa.get} service/datasets.py get_dataset()")
+    logger.debug(f"{fa.service}{fa.get} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
         stmt = select(datasets)
@@ -47,7 +48,7 @@ def get_dataset(dataset_id=None,
     return Datasets(**result.__dict__)
 
 def create_dataset(new_dataset: Datasets) -> Datasets:
-    logger.debug(f"{fa.service}{fa.create} service/datasets.py create_dataset()")
+    logger.debug(f"{fa.service}{fa.create} {stack()[0][3]}()")
     logger.debug(f"•  received: {new_dataset}")
     with Session(engine) as session:
         logger.debug("•  Created session")
@@ -61,7 +62,7 @@ def create_dataset(new_dataset: Datasets) -> Datasets:
     return return_dataset
 
 def update_dataset(dataset_update: Datasets) -> Datasets:
-    logger.debug(f"{fa.service}{fa.update} service/datasets.py update_dataset()")
+    logger.debug(f"{fa.service}{fa.update} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
         stmt = update(datasets)
@@ -72,7 +73,7 @@ def update_dataset(dataset_update: Datasets) -> Datasets:
     return get_dataset(dataset_id=dataset_update.dataset_identifier)
 
 def delete_dataset(dataset_identifier) -> None:
-    logger.debug(f"{fa.service}{fa.delete} service/datasets.py delete_dataset()")
+    logger.debug(f"{fa.service}{fa.delete} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
         stmt = delete(datasets).where(datasets.dataset_identifier == dataset_identifier)

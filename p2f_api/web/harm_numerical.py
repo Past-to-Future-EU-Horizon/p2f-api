@@ -12,6 +12,7 @@ from fastapi import Body, APIRouter, Request
 # Batteries included libraries
 import uuid
 from typing import Optional, List, Union, Literal
+from inspect import stack
 
 router = APIRouter(prefix="/harm-numerical")
 
@@ -31,7 +32,7 @@ def list_harm_numerical(
     data_type: Optional[uuid.UUID]=None, 
     dataset_id: Optional[uuid.UUID]=None
     ) -> Return_harm_numerical:
-    logger.debug(f"{fa.web}{fa.list} {__name__}")
+    logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     logger.debug(f"Received params: {locals()}")
     return harm_numerical.list_numerics(record_hash=record_hash,
                                         numeric_type=numeric_type, 
@@ -41,23 +42,23 @@ def list_harm_numerical(
 # Get Single
 @router.get("/{numeric_id}")
 def get_harm_numerical(numeric_id: uuid.UUID) -> Harm_numerical_union:
-    logger.debug(f"{fa.web}{fa.get} {__name__}")
+    logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_numerical.get_numeric(numeric_id=numeric_id)
 
 # Create
 @router.post("/")
 def create_harm_numerical(new_numeric: Insert_harm_numerical) -> Harm_numerical_union:
-    logger.debug(f"{fa.web}{fa.create} {__name__}")
+    logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_numerical.create_numeric(new_numeric=new_numeric)
 
 # Update 
 @router.put("/")
 def update_harm_numerical(numerical_updates: Harm_numerical_union) -> Harm_numerical_union:
-    logger.debug(f"{fa.web}{fa.update} {__name__}")
+    logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
     return harm_numerical.update_numeric(numerical_updates)
 
 # Delete
 @router.delete("/{numeric_id}")
 def delete_harm_numerical(numeric_id: uuid.UUID) -> None:
-    logger.debug(f"{fa.web}{fa.delete} {__name__}")
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_numerical.delete_numeric(numeric_id=numeric_id)

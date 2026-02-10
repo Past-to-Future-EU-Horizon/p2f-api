@@ -1,5 +1,5 @@
 # Local libraries
-from p2f_api.apilogs import logger
+from p2f_api.apilogs import logger, fa
 from .account_permissions_json import Account_Permissions, default_consortium_permissions
 from ..data.db_connection import engine
 from ..data.temp_accounts import temp_tokens, permitted_addresses, email_history
@@ -17,6 +17,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from uuid import uuid4
 import os
+from inspect import stack
 
 P2F_EMAIL_SA_USERNAME = os.getenv("P2F_EMAIL_SA_USERNAME")
 P2F_EMAIL_SA_PASSWORD = os.getenv("P2F_EMAIL_SA_PASSWORD")
@@ -26,6 +27,7 @@ P2F_TOKEN_TTL = os.getenv("P2F_TOKEN_TTL", default=(24*3600))
 def insert_token_record(email: EmailStr,
                   generated_token: str, 
                   expiration: datetime) -> str:
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     logger.debug("➡️Inserting Token Record")
     with Session(engine) as session:
         stmt = insert(temp_tokens)
@@ -40,6 +42,7 @@ def insert_token_record(email: EmailStr,
 def invalidate_current_token(
         email: EmailStr
     ):
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     new_expiration_time = datetime.now(tz=ZoneInfo("UTC")) - timedelta(seconds=1)
     with Session(engine) as session:
         stmt = update(temp_tokens)
@@ -50,6 +53,7 @@ def invalidate_current_token(
 def send_email_information(email: EmailStr, 
                            generated_token: str, 
                            expiration: datetime):
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     logger.debug("📩Sending token to email")
 
     email_uuid = uuid4()
@@ -81,6 +85,7 @@ Do not reply to this email directly. """
         commit = session.commit()
 
 def token_request(email: EmailStr):
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     if is_permitted_address(email=email):
         new_token = str(token_urlsafe(256))[:127]
         expiration = datetime.now(tz=ZoneInfo("UTC")) + timedelta(hours=2)
@@ -98,6 +103,7 @@ def evaluate_token(
     email: EmailStr, 
     token: str
     ) -> Literal["Authorized", "Expired", "NotFound"]:
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(temp_tokens)
         stmt = stmt.where(temp_tokens.email_address==email)
@@ -114,6 +120,7 @@ def evaluate_token(
 def insert_permitted_address(email: EmailStr,
                              permissions: Account_Permissions=default_consortium_permissions, 
                              timezone: str="Europe/Amsterdam"):
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(permitted_addresses)
         stmt = stmt.values(email_address=email, 
@@ -123,6 +130,7 @@ def insert_permitted_address(email: EmailStr,
         commit = session.commit()
 
 def is_permitted_address(email: EmailStr) -> bool:
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(permitted_addresses)
         stmt = stmt.where(permitted_addresses.email_address == email)
@@ -135,6 +143,7 @@ def is_permitted_address(email: EmailStr) -> bool:
 def is_action_authorized(email: EmailStr, 
                          endpoint: str, 
                          operation: Literal["get", "insert", "update", "delete"]) -> bool:
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(permitted_addresses)
         stmt = stmt.where(permitted_addresses.email_address == email)
