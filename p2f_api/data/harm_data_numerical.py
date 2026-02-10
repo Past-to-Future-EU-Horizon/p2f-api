@@ -9,6 +9,7 @@ from sqlalchemy import Text
 from sqlalchemy import func
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
+from sqlalchemy import UniqueConstraint, PrimaryKeyConstraint
 # Batteries included libraries
 from uuid import UUID
 
@@ -16,7 +17,8 @@ logger.debug(f"{fa.data} {__name__}")
 
 class harmonized_int_confidence(baseSQL):
     __tablename__ = "p2f_harm_integer_confidence"
-    pk_harm_num: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=func.gen_random_uuid())
+    __table_args__ = (PrimaryKeyConstraint("pk_harm_num", "fk_data_type", name="pk_fk_hnic_unique"), { "postgresql_partition_by": "LIST(fk_data_type)"})
+    pk_harm_num: Mapped[UUID] = mapped_column(Uuid, default=func.gen_random_uuid())
     value: Mapped[int] = mapped_column(BigInteger)
     upper_conf_interval: Mapped[float] = mapped_column(Float)
     lower_conf_interval: Mapped[float] = mapped_column(Float)
@@ -27,14 +29,16 @@ class harmonized_int_confidence(baseSQL):
 
 class harmonized_int(baseSQL):
     __tablename__ = "p2f_harm_integer"
-    pk_harm_num: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=func.gen_random_uuid())
+    __table_args__ = (PrimaryKeyConstraint("pk_harm_num", "fk_data_type", name="pk_fk_hni_unique"), { "postgresql_partition_by": "LIST(fk_data_type)"})
+    pk_harm_num: Mapped[UUID] = mapped_column(Uuid, default=func.gen_random_uuid())
     value: Mapped[int] = mapped_column(BigInteger)
     fk_data_record: Mapped[str] = mapped_column(ForeignKey("p2f_harm_data_record.record_hash"))
     fk_data_type: Mapped[UUID] = mapped_column(ForeignKey("p2f_harm_data_types.datatype_id"))
 
 class harmonized_float_confidence(baseSQL):
     __tablename__ = "p2f_harm_float_confidence"
-    pk_harm_num: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=func.gen_random_uuid())
+    __table_args__ = (PrimaryKeyConstraint("pk_harm_num", "fk_data_type", name="pk_fk_hnfc_unique"), { "postgresql_partition_by": "LIST(fk_data_type)"})
+    pk_harm_num: Mapped[UUID] = mapped_column(Uuid, default=func.gen_random_uuid())
     value: Mapped[float] = mapped_column(Double)
     upper_conf_interval: Mapped[float] = mapped_column(Float)
     lower_conf_interval: Mapped[float] = mapped_column(Float)
@@ -45,7 +49,8 @@ class harmonized_float_confidence(baseSQL):
 
 class harmonized_float(baseSQL):
     __tablename__ = "p2f_harm_float"
-    pk_harm_num: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=func.gen_random_uuid())
+    __table_args__ = (PrimaryKeyConstraint("pk_harm_num", "fk_data_type", name="pk_fk_hnf_unique"), { "postgresql_partition_by": "LIST(fk_data_type)"})
+    pk_harm_num: Mapped[UUID] = mapped_column(Uuid, default=func.gen_random_uuid())
     value: Mapped[float] = mapped_column(Double)
     fk_data_record: Mapped[str] = mapped_column(ForeignKey("p2f_harm_data_record.record_hash"))
     fk_data_type: Mapped[UUID] = mapped_column(ForeignKey("p2f_harm_data_types.datatype_id"))

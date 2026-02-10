@@ -17,7 +17,7 @@ def list_references() -> List[Harm_reference]:
     with Session(engine) as session:
         stmt = select(harm_reference)
         results = session.execute(stmt).all()
-    return [Harm_reference(**x[0]).__dict__ for x in results]
+    return [Harm_reference(**x[0].__dict__) for x in results]
 
 # Get
 def get_reference(doi: Optional[str]=None, 

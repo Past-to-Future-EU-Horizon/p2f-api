@@ -4,10 +4,12 @@ from ..service.harm_numerical import list_numerics
 from ..service.harm_data_record import list_harm_data_record
 from ..data.db_connection import engine
 from ..data.harm_data_types import harm_data_type
+from ..data import harm_data_numerical
 from p2f_pydantic.harm_data_types import harm_data_type as Harm_data_type
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
+from sqlalchemy import text
 # Batteries included libraries
 from typing import List, Optional
 from uuid import UUID
@@ -94,7 +96,21 @@ def create_harm_data_type(
         stmt = stmt.values(**new_harm_data_type.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
-    return get_harm_data_type(pk_harm_data_type=execute.inserted_primary_key[0])
+    return_harm_data_type = get_harm_data_type(pk_harm_data_type=execute.inserted_primary_key[0])
+    new_data_type_uuid = return_harm_data_type.datatype_id
+    new_data_type_uuid = new_data_type_uuid.hex
+    with Session(engine) as session:
+        numericals = [harm_data_numerical.harmonized_int,
+                      harm_data_numerical.harmonized_int_confidence,
+                      harm_data_numerical.harmonized_float,
+                      harm_data_numerical.harmonized_float_confidence]
+        numericals = [x.__tablename__ for x in numericals]
+        for partitioner in numericals:
+            stmt = text(f"""CREATE TABLE {partitioner}_{new_data_type_uuid} PARTITION
+                        OF {partitioner} FOR VALUES IN ('{new_data_type_uuid}');""")
+            session.execute(stmt)
+            session.commit()
+    return return_harm_data_type
 
 def update_harm_data_type(
         update_harm_data_type: Harm_data_type
