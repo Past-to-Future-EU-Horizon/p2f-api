@@ -12,6 +12,7 @@ from p2f_api.web import harm_reference
 from p2f_api.web import export_clean_ddl
 from p2f_api.web import link_git
 from p2f_api.web import doi
+from p2f_api.web import dq_comment
 # Third Party Libraries
 from fastapi import FastAPI
 # Batteries included libraries
@@ -35,6 +36,7 @@ app.include_router(harm_age.router)
 app.include_router(harm_reference.router)
 app.include_router(link_git.router)
 app.include_router(doi.router)
+app.include_router(dq_comment.router)
 
 ## Remember to remove in the future
 app.include_router(export_clean_ddl.router)
