@@ -38,5 +38,5 @@ class  email_history(baseSQL):
     email_meta_sender: Mapped[str] = mapped_column(Text, nullable=False)
     email_meta_receiver: Mapped[str] = mapped_column(Text, nullable=False)
     email_meta_subject: Mapped[str] = mapped_column(Text, nullable=False)
-    creation_timestamp: Mapped[datetime] = mapped_column(DateTime(ZoneInfo("UTC")),)
-    update_timestamp: Mapped[datetime] = mapped_column(DateTime(ZoneInfo("UTC")),)
+    creation_timestamp: Mapped[datetime] = mapped_column(DateTime(ZoneInfo("UTC")), default=func.now())
+    update_timestamp: Mapped[datetime] = mapped_column(DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now())

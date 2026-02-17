@@ -58,12 +58,13 @@ def insert_token_record(email: str,
     with Session(engine) as session:
         stmt = insert(temp_tokens)
         stmt = stmt.values(
-            email=email,
+            email_address=email,
             token=hashed_token, 
             expiration=expiration
         )
         execute = session.execute(stmt)
         commit = session.commit()
+    logger.debug("Token inserted into database")
 
 def invalidate_current_token(
         email: EmailStr
