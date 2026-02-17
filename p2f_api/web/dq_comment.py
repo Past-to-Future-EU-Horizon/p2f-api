@@ -19,7 +19,7 @@ def create_dq_comment(new_comment: DQ_Comment) -> List[DQ_Comment]:
     # TODO check for email in new comment is authorized with provided token
     return dq_comment.create_dq_comment(new_comment=new_comment)
 
-@router.update("/")
+@router.put("/")
 def update_dq_comment(update_comment: DQ_Comment) -> List[DQ_Comment]:
     # TODO check for email in updating comment is authorized with provided token
     return dq_comment.update_dq_comment(update_comment=update_comment)

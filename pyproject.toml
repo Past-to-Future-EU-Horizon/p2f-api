@@ -9,6 +9,7 @@ dependencies = [
     "furl>=2.1.4",
     "p2f-pydantic>=0.0.2",
     "psycopg>=3.2.8",
+    "pydantic[email]>=2.12.3",
     "pyjwt>=2.10.1",
     "python-dotenv>=1.1.0",
     "pytz>=2025.2",

@@ -19,7 +19,7 @@ class temp_tokens(baseSQL):
     __tablename__ = "p2f_account_tokens"
     pk_temp_accounts: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     email_address: Mapped[str] = mapped_column(String(127), nullable=False)
-    token: Mapped[str] = mapped_column(String(127), nullable=False)
+    token: Mapped[str] = mapped_column(String(128), nullable=False)
     expiration: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
 class permitted_addresses(baseSQL):

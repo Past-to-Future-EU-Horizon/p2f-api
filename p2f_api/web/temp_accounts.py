@@ -1,8 +1,10 @@
 from p2f_api.apilogs import logger, fa
 from ..service import temp_accounts
-from p2f_pydantic.harm_data_types import harm_data_type as Harm_data_type
+from p2f_pydantic.temp_accounts import request_token as Request_token
+from p2f_pydantic.generic import Message
 # Third Party Libraries
 from fastapi import Body, APIRouter, Request
+from fastapi import BackgroundTasks
 from fastapi import HTTPException
 from pydantic import EmailStr
 # Batteries included libraries
@@ -13,14 +15,16 @@ from inspect import stack
 
 router = APIRouter(prefix="/token")
 
-router.post("/request")
-def request_token(email: EmailStr) -> str:
+@router.post("/request")
+def request_token(email: Request_token, 
+                  background_task: BackgroundTasks) -> Message:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
-    temp_accounts.token_request(email)
+    background_task.add_task(temp_accounts.token_request, email )
     # We always return the same message. 
     ## For security reasons do not reveal permitted email addresses. 
     msg = "Your token request has been received, if your email is valid, you will receive a token through your email soon."
-    return msg
+    msg = Message(message=msg)
+    return msg.model_dump_json(exclude_unset=True)
 
 def authentication(email: EmailStr, 
                   token: str):

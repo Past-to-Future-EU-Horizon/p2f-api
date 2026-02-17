@@ -1,12 +1,15 @@
 # Local libraries
 from p2f_api.apilogs import logger, fa
-from .account_permissions_json import Account_Permissions, default_consortium_permissions
+from .account_permissions_json import Account_Permissions
+from .account_permissions_json import default_consortium_permissions
+from .account_permissions_json import super_user
 from ..data.db_connection import engine
 from ..data.temp_accounts import temp_tokens, permitted_addresses, email_history
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
 from pydantic import EmailStr
+import dotenv
 # Batteries included libraries
 from typing import List, Optional, Literal, Union
 from datetime import datetime, timedelta
@@ -16,24 +19,47 @@ from zoneinfo import ZoneInfo
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from uuid import uuid4
+import hashlib
 import os
 from inspect import stack
+
+dotenv.load_dotenv()
 
 P2F_EMAIL_SA_USERNAME = os.getenv("P2F_EMAIL_SA_USERNAME")
 P2F_EMAIL_SA_PASSWORD = os.getenv("P2F_EMAIL_SA_PASSWORD")
 P2F_EMAIL_ADDRESS = os.getenv("P2F_EMAIL_ADDRESS")
-P2F_TOKEN_TTL = os.getenv("P2F_TOKEN_TTL", default=(24*3600))
+P2F_ADMIN_EMAIL_ADDRESS = os.getenv("P2F_ADMIN_EMAIL_ADDRESS")
+P2F_TOKEN_TTL = int(os.getenv("P2F_TOKEN_TTL", default=(24*3600)))
+P2F_SALT = os.getenv("P2F_SALT", default=token_urlsafe(256))
+P2F_HASH_COUNT = int(os.getenv("P2F_HASH_COUNT", default=2000))
+P2F_TOKEN_DEBUG = bool(os.getenv("P2F_TOKEN_DEBUG", default=False))
+P2F_TOKEN_LENGTH = int(os.getenv("P2F_TOKEN_LENGTH", default=64))
 
-def insert_token_record(email: EmailStr,
+def hashorama(password: str) -> str:
+    logger.debug(f"{fa.background}{fa.service} {__name__} {stack()[0][3]}()")
+    c = 0
+    h_input = password
+    while c <= P2F_HASH_COUNT:
+        if c % 100 == 0:
+            logger.debug(f"•• Hash run {c}")
+        h = hashlib.sha512()
+        h.update(h_input.encode("utf8"))
+        h.update(P2F_SALT.encode("utf8"))
+        h_input = str(h.hexdigest())
+        c += 1
+    return h_input
+
+def insert_token_record(email: str,
                   generated_token: str, 
-                  expiration: datetime) -> str:
+                  expiration: datetime):
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     logger.debug("➡️Inserting Token Record")
+    hashed_token = hashorama(generated_token)
     with Session(engine) as session:
         stmt = insert(temp_tokens)
         stmt = stmt.values(
             email=email,
-            token=generated_token, 
+            token=hashed_token, 
             expiration=expiration
         )
         execute = session.execute(stmt)
@@ -62,15 +88,17 @@ def send_email_information(email: EmailStr,
     message["Subject"] = "P2F Portal Token"
     message["From"] = P2F_EMAIL_ADDRESS
     message["To"] = email
-    basic_text = f"""\
-Your one day token for the P2F Portal is below:
+    basic_text = f"""
+Your token for the P2F Portal is below:
 {generated_token}
 
 This token will expire on {expiration}. 
 
-This is an automated email from the P2F API, for questions email g.t.speed@uu.nl.
+This is an automated email from the P2F API, for questions email {P2F_ADMIN_EMAIL_ADDRESS}.
 Do not reply to this email directly. """
     message.attach(MIMEText(basic_text, "plain"))
+    if P2F_TOKEN_DEBUG:
+        logger.debug(message)
     with Session(engine) as session:
         stmt = insert(email_history)
         stmt = stmt.values(
@@ -87,16 +115,19 @@ Do not reply to this email directly. """
 def token_request(email: EmailStr):
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     if is_permitted_address(email=email):
-        new_token = str(token_urlsafe(256))[:127]
-        expiration = datetime.now(tz=ZoneInfo("UTC")) + timedelta(hours=2)
+        new_token = str(token_urlsafe(256))[:P2F_TOKEN_LENGTH]
+        expiration = datetime.now(tz=ZoneInfo("UTC")) + timedelta(seconds=P2F_TOKEN_TTL)
         logger.debug('🪙Generated token')
+        if P2F_TOKEN_DEBUG:
+            # Don't run this in production, leaky tokens sink shifts. 
+            logger.debug(f"Newly generated token for {email}\n{new_token}\nExpiring on {expiration.isoformat()}")
         insert_token_record(email=email, 
                             generated_token=new_token,
                             expiration=expiration)
         logger.debug('🪙➡️📩Token inserted, emailing token')
         send_email_information(email=email, 
-                            generated_token=new_token,
-                            expiration=expiration)
+                               generated_token=new_token,
+                               expiration=expiration)
         logger.debug('🌐📩Email sent')
 
 def evaluate_token(
@@ -104,6 +135,7 @@ def evaluate_token(
     token: str
     ) -> Literal["Authorized", "Expired", "NotFound"]:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
+    token = hashorama(token)
     with Session(engine) as session:
         stmt = select(temp_tokens)
         stmt = stmt.where(temp_tokens.email_address==email)
@@ -122,9 +154,11 @@ def insert_permitted_address(email: EmailStr,
                              timezone: str="Europe/Amsterdam"):
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
+        del_stmt = delete(permitted_addresses).where(permitted_addresses==email)
+        execute_del_stmt = session.execute(del_stmt)
         stmt = insert(permitted_addresses)
         stmt = stmt.values(email_address=email, 
-                           permissions=permissions,
+                           permissions=permissions.model_dump_json(exclude_unset=True),
                            timezone=timezone)
         execute = session.execute(stmt)
         commit = session.commit()
@@ -153,3 +187,7 @@ def is_action_authorized(email: EmailStr,
         return permissions[endpoint][operation]
     else: 
         return False
+    
+
+insert_permitted_address(email=P2F_ADMIN_EMAIL_ADDRESS, 
+                         permissions=super_user)
