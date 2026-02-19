@@ -4,6 +4,7 @@ from data.db_connection import engine
 from data.db_connection import baseSQL
 from sqlalchemy.schema import CreateTable
 
+
 def get_clean_ddl() -> str:
     logger.debug(f"{fa.service}{fa.get} {__name__}")
     sql = ""

@@ -6,7 +6,8 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-class FA: # function annotations
+
+class FA:  # function annotations
     def __init__(self):
         # run level
         self.web = "🕸️"
@@ -17,9 +18,10 @@ class FA: # function annotations
         self.get = "🔎"
         self.list = "📃"
         self.create = "🆕"
-        self.update = "✏️" 
+        self.update = "✏️"
         self.delete = "🗑️"
         self.assign = "↔️"
         self.remove = "🔙"
+
 
 fa = FA()

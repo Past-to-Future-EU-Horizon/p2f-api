@@ -14,6 +14,7 @@ from p2f_api.web import link_git
 from p2f_api.web import doi
 from p2f_api.web import dq_comment
 from p2f_api.web import temp_accounts
+
 # Third Party Libraries
 from fastapi import FastAPI
 # Batteries included libraries
@@ -21,7 +22,7 @@ from fastapi import FastAPI
 app = FastAPI(
     title="Past to Future Dataset API",
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
-    version="0.0.1"
+    version="0.0.5",
 )
 logger.debug(f"{fa.background} {__name__}")
 logger.debug("▶️  FastAPI() Started")
@@ -45,4 +46,5 @@ app.include_router(export_clean_ddl.router)
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app=app)

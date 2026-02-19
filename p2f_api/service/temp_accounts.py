@@ -5,11 +5,13 @@ from .account_permissions_json import default_consortium_permissions
 from .account_permissions_json import super_user
 from ..data.db_connection import engine
 from ..data.temp_accounts import temp_tokens, permitted_addresses, email_history
+
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
 from pydantic import EmailStr
 import dotenv
+
 # Batteries included libraries
 from typing import List, Optional, Literal, Union
 from datetime import datetime, timedelta
@@ -37,10 +39,11 @@ P2F_EMAIL_ADDRESS = os.getenv("P2F_EMAIL_ADDRESS")
 P2F_EMAIL_IP_CIDR = ipaddress.ip_network(os.getenv("P2F_EMAIL_IP_CIDR"), strict=False)
 P2F_ADMIN_EMAIL_ADDRESS = os.getenv("P2F_ADMIN_EMAIL_ADDRESS")
 P2F_SALT = os.getenv("P2F_SALT", default=token_urlsafe(256))
-P2F_TOKEN_TTL = int(os.getenv("P2F_TOKEN_TTL", default=(24*3600)))
+P2F_TOKEN_TTL = int(os.getenv("P2F_TOKEN_TTL", default=(24 * 3600)))
 P2F_HASH_COUNT = int(os.getenv("P2F_HASH_COUNT", default=2000))
 P2F_TOKEN_DEBUG = bool(os.getenv("P2F_TOKEN_DEBUG", default=False))
 P2F_TOKEN_LENGTH = int(os.getenv("P2F_TOKEN_LENGTH", default=64))
+
 
 def hashorama(password: str) -> str:
     logger.debug(f"{fa.background}{fa.service} {__name__} {stack()[0][3]}()")
@@ -48,7 +51,7 @@ def hashorama(password: str) -> str:
     h_input = password
     while c <= P2F_HASH_COUNT:
         # if c % 100 == 0:
-            # logger.debug(f"•• Hash run {c}")
+        # logger.debug(f"•• Hash run {c}")
         h = hashlib.sha512()
         h.update(h_input.encode("utf8"))
         h.update(P2F_SALT.encode("utf8"))
@@ -65,28 +68,24 @@ def insert_token_record(email: str,
     with Session(engine) as session:
         stmt = insert(temp_tokens)
         stmt = stmt.values(
-            email_address=email,
-            token=hashed_token, 
-            expiration=expiration
+            email_address=email, token=hashed_token, expiration=expiration
         )
         execute = session.execute(stmt)
         commit = session.commit()
     logger.debug("Token inserted into database")
 
-def invalidate_current_token(
-        email: EmailStr
-    ):
+
+def invalidate_current_token(email: EmailStr):
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     new_expiration_time = datetime.now(tz=ZoneInfo("UTC")) - timedelta(seconds=1)
     with Session(engine) as session:
         stmt = update(temp_tokens)
-        stmt = stmt.where(temp_tokens.email_address==email)
-        stmt = stmt.where(temp_tokens.expiration<=datetime.now(tz=ZoneInfo("UTC")))
+        stmt = stmt.where(temp_tokens.email_address == email)
+        stmt = stmt.where(temp_tokens.expiration <= datetime.now(tz=ZoneInfo("UTC")))
         stmt = stmt.values(expiration=new_expiration_time)
 
-def create_email_message(email: EmailStr, 
-                 generated_token: str, 
-                 expiration: datetime):
+
+def create_email_message(email: EmailStr, generated_token: str, expiration: datetime):
     message = MIMEMultipart("alternative")
     message["Subject"] = "P2F Portal Token"
     message["From"] = P2F_EMAIL_ADDRESS
@@ -104,9 +103,8 @@ Do not reply to this email directly. """
         logger.debug(message)
     return message
 
-def email_history_update(email_uuid: UUID, 
-                         receipient: str,
-                         status: str="Created"):
+
+def email_history_update(email_uuid: UUID, receipient: str, status: str = "Created"):
     with Session(engine) as session:
         stmt = select(email_history)
         stmt = stmt.where(email_history.email_id == email_uuid)
@@ -119,22 +117,25 @@ def email_history_update(email_uuid: UUID,
             stmt = insert(email_history)
             stmt = stmt.values(
                 email_id=email_uuid,
-                status=status, 
-                sending_time=datetime.now(tz=ZoneInfo("UTC")), 
+                status=status,
+                sending_time=datetime.now(tz=ZoneInfo("UTC")),
                 email_meta_sender=P2F_EMAIL_ADDRESS,
                 email_meta_receiver=receipient,
-                email_meta_subject="P2F Portal Token"
+                email_meta_subject="P2F Portal Token",
             )
         execute = session.execute(stmt)
         commit = session.commit()
+
 
 def send_email(message: MIMEMultipart,
                recipient: str):
     logger.debug(f"{fa.background}{fa.service} {__name__} {stack()[0][3]}()")
     context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(host=P2F_EMAIL_SA_SERVER, 
-                          port=P2F_EMAIL_SA_PORT, 
-                          context=context) as server:
+    with smtplib.SMTP_SSL(
+        host=P2F_EMAIL_SA_SERVER,
+        port=P2F_EMAIL_SA_PORT,
+        context=context
+    ) as server:
         server.login(user=P2F_EMAIL_SA_USERNAME,
                      password=P2F_EMAIL_SA_PASSWORD)
         server.sendmail(
@@ -143,8 +144,9 @@ def send_email(message: MIMEMultipart,
             msg=message.as_string()
         )
 
+
 def check_host_ip() -> bool:
-    """Check the IP address of the host so we don't accidentally try to send an email from outside our requested IP range. 
+    """Check the IP address of the host so we don't accidentally try to send an email from outside our requested IP range.
 
     :return: bool
     :rtype: bool
@@ -159,7 +161,10 @@ def check_host_ip() -> bool:
             if ip_rec["ifname"] not in ["lo"]:
                 if len(ip_rec["addr_info"]) == 1:
                     IPADDRS.append(ip_rec["addr_info"][0]["local"])
-                    if ipaddress.ip_address(ip_rec["addr_info"][0]["local"]) in P2F_EMAIL_IP_CIDR:
+                    if (
+                        ipaddress.ip_address(ip_rec["addr_info"][0]["local"])
+                        in P2F_EMAIL_IP_CIDR
+                    ):
                         status = True
                 if len(ip_rec["addr_info"]) > 1:
                     # prefixed = {prefix: addr for prefix, addr in } This could probably be comprehensioned
@@ -167,7 +172,10 @@ def check_host_ip() -> bool:
                     for addr_rec in ip_rec["addr_info"]:
                         prefixed[addr_rec["prefixlen"]] = addr_rec["local"]
                     IPADDRS.append(prefixed[min(list(prefixed.keys()))])
-                    if ipaddress.ip_address(prefixed[min(list(prefixed.keys()))]) in P2F_EMAIL_IP_CIDR:
+                    if (
+                        ipaddress.ip_address(prefixed[min(list(prefixed.keys()))])
+                        in P2F_EMAIL_IP_CIDR
+                    ):
                         status = True
     except Exception as e:
         logger.debug(f"{stack()[0][3]}() experienced an error: {e}")
@@ -176,72 +184,84 @@ def check_host_ip() -> bool:
         logger.debug(f"{stack()[0][3]}() returning {status}")
     return status
 
-def send_email_information(email: EmailStr, 
-                           generated_token: str, 
-                           expiration: datetime):
+
+def send_email_information(email: EmailStr, generated_token: str, expiration: datetime):
     logger.debug(f"{fa.background}{fa.service} {__name__} {stack()[0][3]}()")
     logger.debug("📩Sending token to email")
 
     email_uuid = uuid4()
-    message = create_email_message(email=email, 
-                                   generated_token=generated_token, 
-                                   expiration=expiration)
-    email_history_update(email_uuid=email_uuid, 
-                         receipient=email, 
-                         status="Created")
+    message = create_email_message(
+        email=email,
+        generated_token=generated_token,
+        expiration=expiration
+    )
+    email_history_update(email_uuid=email_uuid, receipient=email, status="Created")
     if check_host_ip():
         send_email(message=message, recipient=email)
+
 
 def token_request(email: EmailStr):
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     if is_permitted_address(email=email):
         new_token = str(token_urlsafe(256))[:P2F_TOKEN_LENGTH]
         expiration = datetime.now(tz=ZoneInfo("UTC")) + timedelta(seconds=P2F_TOKEN_TTL)
-        logger.debug('🪙Generated token')
+        logger.debug("🪙Generated token")
         if P2F_TOKEN_DEBUG:
-            # Don't run this in production, leaky tokens sink shifts. 
-            logger.debug(f"Newly generated token for {email}\n{new_token}\nExpiring on {expiration.isoformat()}")
-        insert_token_record(email=email, 
-                            generated_token=new_token,
-                            expiration=expiration)
-        logger.debug('🪙➡️📩Token inserted, emailing token')
-        send_email_information(email=email, 
-                               generated_token=new_token,
-                               expiration=expiration)
-        logger.debug('🌐📩Email sent')
+            # Don't run this in production, leaky tokens sink shifts.
+            logger.debug(
+                f"Newly generated token for {email}\n{new_token}\nExpiring on {expiration.isoformat()}"
+            )
+        insert_token_record(
+            email=email,
+            generated_token=new_token,
+            expiration=expiration
+        )
+        logger.debug("🪙➡️📩Token inserted, emailing token")
+        send_email_information(
+            email=email,
+            generated_token=new_token,
+            expiration=expiration
+        )
+        logger.debug("🌐📩Email sent")
+
 
 def evaluate_token(
-    email: EmailStr, 
-    token: str
-    ) -> Literal["Authorized", "Expired", "NotFound"]:
+    email: EmailStr, token: str
+) -> Literal["Authorized", "Expired", "NotFound"]:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     token = hashorama(token)
     with Session(engine) as session:
         stmt = select(temp_tokens)
-        stmt = stmt.where(temp_tokens.email_address==email)
-        stmt = stmt.where(temp_tokens.token==token)
+        stmt = stmt.where(temp_tokens.email_address == email)
+        stmt = stmt.where(temp_tokens.token == token)
         result = session.execute(stmt).first()
     if result is None:
         return "NotFound"
     else:
         if result[0].expiration < datetime.now(tz=ZoneInfo("UTC")):
             return "Expired"
-        else: 
+        else:
             return "Authorized"
 
-def insert_permitted_address(email: EmailStr,
-                             permissions: Account_Permissions=default_consortium_permissions, 
-                             timezone: str="Europe/Amsterdam"):
+
+def insert_permitted_address(
+    email: EmailStr,
+    permissions: Account_Permissions = default_consortium_permissions,
+    timezone: str = "Europe/Amsterdam",
+):
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
-        del_stmt = delete(permitted_addresses).where(permitted_addresses==email)
+        del_stmt = delete(permitted_addresses).where(permitted_addresses == email)
         execute_del_stmt = session.execute(del_stmt)
         stmt = insert(permitted_addresses)
-        stmt = stmt.values(email_address=email, 
-                           permissions=permissions.model_dump_json(exclude_unset=True),
-                           timezone=timezone)
+        stmt = stmt.values(
+            email_address=email,
+            permissions=permissions.model_dump_json(exclude_unset=True),
+            timezone=timezone,
+        )
         execute = session.execute(stmt)
         commit = session.commit()
+
 
 def is_permitted_address(email: EmailStr) -> bool:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
@@ -251,12 +271,15 @@ def is_permitted_address(email: EmailStr) -> bool:
         result = session.execute(stmt).first()
     if result:
         return True
-    else: 
+    else:
         return False
 
-def is_action_authorized(email: EmailStr, 
-                         endpoint: str, 
-                         operation: Literal["get", "insert", "update", "delete"]) -> bool:
+
+def is_action_authorized(
+    email: EmailStr,
+    endpoint: str,
+    operation: Literal["get", "insert", "update", "delete"],
+) -> bool:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(permitted_addresses)
@@ -265,9 +288,9 @@ def is_action_authorized(email: EmailStr,
     if result:
         permissions = Account_Permissions(**result[0]).model_dump(exclude_unset=True)
         return permissions[endpoint][operation]
-    else: 
+    else:
         return False
-    
 
-insert_permitted_address(email=P2F_ADMIN_EMAIL_ADDRESS, 
+
+insert_permitted_address(email=P2F_ADMIN_EMAIL_ADDRESS,
                          permissions=super_user)

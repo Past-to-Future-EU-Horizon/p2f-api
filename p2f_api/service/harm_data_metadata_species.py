@@ -2,37 +2,44 @@ from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
 from ..data.harm_data_metadata import harm_species_to_record, harm_data_species
 from p2f_pydantic.harm_data_metadata import harm_data_species as Harm_data_species
+
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
+
 # Batteries included libraries
 from typing import List, Optional
 from uuid import UUID
 from inspect import stack
 
+
 def list_harm_metadata_species(
-        tax_domain: Optional[str]=None,
-        tax_kingdom: Optional[str]=None,
-        tax_subkingdom: Optional[str]=None,
-        tax_infrakingdom: Optional[str]=None,
-        tax_phylum: Optional[str]=None,
-        tax_class: Optional[str]=None,
-        tax_subclass: Optional[str]=None,
-        tax_order: Optional[str]=None,
-        tax_suborder: Optional[str]=None,
-        tax_superfamily: Optional[str]=None,
-        tax_family: Optional[str]=None,
-        tax_subfamily: Optional[str]=None,
-        tax_genus: Optional[str]=None,
-        tax_species: Optional[str]=None,
-        tax_subspecies: Optional[str]=None,
-        common_name: Optional[str]=None,
-        display_species: Optional[str]=None,
-    ) -> List[Harm_data_species]:
+    tax_domain: Optional[str] = None,
+    tax_kingdom: Optional[str] = None,
+    tax_subkingdom: Optional[str] = None,
+    tax_infrakingdom: Optional[str] = None,
+    tax_phylum: Optional[str] = None,
+    tax_class: Optional[str] = None,
+    tax_subclass: Optional[str] = None,
+    tax_order: Optional[str] = None,
+    tax_suborder: Optional[str] = None,
+    tax_superfamily: Optional[str] = None,
+    tax_family: Optional[str] = None,
+    tax_subfamily: Optional[str] = None,
+    tax_genus: Optional[str] = None,
+    tax_species: Optional[str] = None,
+    tax_subspecies: Optional[str] = None,
+    common_name: Optional[str] = None,
+    display_species: Optional[str] = None,
+) -> List[Harm_data_species]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_data_species)
-        tax_values = {x:y for x, y in dict(locals()).items() if x.startswith("tax_") and y != None}
+        tax_values = {
+            x: y
+            for x, y in dict(locals()).items()
+            if x.startswith("tax_") and y != None
+        }
         if tax_domain is not None:
             stmt = stmt.where(harm_data_species.tax_domain == tax_domain)
         if tax_kingdom is not None:
@@ -70,18 +77,22 @@ def list_harm_metadata_species(
         results = session.execute(stmt).all()
     return [Harm_data_species(**x[0].__dict__) for x in results]
 
-def get_harm_metadata_species(species_id: Optional[UUID]=None, 
-                              pk_harm_species: Optional[int]=None):
+
+def get_harm_metadata_species(
+    species_id: Optional[UUID] = None,
+    pk_harm_species: Optional[int] = None
+):
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_data_species)
         if species_id is not None:
             stmt = stmt.where(harm_data_species.species_identifier == species_id)
         if pk_harm_species is not None:
-            stmt = stmt.where(harm_data_species.pk_harm_species==pk_harm_species)
+            stmt = stmt.where(harm_data_species.pk_harm_species == pk_harm_species)
         result = session.execute(stmt).first()
         logger.debug(result[0])
     return Harm_data_species(**result[0].__dict__)
+
 
 def create_harm_metadata_species(new_species: Harm_data_species) -> Harm_data_species:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
@@ -93,30 +104,31 @@ def create_harm_metadata_species(new_species: Harm_data_species) -> Harm_data_sp
     new_pk = execute.inserted_primary_key
     return get_harm_metadata_species(pk_harm_species=new_pk[0])
 
+
 def delete_harm_species(species_id: UUID) -> None:
     logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_data_species)
-        stmt = stmt.where(harm_data_species.species_identifier==species_id)
+        stmt = stmt.where(harm_data_species.species_identifier == species_id)
         execute = session.execute(stmt)
         commit = session.commit()
 
-def assign_species_to_record_hash(species_id: UUID, 
-                                  record_hash: str):
+
+def assign_species_to_record_hash(species_id: UUID, record_hash: str):
     logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_species_to_record)
-        stmt = stmt.values(fk_species_identifier=species_id, 
+        stmt = stmt.values(fk_species_identifier=species_id,
                            fk_data_record=record_hash)
         execute = session.execute(stmt)
         commit = session.commit()
 
-def remove_specied_to_record_assignment(species_id: UUID, 
-                                        record_hash: str):
+
+def remove_specied_to_record_assignment(species_id: UUID, record_hash: str):
     logger.debug(f"{fa.service}{fa.remove} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_species_to_record)
-        stmt = stmt.where(harm_species_to_record.fk_species_identifier==species_id)
-        stmt = stmt.where(harm_species_to_record.fk_data_record==record_hash)
+        stmt = stmt.where(harm_species_to_record.fk_species_identifier == species_id)
+        stmt = stmt.where(harm_species_to_record.fk_data_record == record_hash)
         execute = session.execute(stmt)
         commit = session.commit()

@@ -6,24 +6,29 @@ from ..data.db_connection import engine
 from ..data.harm_data_types import harm_data_type
 from ..data import harm_data_numerical
 from p2f_pydantic.harm_data_types import harm_data_type as Harm_data_type
+
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
 from sqlalchemy import text
+
 # Batteries included libraries
 from typing import List, Optional
 from uuid import UUID
 from inspect import stack
 
-def list_harm_data_types_by_dataset_id(dataset_id: Optional[UUID]=None) -> List[UUID]:
+
+def list_harm_data_types_by_dataset_id(dataset_id: Optional[UUID] = None) -> List[UUID]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
-    data_records = list_harm_data_record(dataset=dataset_id) 
+    data_records = list_harm_data_record(dataset=dataset_id)
     logger.debug(f"•  data records {data_records}")
     numeric_records = []
     for data_record in data_records:
         logger.debug("•  Iterating through data records")
-        listed_numerics = list_numerics(record_hash=data_record.record_hash, 
-                                        dataset_id=dataset_id)
+        listed_numerics = list_numerics(
+            record_hash=data_record.record_hash,
+            dataset_id=dataset_id
+        )
         if listed_numerics.data_harmonized_int is not None:
             logger.debug("•• listed_numerics.data_harmonized_int")
             for record in listed_numerics.data_harmonized_int:
@@ -40,15 +45,16 @@ def list_harm_data_types_by_dataset_id(dataset_id: Optional[UUID]=None) -> List[
             logger.debug("•• listed_numerics.data_harmonized_float_confidence")
             for record in listed_numerics.data_harmonized_float_confidence:
                 numeric_records.append(record)
-    numeric_records = {x.fk_data_type for x in numeric_records} # yes this is a set
+    numeric_records = {x.fk_data_type for x in numeric_records}  # yes this is a set
     return numeric_records
 
+
 def list_harm_data_types(
-        measure: Optional[str]=None, 
-        unit_of_measure: Optional[str]=None,
-        method: Optional[str]=None,
-        dataset_id: Optional[UUID]=None
-    ) -> List[Harm_data_type]:
+    measure: Optional[str] = None,
+    unit_of_measure: Optional[str] = None,
+    method: Optional[str] = None,
+    dataset_id: Optional[UUID] = None,
+) -> List[Harm_data_type]:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
@@ -73,10 +79,11 @@ def list_harm_data_types(
     logger.debug(results)
     return results
 
+
 def get_harm_data_type(
-        datatype_id: Optional[UUID]=None,
-        pk_harm_data_type: Optional[int]=None
-    ) -> Harm_data_type:
+    datatype_id: Optional[UUID] = None,
+    pk_harm_data_type: Optional[int] = None
+) -> Harm_data_type:
     logger.debug(f"{fa.service}{fa.get} {__name__}  {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_data_type)
@@ -87,23 +94,26 @@ def get_harm_data_type(
         result = session.execute(stmt).first()
     return Harm_data_type(**result.tuple()[0].__dict__)
 
-def create_harm_data_type(
-        new_harm_data_type: Harm_data_type    
-    ) -> Harm_data_type:
+
+def create_harm_data_type(new_harm_data_type: Harm_data_type) -> Harm_data_type:
     logger.debug(f"{fa.service}{fa.create} {__name__}  {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_data_type)
         stmt = stmt.values(**new_harm_data_type.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
-    return_harm_data_type = get_harm_data_type(pk_harm_data_type=execute.inserted_primary_key[0])
+    return_harm_data_type = get_harm_data_type(
+        pk_harm_data_type=execute.inserted_primary_key[0]
+    )
     new_data_type_uuid = return_harm_data_type.datatype_id
     new_data_type_uuid = new_data_type_uuid.hex
     with Session(engine) as session:
-        numericals = [harm_data_numerical.harmonized_int,
-                      harm_data_numerical.harmonized_int_confidence,
-                      harm_data_numerical.harmonized_float,
-                      harm_data_numerical.harmonized_float_confidence]
+        numericals = [
+            harm_data_numerical.harmonized_int,
+            harm_data_numerical.harmonized_int_confidence,
+            harm_data_numerical.harmonized_float,
+            harm_data_numerical.harmonized_float_confidence,
+        ]
         numericals = [x.__tablename__ for x in numericals]
         for partitioner in numericals:
             stmt = text(f"""CREATE TABLE {partitioner}_{new_data_type_uuid} PARTITION
@@ -112,21 +122,21 @@ def create_harm_data_type(
             session.commit()
     return return_harm_data_type
 
-def update_harm_data_type(
-        update_harm_data_type: Harm_data_type
-    ) -> Harm_data_type:
+
+def update_harm_data_type(update_harm_data_type: Harm_data_type) -> Harm_data_type:
     logger.debug(f"{fa.service}{fa.update} {__name__}  {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = update(harm_data_type)
-        stmt = stmt.where(harm_data_type.datatype_id == update_harm_data_type.datatype_id)
+        stmt = stmt.where(
+            harm_data_type.datatype_id == update_harm_data_type.datatype_id
+        )
         stmt = stmt.values(update_harm_data_type)
         execute = session.execute(stmt)
         commit = session.commit()
     return get_harm_data_type(datatype_id=update_harm_data_type.datatype_id)
 
-def delete_harm_data_type(
-        datatype_id: UUID
-    ) -> None:
+
+def delete_harm_data_type(datatype_id: UUID) -> None:
     logger.debug(f"{fa.service}{fa.delete} {__name__}  {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_data_type)
