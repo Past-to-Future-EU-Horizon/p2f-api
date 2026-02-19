@@ -23,7 +23,7 @@ class temp_tokens(baseSQL):
     pk_temp_accounts: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     email_address: Mapped[str] = mapped_column(String(127), nullable=False)
     token: Mapped[str] = mapped_column(String(128), nullable=False)
-    expiration: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    expiration: Mapped[datetime] = mapped_column(DateTime(ZoneInfo('UTC')), nullable=False)
 
 
 class permitted_addresses(baseSQL):

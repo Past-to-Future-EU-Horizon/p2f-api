@@ -226,7 +226,8 @@ def token_request(email: EmailStr):
 
 
 def evaluate_token(
-    email: EmailStr, token: str
+    email: EmailStr, 
+    token: str
 ) -> Literal["Authorized", "Expired", "NotFound"]:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     token = hashorama(token)
@@ -282,12 +283,15 @@ def is_action_authorized(
 ) -> bool:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
-        stmt = select(permitted_addresses)
+        stmt = select(permitted_addresses.permissions)
         stmt = stmt.where(permitted_addresses.email_address == email)
         result = session.execute(stmt).first()
     if result:
-        permissions = Account_Permissions(**result[0]).model_dump(exclude_unset=True)
-        return permissions[endpoint][operation]
+        # logger.debug(result)
+        permission_json = json.loads(result[0])
+        # logger.debug(permission_json)
+        # permissions = Account_Permissions(permission_json).model_dump(exclude_unset=True)
+        return permission_json[endpoint][operation]
     else:
         return False
 

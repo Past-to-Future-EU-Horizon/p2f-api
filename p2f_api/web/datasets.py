@@ -1,14 +1,17 @@
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from ..service import datasets
+from .temp_accounts import combined_auth
 from p2f_pydantic.datasets import Datasets
+from p2f_pydantic.temp_accounts import Temp_Account
 
 # Third Party Libraries
-from fastapi import Body, APIRouter, Request
+from fastapi import APIRouter, Security, Depends
+from fastapi import Header, Body
 
 # Batteries included libraries
 import uuid
-from typing import Optional, List
+from typing import Optional, List, Annotated
 from inspect import stack
 
 router = APIRouter(prefix="/datasets")
@@ -17,6 +20,7 @@ router = APIRouter(prefix="/datasets")
 # List
 @router.get("/")
 def list_datasets(
+    auth: Annotated[Temp_Account, Depends(combined_auth)],
     is_new_p2f: Optional[bool] = None,
     is_sub_dataset: Optional[bool] = None,
     doi: Optional[str] = None,

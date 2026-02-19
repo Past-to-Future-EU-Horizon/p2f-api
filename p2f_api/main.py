@@ -22,7 +22,7 @@ from fastapi import FastAPI
 app = FastAPI(
     title="Past to Future Dataset API",
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
-    version="0.0.5",
+    version="0.0.6",
 )
 logger.debug(f"{fa.background} {__name__}")
 logger.debug("▶️  FastAPI() Started")

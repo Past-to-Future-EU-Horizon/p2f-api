@@ -22,6 +22,8 @@ class FA:  # function annotations
         self.delete = "🗑️"
         self.assign = "↔️"
         self.remove = "🔙"
+        # Other
+        self.auth = "🔐"
 
 
 fa = FA()

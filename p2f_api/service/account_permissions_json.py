@@ -9,7 +9,7 @@ class Aspect_Permissions(BaseModel):
     delete: bool=False
 
 class Account_Permissions(BaseModel):
-    dataset: Aspect_Permissions
+    datasets: Aspect_Permissions
     harm_age: Aspect_Permissions
     harm_location: Aspect_Permissions
     harm_data_records: Aspect_Permissions
@@ -21,7 +21,7 @@ class Account_Permissions(BaseModel):
     link_git: Aspect_Permissions
 
 default_consortium_permissions = Account_Permissions(
-    dataset=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
+    datasets=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
     harm_age=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
     harm_location=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
     harm_data_records=Aspect_Permissions(get=True, insert=True, update=False, delete=False), 
@@ -34,7 +34,7 @@ default_consortium_permissions = Account_Permissions(
 )
 
 public_view = Account_Permissions(
-    dataset=Aspect_Permissions(get=True, insert=False, update=False, delete=False), 
+    datasets=Aspect_Permissions(get=True, insert=False, update=False, delete=False), 
     harm_age=Aspect_Permissions(get=True, insert=False, update=False, delete=False), 
     harm_location=Aspect_Permissions(get=True, insert=False, update=False, delete=False), 
     harm_data_records=Aspect_Permissions(get=True, insert=False, update=False, delete=False), 
@@ -47,7 +47,7 @@ public_view = Account_Permissions(
 )
 
 super_user = Account_Permissions(
-    dataset=Aspect_Permissions(get=True, insert=True, update=True, delete=True), 
+    datasets=Aspect_Permissions(get=True, insert=True, update=True, delete=True), 
     harm_age=Aspect_Permissions(get=True, insert=True, update=True, delete=True), 
     harm_location=Aspect_Permissions(get=True, insert=True, update=True, delete=True), 
     harm_data_records=Aspect_Permissions(get=True, insert=True, update=True, delete=True), 
