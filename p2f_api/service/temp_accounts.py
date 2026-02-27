@@ -81,8 +81,10 @@ def invalidate_current_token(email: EmailStr):
     with Session(engine) as session:
         stmt = update(temp_tokens)
         stmt = stmt.where(temp_tokens.email_address == email)
-        stmt = stmt.where(temp_tokens.expiration <= datetime.now(tz=ZoneInfo("UTC")))
+        stmt = stmt.where(temp_tokens.expiration >= datetime.now(tz=ZoneInfo("UTC")))
         stmt = stmt.values(expiration=new_expiration_time)
+        session.execute(stmt)
+        session.commit()
 
 
 def create_email_message(email: EmailStr, generated_token: str, expiration: datetime):
@@ -199,30 +201,49 @@ def send_email_information(email: EmailStr, generated_token: str, expiration: da
     if check_host_ip():
         send_email(message=message, recipient=email)
 
+def last_request(email: EmailStr):
+    with Session(engine) as session:
+        stmt = select(email_history.creation_timestamp)
+        stmt = stmt.where(email_history.email_meta_receiver == email)
+        stmt = stmt.order_by(email_history.creation_timestamp.desc())
+        result = session.execute(stmt).first()
+    if result is not None:
+        # return the result no matter the time
+        return result[0]
+    else:
+        # if no result then send something that will be valid for creating a new token
+        return datetime.now(tz=ZoneInfo("UTC")) - timedelta(days=1)
 
 def token_request(email: EmailStr):
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
-    if is_permitted_address(email=email):
-        new_token = str(token_urlsafe(256))[:P2F_TOKEN_LENGTH]
-        expiration = datetime.now(tz=ZoneInfo("UTC")) + timedelta(seconds=P2F_TOKEN_TTL)
-        logger.debug("🪙Generated token")
-        if P2F_TOKEN_DEBUG:
-            # Don't run this in production, leaky tokens sink shifts.
-            logger.debug(
-                f"Newly generated token for {email}\n{new_token}\nExpiring on {expiration.isoformat()}"
+    # Check if the email address is allowed
+    if is_permitted_address(email=email): 
+        # Check timing of last request
+        last_request = last_request(email=email)
+        if last_request <= datetime.now(tz=ZoneInfo("UTC")) + timedelta(seconds=(5*60)):
+            logger.debug(f"Email address {email} had a request within the past 5 minutes, doing nothing.")
+        else:
+            invalidate_current_token(email=email)
+            new_token = str(token_urlsafe(256))[:P2F_TOKEN_LENGTH]
+            expiration = datetime.now(tz=ZoneInfo("UTC")) + timedelta(seconds=P2F_TOKEN_TTL)
+            logger.debug("🪙Generated token")
+            if P2F_TOKEN_DEBUG:
+                # Don't run this in production, leaky tokens sink shifts.
+                logger.debug(
+                    f"Newly generated token for {email}\n{new_token}\nExpiring on {expiration.isoformat()}"
+                )
+            insert_token_record(
+                email=email,
+                generated_token=new_token,
+                expiration=expiration
             )
-        insert_token_record(
-            email=email,
-            generated_token=new_token,
-            expiration=expiration
-        )
-        logger.debug("🪙➡️📩Token inserted, emailing token")
-        send_email_information(
-            email=email,
-            generated_token=new_token,
-            expiration=expiration
-        )
-        logger.debug("🌐📩Email sent")
+            logger.debug("🪙➡️📩Token inserted, emailing token")
+            send_email_information(
+                email=email,
+                generated_token=new_token,
+                expiration=expiration
+            )
+            logger.debug("🌐📩Email sent")
 
 
 def evaluate_token(
