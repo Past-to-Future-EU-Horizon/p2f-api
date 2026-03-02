@@ -2,6 +2,10 @@ FROM ghcr.io/astral-sh/uv:python3.13-alpine
 
 WORKDIR /p2f/api
 
+RUN apk update
+RUN apk upgrade
+RUN apk add git
+
 ADD . .
 
 EXPOSE 8084
