@@ -27,7 +27,7 @@ ENV P2F_TOKEN_LENGTH=64
 
 ENV UV_LINK_MODE=copy
 
-RUN --mount=type=cache,target=/root/.cache/ uv sync --locked
+RUN --mount=type=cache,target=/root/.cache/ uv sync
 
 ENV PATH="/p2f/api/.venv/bin/:$PATH"
 
