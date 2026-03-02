@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:python3.13-trixie
+FROM ghcr.io/astral-sh/uv:python3.13-alpine
 
 WORKDIR /p2f/api
 
@@ -11,6 +11,20 @@ ENV PG_PASS=value
 ENV PG_HOST=value
 ENV PG_PORT=value
 ENV PG_DB=value
+
+ENV P2F_EMAIL_SA_USERNAME=value
+ENV P2F_EMAIL_SA_PASSWORD=value
+ENV P2F_EMAIL_SA_PORT=587
+ENV P2F_EMAIL_SA_SERVER=value
+ENV P2F_EMAIL_ADDRESS=value
+ENV P2F_EMAIL_IP_CIDR=value
+ENV P2F_ADMIN_EMAIL_ADDRESS=value
+ENV P2F_TOKEN_TTL=value
+ENV P2F_SALT=value
+ENV P2F_HASH_COUNT=2000
+ENV P2F_TOKEN_DEBUG=False
+ENV P2F_TOKEN_LENGTH=64
+
 ENV UV_LINK_MODE=copy
 
 RUN --mount=type=cache,target=/root/.cache/ uv sync --locked
