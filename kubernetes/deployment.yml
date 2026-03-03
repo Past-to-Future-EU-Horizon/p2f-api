@@ -1,0 +1,117 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: p2f-api
+  labels:
+    app: p2f-api
+    app.kubernetes.io/component: p2f-api
+    app.kubernetes.io/instance: p2f-api
+    app.kubernetes.io/name: p2f-api
+    app.kubernetes.io/part-of: p2f-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: p2f-api
+  template:
+    metadata:
+      labels:
+        app: p2f-api
+        deployment: p2f-api
+    spec:
+      containers:
+        - name: container
+          image: 'ghcr.io/past-to-future-eu-horizon/p2f_api:latest'
+          ports:
+            - containerPort: 8084
+              protocol: TCP
+          env:
+            - name: P2F_ADMIN_EMAIL_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-admin-email-address
+                  key: P2F_ADMIN_EMAIL_ADDRESS
+            - name: P2F_EMAIL_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-email-address
+                  key: P2F_EMAIL_ADDRESS
+            - name: P2F_EMAIL_IP_CIDR
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-email-ip-cidr
+                  key: P2F_EMAIL_IP_CIDR
+            - name: P2F_EMAIL_SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-email-sa-password
+                  key: P2F_EMAIL_SA_PASSWORD
+            - name: P2F_EMAIL_SA_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-email-sa-port
+                  key: P2F_EMAIL_SA_PORT
+            - name: P2F_EMAIL_SA_SERVER
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-email-sa-server
+                  key: P2F_EMAIL_SA_SERVER
+            - name: P2F_EMAIL_SA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-email-sa-username
+                  key: P2F_EMAIL_SA_USERNAME
+            - name: P2F_HASH_COUNT
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-hash-count
+                  key: P2F_HASH_COUNT
+            - name: P2F_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-salt
+                  key: P2F_SALT
+            - name: P2F_TOKEN_DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-token-debug
+                  key: P2F_TOKEN_DEBUG
+            - name: P2F_TOKEN_LENGTH
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-token-length
+                  key: P2F_TOKEN_LENGTH
+            - name: P2F_TOKEN_TTL
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-token-ttl
+                  key: P2F_TOKEN_TTL
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-temp
+                  key: PG_USER
+            - name: PG_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: pg-temp
+                  key: PG_PASS
+            - name: PG_DB
+              valueFrom:
+                secretKeyRef:
+                  name: pg-temp
+                  key: PG_DB
+            - name: PG_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: pg-temp-host
+                  key: PG_HOST
+            - name: PG_PORT
+              value: '5432'
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+  strategy:
+    type: RollingUpdate
