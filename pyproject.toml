@@ -1,6 +1,6 @@
 [project]
 name = "p2f-api"
-version = "0.0.12"
+version = "0.0.13"
 description = "FastAPI based API for the Past to Future project."
 readme = "README.md"
 requires-python = ">=3.13"
@@ -9,7 +9,7 @@ dependencies = [
     "furl>=2.1.4",
     "openpyxl>=3.1.5",
     "p2f-pydantic>=0.0.2",
-    "psycopg>=3.2.8",
+    "psycopg[binary,pool]>=3.2.8",
     "pydantic[email]>=2.12.3",
     "pyjwt>=2.10.1",
     "python-dotenv>=1.1.0",
