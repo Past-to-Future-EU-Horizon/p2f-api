@@ -3,6 +3,7 @@ from p2f_api.apilogs import logger, fa
 from .account_permissions_json import Account_Permissions
 from .account_permissions_json import default_consortium_permissions
 from .account_permissions_json import super_user
+from .account_permissions_json import public_view
 from ..data.db_connection import engine
 from ..data.temp_accounts import temp_tokens, permitted_addresses, email_history
 
@@ -203,15 +204,20 @@ def send_email_information(email: EmailStr, generated_token: str, expiration: da
 
 def last_request(email: EmailStr):
     with Session(engine) as session:
+        # We use the email history to do the check, as we do not want a situation where
+        #   a user requests a token in quick succession, then checks just under 5 min
+        #   later, and then have to wait another 5 minutes before the API will take action
         stmt = select(email_history.creation_timestamp)
         stmt = stmt.where(email_history.email_meta_receiver == email)
         stmt = stmt.order_by(email_history.creation_timestamp.desc())
         result = session.execute(stmt).first()
     if result is not None:
+        logger.debug(f"•• Result found for email history, returning {result[0]}")
         # return the result no matter the time
         return result[0]
     else:
         # if no result then send something that will be valid for creating a new token
+        logger.debug(f"•• No result found, returning {datetime.now(tz=ZoneInfo('UTC')) - timedelta(days=1)}")
         return datetime.now(tz=ZoneInfo("UTC")) - timedelta(days=1)
 
 def token_request(email: EmailStr):
@@ -219,10 +225,15 @@ def token_request(email: EmailStr):
     # Check if the email address is allowed
     if is_permitted_address(email=email): 
         # Check timing of last request
-        last_request = last_request(email=email)
-        if last_request <= datetime.now(tz=ZoneInfo("UTC")) + timedelta(seconds=(5*60)):
-            logger.debug(f"Email address {email} had a request within the past 5 minutes, doing nothing.")
+        lr = last_request(email=email)
+        now = datetime.now(tz=ZoneInfo("UTC"))
+        fivecalc = lr + timedelta(seconds=(5*60))
+        NOWP5_EVAL = now <= fivecalc
+        logger.debug(f"Now value and calculation lr {lr} -- now {now} -- fivecalc {fivecalc}")
+        if NOWP5_EVAL:
+            logger.debug(f"•• Email address {email} had a request within the past 5 minutes, doing nothing.")
         else:
+            logger.debug(f"•• Email address {email} did not have a request within the past 5 minutes, generating new code.")
             invalidate_current_token(email=email)
             new_token = str(token_urlsafe(256))[:P2F_TOKEN_LENGTH]
             expiration = datetime.now(tz=ZoneInfo("UTC")) + timedelta(seconds=P2F_TOKEN_TTL)
@@ -298,23 +309,26 @@ def is_permitted_address(email: EmailStr) -> bool:
 
 
 def is_action_authorized(
-    email: EmailStr,
     endpoint: str,
     operation: Literal["get", "insert", "update", "delete"],
+    email: Optional[EmailStr]=None,
 ) -> bool:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
-    with Session(engine) as session:
-        stmt = select(permitted_addresses.permissions)
-        stmt = stmt.where(permitted_addresses.email_address == email)
-        result = session.execute(stmt).first()
-    if result:
-        # logger.debug(result)
-        permission_json = json.loads(result[0])
-        # logger.debug(permission_json)
-        # permissions = Account_Permissions(permission_json).model_dump(exclude_unset=True)
-        return permission_json[endpoint][operation]
-    else:
-        return False
+    if email is not None:
+        with Session(engine) as session:
+            stmt = select(permitted_addresses.permissions)
+            stmt = stmt.where(permitted_addresses.email_address == email)
+            result = session.execute(stmt).first()
+        if result:
+            # logger.debug(result)
+            permission_json = json.loads(result[0])
+            # logger.debug(permission_json)
+            # permissions = Account_Permissions(permission_json).model_dump(exclude_unset=True)
+            return permission_json[endpoint][operation]
+        else:
+            return False
+    else: 
+        return public_view[endpoint][operation]
 
 
 insert_permitted_address(email=P2F_ADMIN_EMAIL_ADDRESS,

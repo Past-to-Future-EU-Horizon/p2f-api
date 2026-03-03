@@ -10,7 +10,7 @@ from fastapi import Request
 from furl import furl
 
 # Batteries included libraries
-from typing import Literal, Annotated, Union
+from typing import Literal, Optional
 from inspect import stack
 
 router = APIRouter(prefix="/token")
@@ -40,21 +40,27 @@ def authentication(auth: Temp_Account) -> bool:
 
 def authorization(
     endpoint: str,
-    email: str,
     operation: Literal["get", "insert", "update", "delete"],
+    email: Optional[str]=None,
 ) -> bool:
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
     return temp_accounts.is_action_authorized(email, endpoint, operation)
 
-def combined_auth(auth: Temp_Account,
-                  request: Request ):
+def combined_auth(request: Request,
+                  auth: Optional[Temp_Account]=None):
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
     operation = request.method.lower()
     path_furl = furl(request.url)
     endpoint = path_furl.path.segments[0]
-    a1 = authentication(auth=auth)
-    a2 = authorization(endpoint=endpoint, 
-                       email=auth.email,
-                       operation=operation)
-    logger.debug(f"Authentication: {a1} -- Authorization: {a2}")
-    return a1 and a2
+    # Generally we will allow GET operations, if an operation is allowed by public 
+    #    return true
+    if auth is None:
+        return authorization(endpoint=endpoint, 
+                             operation=operation)
+    else:
+        a1 = authentication(auth=auth)
+        a2 = authorization(endpoint=endpoint, 
+                        email=auth.email,
+                        operation=operation)
+        logger.debug(f"Authentication: {a1} -- Authorization: {a2}")
+        return a1 and a2
