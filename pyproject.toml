@@ -1,3 +1,12 @@
+[build-system]
+requires = ["uv_build >= 0.10.7, <0.11.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+namespace = true
+
+
 [project]
 name = "p2f_api"
 version = "0.0.20"
@@ -29,6 +38,3 @@ Repository = "https://github.com/Past-to-Future-EU-Horizon/p2f-api.git"
 
 [tool.uv.sources]
 p2f-pydantic = { git = "https://github.com/Past-to-Future-EU-Horizon/p2f-pydantic" }
-
-[tool.setuptools.packages.find]
-where = ["./p2f_api/"]
