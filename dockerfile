@@ -34,7 +34,7 @@ ENV UV_LINK_MODE=copy
 WORKDIR /p2f/api
 RUN --mount=type=cache,target=/root/.cache/ uv sync --no-install-project
 
-# ENV PATH="/p2f/api/.venv/bin/.:$PATH"
+ENV PATH="/p2f/api/.venv/bin/.:$PATH"
 
 # # RUN uv sync --locked
 # RUN uv build --verbose /p2f/api/.
