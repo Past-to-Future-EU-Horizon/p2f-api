@@ -176,3 +176,5 @@ cython_debug/
 
 uv.lock
 domain_list.py
+kubernetes/test.ds.yml
+kubernetes/test.ingress.yml

@@ -13,18 +13,19 @@ spec:
   selector:
     matchLabels:
       app: p2f-api
+      app.kubernetes.io/name: p2f-api
   template:
     metadata:
       labels:
         app: p2f-api
         deployment: p2f-api
+        app.kubernetes.io/name: p2f-api
     spec:
       containers:
-        - name: container
+        - name: p2f-api
           image: 'ghcr.io/past-to-future-eu-horizon/p2f_api:latest'
           ports:
             - containerPort: 8084
-              protocol: TCP
           env:
             - name: P2F_ADMIN_EMAIL_ADDRESS
               valueFrom:
@@ -108,9 +109,6 @@ spec:
                   key: PG_HOST
             - name: PG_PORT
               value: '5432'
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
           imagePullPolicy: Always
       restartPolicy: Always
   strategy:
