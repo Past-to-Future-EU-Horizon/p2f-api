@@ -1,6 +1,6 @@
 [project]
-name = "p2f-api"
-version = "0.0.18"
+name = "p2f_api"
+version = "0.0.19"
 description = "FastAPI based API for the Past to Future project."
 requires-python = ">=3.13"
 dependencies = [
@@ -27,9 +27,8 @@ readme = {file = "README.md", content-type = "text/markdown"}
 Homepage = "https://past2future.org/"
 Repository = "https://github.com/Past-to-Future-EU-Horizon/p2f-api.git"
 
-
 [tool.uv.sources]
 p2f-pydantic = { git = "https://github.com/Past-to-Future-EU-Horizon/p2f-pydantic" }
 
 [tool.setuptools.packages.find]
-where = ["./p2f_api"]
+where = ["./p2f_api/"]

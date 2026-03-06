@@ -1,12 +1,12 @@
 FROM ghcr.io/astral-sh/uv:python3.13-alpine
 
-WORKDIR /p2f/api
+# WORKDIR /p2f/api
 
 RUN apk update
 RUN apk upgrade
 RUN apk add git
 
-ADD . .
+ADD . /p2f/api/
 
 EXPOSE 8084
 
@@ -31,13 +31,17 @@ EXPOSE 8084
 
 ENV UV_LINK_MODE=copy
 
-RUN --mount=type=cache,target=/root/.cache/ uv sync
+WORKDIR /p2f/api
+RUN --mount=type=cache,target=/root/.cache/ uv sync --no-install-project
 
-ENV PATH="/p2f/api/.venv/bin/:$PATH"
+# ENV PATH="/p2f/api/.venv/bin/.:$PATH"
 
-RUN uv pip install -e .
+# # RUN uv sync --locked
+# RUN uv build --verbose /p2f/api/.
+# RUN uv pip install .
+RUN uv sync 
 
-WORKDIR /p2f/api/p2f_api
+# WORKDIR /p2f/api/p2f_api
 
 # CMD ["/bin/bash"]
-CMD [ "uvicorn", "--port", "8084", "main:app" ]
+CMD [ "uvicorn", "--port", "8084", "p2f_api/main:app" ]
