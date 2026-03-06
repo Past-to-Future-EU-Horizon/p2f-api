@@ -1,7 +1,7 @@
 # p2f-api
 API Layer for the Past to Future projects Portal. Past to Future is an EU Horizon funded project. 
 
-*v0.0.16*
+*v0.0.17*
 
 ## Environment Variables
 
@@ -30,6 +30,9 @@ Account management
 * P2F_TOKEN_DEBUG = False
 * P2F_TOKEN_LENGTH = 64
 
+Debug management 
+
+* P2F_DDL
 
 ## Installation
 

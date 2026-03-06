@@ -14,10 +14,10 @@ from p2f_api.web import link_git
 from p2f_api.web import doi
 from p2f_api.web import dq_comment
 from p2f_api.web import temp_accounts
-
 # Third Party Libraries
 from fastapi import FastAPI
 # Batteries included libraries
+import os
 
 app = FastAPI(
     title="Past to Future Dataset API",
@@ -42,7 +42,9 @@ app.include_router(dq_comment.router)
 app.include_router(temp_accounts.router)
 
 ## Remember to remove in the future
-app.include_router(export_clean_ddl.router)
+P2F_DDL = bool(os.getenv("P2F_DDL", default=False))
+if P2F_DDL:
+    app.include_router(export_clean_ddl.router)
 
 if __name__ == "__main__":
     import uvicorn
