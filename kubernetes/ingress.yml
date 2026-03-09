@@ -23,3 +23,29 @@ spec:
   - hosts:
     - {hostname}
     secretName: p2f-api-tls
+--- 
+apiVersion: citrix.com/v1
+kind: rewritepolicy
+metadata:
+  name: httpxforwardedforadd
+spec:
+  rewrite-policies:
+    - servicenames:
+        - p2f-api
+      rewrite-policy:
+        operation: insert_http_header
+        target: X-Forwarded-For
+        modify-expression: client.ip.src
+        comment: 'HTTP Initial X-Forwarded-For header add'
+        direction: REQUEST
+        rewrite-criteria: 'HTTP.REQ.HEADER("X-Forwarded-For").EXISTS.NOT'
+
+    - servicenames:
+        - p2f-api
+      rewrite-policy:
+        operation: replace
+        target: HTTP.REQ.HEADER("X-Forwarded-For")
+        modify-expression: 'HTTP.REQ.HEADER("X-Forwarded-For").APPEND(",").APPEND(CLIENT.IP.SRC)'
+        comment: 'HTTP Append X-Forwarded-For IPs'
+        direction: REQUEST
+        rewrite-criteria: 'HTTP.REQ.HEADER("X-Forwarded-For").EXISTS'
