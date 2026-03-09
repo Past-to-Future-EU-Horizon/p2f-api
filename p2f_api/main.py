@@ -22,7 +22,7 @@ import os
 app = FastAPI(
     title="Past to Future Dataset API",
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
-    version="0.0.6",
+    version="0.0.23",
 )
 logger.debug(f"{fa.background} {__name__}")
 logger.debug("▶️  FastAPI() Started")
@@ -38,7 +38,7 @@ app.include_router(harm_age.router)
 app.include_router(harm_reference.router)
 app.include_router(link_git.router)
 app.include_router(doi.router)
-app.include_router(dq_comment.router)
+# app.include_router(dq_comment.router)
 app.include_router(temp_accounts.router)
 
 ## Remember to remove in the future
