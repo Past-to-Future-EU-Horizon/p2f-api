@@ -1,28 +1,19 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: p2f-api
-  labels:
-    app: p2f-api
-    app.kubernetes.io/component: p2f-api
-    app.kubernetes.io/instance: p2f-api
-    app.kubernetes.io/name: p2f-api
-    app.kubernetes.io/part-of: p2f-api
+  name: p2f-api-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: p2f-api
-      app.kubernetes.io/name: p2f-api
+      app: p2f-api-deployment
   template:
     metadata:
       labels:
-        app: p2f-api
-        deployment: p2f-api
-        app.kubernetes.io/name: p2f-api
+        app: p2f-api-deployment
     spec:
       containers:
-        - name: p2f-api
+        - name: p2f-api-deployment
           image: 'ghcr.io/past-to-future-eu-horizon/p2f_api:latest'
           ports:
             - containerPort: 8084
@@ -30,67 +21,67 @@ spec:
             - name: P2F_ADMIN_EMAIL_ADDRESS
               valueFrom:
                 secretKeyRef:
-                  name: p2f-admin-email-address
+                  name: p2f-email
                   key: P2F_ADMIN_EMAIL_ADDRESS
             - name: P2F_EMAIL_ADDRESS
               valueFrom:
                 secretKeyRef:
-                  name: p2f-email-address
+                  name: p2f-email
                   key: P2F_EMAIL_ADDRESS
             - name: P2F_EMAIL_IP_CIDR
               valueFrom:
                 secretKeyRef:
-                  name: p2f-email-ip-cidr
+                  name: p2f-email
                   key: P2F_EMAIL_IP_CIDR
             - name: P2F_EMAIL_IP_ACTIVE
               valueFrom:
                 secretKeyRef:
-                  name: p2f-email-ip-active
+                  name: p2f-email
                   key: P2F_EMAIL_IP_ACTIVE
             - name: P2F_EMAIL_SA_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: p2f-email-sa-password
+                  name: p2f-email
                   key: P2F_EMAIL_SA_PASSWORD
             - name: P2F_EMAIL_SA_PORT
               valueFrom:
                 secretKeyRef:
-                  name: p2f-email-sa-port
+                  name: p2f-email
                   key: P2F_EMAIL_SA_PORT
             - name: P2F_EMAIL_SA_SERVER
               valueFrom:
                 secretKeyRef:
-                  name: p2f-email-sa-server
+                  name: p2f-email
                   key: P2F_EMAIL_SA_SERVER
             - name: P2F_EMAIL_SA_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: p2f-email-sa-username
+                  name: p2f-email
                   key: P2F_EMAIL_SA_USERNAME
             - name: P2F_HASH_COUNT
               valueFrom:
                 secretKeyRef:
-                  name: p2f-hash-count
+                  name: p2f-token
                   key: P2F_HASH_COUNT
             - name: P2F_SALT
               valueFrom:
                 secretKeyRef:
-                  name: p2f-salt
+                  name: p2f-token
                   key: P2F_SALT
             - name: P2F_TOKEN_DEBUG
               valueFrom:
                 secretKeyRef:
-                  name: p2f-token-debug
+                  name: p2f-token
                   key: P2F_TOKEN_DEBUG
             - name: P2F_TOKEN_LENGTH
               valueFrom:
                 secretKeyRef:
-                  name: p2f-token-length
+                  name: p2f-token
                   key: P2F_TOKEN_LENGTH
             - name: P2F_TOKEN_TTL
               valueFrom:
                 secretKeyRef:
-                  name: p2f-token-ttl
+                  name: p2f-token
                   key: P2F_TOKEN_TTL
             - name: PG_USER
               valueFrom:
@@ -110,7 +101,7 @@ spec:
             - name: PG_HOST
               valueFrom:
                 secretKeyRef:
-                  name: pg-temp-host
+                  name: pg-temp
                   key: PG_HOST
             - name: PG_PORT
               value: '5432'
