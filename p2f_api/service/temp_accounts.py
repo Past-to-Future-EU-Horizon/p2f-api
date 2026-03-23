@@ -200,7 +200,7 @@ def send_email_information(email: EmailStr, generated_token: str, expiration: da
         expiration=expiration
     )
     email_history_update(email_uuid=email_uuid, receipient=email, status="Created")
-    if P2F_EMAIL_IP_ACTIVE():
+    if P2F_EMAIL_IP_ACTIVE:
         send_email(message=message, recipient=email)
 
 def last_request(email: EmailStr):
