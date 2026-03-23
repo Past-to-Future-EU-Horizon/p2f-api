@@ -135,7 +135,7 @@ def send_email(message: MIMEMultipart,
                recipient: str):
     logger.debug(f"{fa.background}{fa.service} {__name__} {stack()[0][3]}()")
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-    context.minimum_version = ssl.TLSVersion.TLSv1_3
+    context.minimum_version = ssl.TLSVersion.TLSv1_2
     context.maximum_version = ssl.TLSVersion.TLSv1_3
     with smtplib.SMTP_SSL(
         host=P2F_EMAIL_SA_SERVER,
