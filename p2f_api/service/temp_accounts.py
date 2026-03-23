@@ -134,7 +134,9 @@ def email_history_update(email_uuid: UUID, receipient: str, status: str = "Creat
 def send_email(message: MIMEMultipart,
                recipient: str):
     logger.debug(f"{fa.background}{fa.service} {__name__} {stack()[0][3]}()")
-    context = ssl.create_default_context(purpose=ssl.PROTOCOL_TLS_CLIENT)
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    context.minimum_version = ssl.TLSVersion.TLSv1_3
+    context.maximum_version = ssl.TLSVersion.TLSv1_3
     with smtplib.SMTP_SSL(
         host=P2F_EMAIL_SA_SERVER,
         port=P2F_EMAIL_SA_PORT,
