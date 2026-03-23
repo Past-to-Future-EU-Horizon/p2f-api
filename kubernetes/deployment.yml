@@ -42,6 +42,11 @@ spec:
                 secretKeyRef:
                   name: p2f-email-ip-cidr
                   key: P2F_EMAIL_IP_CIDR
+            - name: P2F_EMAIL_IP_ACTIVE
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-email-ip-active
+                  key: P2F_EMAIL_IP_ACTIVE
             - name: P2F_EMAIL_SA_PASSWORD
               valueFrom:
                 secretKeyRef:

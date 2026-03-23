@@ -38,6 +38,7 @@ P2F_EMAIL_SA_PORT = int(os.getenv("P2F_EMAIL_SA_PORT", default=587))
 P2F_EMAIL_SA_SERVER = os.getenv("P2F_EMAIL_SA_SERVER")
 P2F_EMAIL_ADDRESS = os.getenv("P2F_EMAIL_ADDRESS")
 P2F_EMAIL_IP_CIDR = ipaddress.ip_network(os.getenv("P2F_EMAIL_IP_CIDR"), strict=False)
+P2F_EMAIL_IP_ACTIVE = bool(os.getenv("P2F_EMAIL_IP_ACTIVE", default=False))
 P2F_ADMIN_EMAIL_ADDRESS = os.getenv("P2F_ADMIN_EMAIL_ADDRESS")
 P2F_SALT = os.getenv("P2F_SALT", default=token_urlsafe(256))
 P2F_TOKEN_TTL = int(os.getenv("P2F_TOKEN_TTL", default=(24 * 3600)))
@@ -199,7 +200,7 @@ def send_email_information(email: EmailStr, generated_token: str, expiration: da
         expiration=expiration
     )
     email_history_update(email_uuid=email_uuid, receipient=email, status="Created")
-    if check_host_ip():
+    if P2F_EMAIL_IP_ACTIVE():
         send_email(message=message, recipient=email)
 
 def last_request(email: EmailStr):
@@ -281,7 +282,7 @@ def insert_permitted_address(
     email: EmailStr,
     permissions: Account_Permissions = default_consortium_permissions,
     timezone: str = "Europe/Amsterdam",
-):
+    ):
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         del_stmt = delete(permitted_addresses).where(permitted_addresses == email)
