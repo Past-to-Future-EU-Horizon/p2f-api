@@ -29,6 +29,7 @@ from uuid import uuid4, UUID
 import hashlib
 import os
 from inspect import stack
+import traceback
 
 dotenv.load_dotenv()
 
@@ -155,7 +156,7 @@ def send_email(message: MIMEMultipart,
                         to_addrs=recipient,
                         msg=message.as_string()
                     )
-            elif minimum_TLS_version == None:
+            else:
                 with smtplib.SMTP_SSL(
                     host=P2F_EMAIL_SA_SERVER,
                     port=P2F_EMAIL_SA_PORT
@@ -169,6 +170,7 @@ def send_email(message: MIMEMultipart,
                     )
         except Exception as e:
             logger.debug(f"Error encountered in Email {e}")
+            logger.debug(f"{traceback.format_exc()}")
             tc += 1
             if minimum_TLS_version in [ssl.TLSVersion.TLSv1_3, ssl.TLSVersion.TLSv1_2, ssl.TLSVersion.TLSv1_1]:
                 if minimum_TLS_version == ssl.TLSVersion.TLSv1_3:
@@ -180,7 +182,8 @@ def send_email(message: MIMEMultipart,
                 elif minimum_TLS_version == ssl.TLSVersion.TLSv1_1:
                     logger.debug("TLS version downgraded to no TLS")
                     minimum_TLS_version = None
-
+        if tc >= 5:
+            raise ConnectionAbortedError(f"Could not auth and connect with {P2F_EMAIL_SA_SERVER}")
 
 def check_host_ip() -> bool:
     """Check the IP address of the host so we don't accidentally try to send an email from outside our requested IP range.
