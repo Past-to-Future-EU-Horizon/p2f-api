@@ -25,7 +25,7 @@ from dotenv import load_dotenv
 import os
 import pathlib
 
-logger.debug(f"{fa.data} {__name__} P2F-API v0.0.41")
+logger.debug(f"{fa.data} {__name__} P2F-API v0.0.42")
 
 p = pathlib.Path(os.getcwd())
 print(p)
