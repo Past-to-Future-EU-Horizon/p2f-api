@@ -45,4 +45,4 @@ RUN uv pip install .
 WORKDIR /p2f/api/p2f_api
 
 # CMD ["/bin/bash"]
-CMD [ "uvicorn", "--host", "0.0.0.0", "--port", "8084", "--log-level", "trace", "main:app" ]
+CMD [ "uvicorn", "--host", "0.0.0.0", "--port", "8084", "--log-level", "trace", '--forwarded-allow-ips="*"', "main:app" ]
