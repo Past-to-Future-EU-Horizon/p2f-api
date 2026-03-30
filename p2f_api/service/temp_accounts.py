@@ -65,7 +65,7 @@ def hashorama(password: str) -> str:
 def insert_token_record(email: str,
                   generated_token: str, 
                   expiration: datetime):
-    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
+    logger.debug(f"{fa.background}{fa.create} {__name__} {stack()[0][3]}()")
     logger.debug("➡️Inserting Token Record")
     hashed_token = hashorama(generated_token)
     with Session(engine) as session:
@@ -135,70 +135,26 @@ def email_history_update(email_uuid: UUID, receipient: str, status: str = "Creat
 def send_email(message: MIMEMultipart,
                recipient: str):
     logger.debug(f"{fa.background}{fa.service} {__name__} {stack()[0][3]}()")
-    email_sending_status = False
-    minimum_TLS_version = ssl.TLSVersion.TLSv1_2
-    tc = 0
-    ssl_context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
-    with smtplib.SMTP(host=P2F_EMAIL_SA_SERVER, 
-                     port=P2F_EMAIL_SA_PORT) as server:
-        logger.debug("Server intiated")
-        server.starttls()
-        logger.debug("TLS Started")
-        server.login(user=P2F_EMAIL_SA_USERNAME, password=P2F_EMAIL_SA_PASSWORD)
-        logger.debug("Logged into server")
-        server.sendmail(
-                        from_addr=P2F_EMAIL_ADDRESS,
-                        to_addrs=recipient,
-                        msg=message.as_string()
-                        )
-        logger.debug("Sent email")
-    
-    # while email_sending_status == False and tc < 5:
-    #     try:
-    #         context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-    #         context.minimum_version = minimum_TLS_version
-    #         context.maximum_version = ssl.TLSVersion.TLSv1_3
-    #         if minimum_TLS_version in [ssl.TLSVersion.TLSv1_3, ssl.TLSVersion.TLSv1_2, ssl.TLSVersion.TLSv1_1]:
-    #             with smtplib.SMTP_SSL(
-    #                 host=P2F_EMAIL_SA_SERVER,
-    #                 port=P2F_EMAIL_SA_PORT,
-    #                 context=context
-    #             ) as server:
-    #                 server.login(user=P2F_EMAIL_SA_USERNAME,
-    #                             password=P2F_EMAIL_SA_PASSWORD)
-    #                 server.sendmail(
-    #                     from_addr=P2F_EMAIL_ADDRESS,
-    #                     to_addrs=recipient,
-    #                     msg=message.as_string()
-    #                 )
-    #         else:
-    #             with smtplib.SMTP_SSL(
-    #                 host=P2F_EMAIL_SA_SERVER,
-    #                 port=P2F_EMAIL_SA_PORT
-    #             ) as server:
-    #                 server.login(user=P2F_EMAIL_SA_USERNAME,
-    #                             password=P2F_EMAIL_SA_PASSWORD)
-    #                 server.sendmail(
-    #                     from_addr=P2F_EMAIL_ADDRESS,
-    #                     to_addrs=recipient,
-    #                     msg=message.as_string()
-    #                 )
-    #     except Exception as e:
-    #         logger.debug(f"Error encountered in Email {e}")
-    #         logger.debug(f"{traceback.format_exc()}")
-    #         tc += 1
-    #         if minimum_TLS_version in [ssl.TLSVersion.TLSv1_3, ssl.TLSVersion.TLSv1_2, ssl.TLSVersion.TLSv1_1]:
-    #             if minimum_TLS_version == ssl.TLSVersion.TLSv1_3:
-    #                 logger.debug("TLS version downgraded to TLSv1_2")
-    #                 minimum_TLS_version = ssl.TLSVersion.TLSv1_2
-    #             elif minimum_TLS_version == ssl.TLSVersion.TLSv1_2:
-    #                 logger.debug("TLS version downgraded to TLSv1_1")
-    #                 minimum_TLS_version = ssl.TLSVersion.TLSv1_1
-    #             elif minimum_TLS_version == ssl.TLSVersion.TLSv1_1:
-    #                 logger.debug("TLS version downgraded to no TLS")
-    #                 minimum_TLS_version = None
-    #     if tc >= 5:
-    #         raise ConnectionAbortedError(f"Could not auth and connect with {P2F_EMAIL_SA_SERVER}")
+    status = False
+    try:
+        with smtplib.SMTP(host=P2F_EMAIL_SA_SERVER, 
+                        port=P2F_EMAIL_SA_PORT) as server:
+            logger.debug("Server intiated")
+            server.starttls()
+            logger.debug("TLS Started")
+            server.login(user=P2F_EMAIL_SA_USERNAME, password=P2F_EMAIL_SA_PASSWORD)
+            logger.debug("Logged into server")
+            server.sendmail(
+                            from_addr=P2F_EMAIL_ADDRESS,
+                            to_addrs=recipient,
+                            msg=message.as_string()
+                            )
+            logger.debug("Sent email")
+        status = True
+    except Exception as E:
+        logger.debug(f"Email sending encountered an error: {E}")
+        logger.debug(traceback.format_exc())
+    return status
 
 def check_host_ip() -> bool:
     """Check the IP address of the host so we don't accidentally try to send an email from outside our requested IP range.
@@ -251,8 +207,11 @@ def send_email_information(email: EmailStr, generated_token: str, expiration: da
         expiration=expiration
     )
     if P2F_EMAIL_IP_ACTIVE:
-        send_email(message=message, recipient=email)
-        email_history_update(email_uuid=email_uuid, receipient=email, status="Created")
+        email_send = send_email(message=message, recipient=email)
+        if email_send == True: 
+            email_history_update(email_uuid=email_uuid, receipient=email, status="Created")
+        else:
+            email_history_update(email_uuid=email_uuid, receipient=email, status="Failed")
 
 def last_request(email: EmailStr):
     with Session(engine) as session:
@@ -273,7 +232,7 @@ def last_request(email: EmailStr):
         return datetime.now(tz=ZoneInfo("UTC")) - timedelta(days=1)
 
 def token_request(email: EmailStr):
-    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
+    logger.debug(f"{fa.background}{fa.create} {__name__} {stack()[0][3]}()")
     # Check if the email address is allowed
     if is_permitted_address(email=email): 
         # Check timing of last request
@@ -285,7 +244,7 @@ def token_request(email: EmailStr):
         if NOWP5_EVAL:
             logger.debug(f"•• Email address {email} had a request within the past 5 minutes, doing nothing.")
         else:
-            logger.debug(f"•• Email address {email} did not have a request within the past 5 minutes, generating new code.")
+            logger.debug(f"•• Email address {email} did not have a request within the past 5 minutes, generating new token.")
             invalidate_current_token(email=email)
             new_token = str(token_urlsafe(256))[:P2F_TOKEN_LENGTH]
             expiration = datetime.now(tz=ZoneInfo("UTC")) + timedelta(seconds=P2F_TOKEN_TTL)
