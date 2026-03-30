@@ -138,7 +138,7 @@ def send_email(message: MIMEMultipart,
     email_sending_status = False
     minimum_TLS_version = ssl.TLSVersion.TLSv1_2
     tc = 0
-    ssl_context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+    ssl_context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
     with smtplib.SMTP_SSL(host=P2F_EMAIL_SA_SERVER, 
                      port=P2F_EMAIL_SA_PORT,
                      context=ssl_context) as server:
