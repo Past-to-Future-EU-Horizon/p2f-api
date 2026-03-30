@@ -14,6 +14,7 @@ from p2f_api.web import link_git
 from p2f_api.web import doi
 from p2f_api.web import dq_comment
 from p2f_api.web import temp_accounts
+from p2f_api.web import health
 # Third Party Libraries
 from fastapi import FastAPI
 # Batteries included libraries
@@ -27,6 +28,10 @@ app = FastAPI(
 logger.debug(f"{fa.background} {__name__}")
 logger.debug("▶️  FastAPI() Started")
 
+# For Kubernetes heartbeat/healthchecks
+app.include_router(health.router)
+
+# Main data Types
 app.include_router(datasets.router)
 app.include_router(harm_numerical.router)
 app.include_router(harm_data_record.router)
@@ -41,7 +46,7 @@ app.include_router(doi.router)
 # app.include_router(dq_comment.router)
 app.include_router(temp_accounts.router)
 
-## Remember to remove in the future
+# Debugging features
 P2F_DDL = bool(os.getenv("P2F_DDL", default=False))
 if P2F_DDL:
     app.include_router(export_clean_ddl.router)
