@@ -42,7 +42,7 @@ RUN uv build --verbose /p2f/api/.
 RUN uv pip install .
 # RUN uv sync
 
-WORKDIR /p2f/api/p2f_api
+# WORKDIR /p2f/api/p2f_api
 
 # CMD ["/bin/bash"]
-CMD [ "uvicorn", "--host", "0.0.0.0", "--port", "8084", "--log-level", "trace", "--forwarded-allow-ips", "*", "main:app" ]
+CMD [ "fastapi", "run", "p2f_api/main.py", "--host", "0.0.0.0", "--port", "8084", "--forwarded-allow-ips", "*" ]
