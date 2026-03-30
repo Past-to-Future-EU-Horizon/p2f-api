@@ -136,54 +136,68 @@ def send_email(message: MIMEMultipart,
                recipient: str):
     logger.debug(f"{fa.background}{fa.service} {__name__} {stack()[0][3]}()")
     email_sending_status = False
-    minimum_TLS_version = ssl.TLSVersion.TLSv1_3
+    minimum_TLS_version = ssl.TLSVersion.TLSv1_2
     tc = 0
-    while email_sending_status == False and tc < 5:
-        try:
-            context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-            context.minimum_version = minimum_TLS_version
-            context.maximum_version = ssl.TLSVersion.TLSv1_3
-            if minimum_TLS_version in [ssl.TLSVersion.TLSv1_3, ssl.TLSVersion.TLSv1_2, ssl.TLSVersion.TLSv1_1]:
-                with smtplib.SMTP_SSL(
-                    host=P2F_EMAIL_SA_SERVER,
-                    port=P2F_EMAIL_SA_PORT,
-                    context=context
-                ) as server:
-                    server.login(user=P2F_EMAIL_SA_USERNAME,
-                                password=P2F_EMAIL_SA_PASSWORD)
-                    server.sendmail(
+    ssl_context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+    with smtplib.SMTP_SSL(host=P2F_EMAIL_SA_SERVER, 
+                     port=P2F_EMAIL_SA_PORT,
+                     context=ssl_context) as server:
+        logger.debug("Server intiated")
+        server.login(user=P2F_EMAIL_SA_USERNAME, password=P2F_EMAIL_SA_PASSWORD)
+        logger.debug("Logged into server")
+        server.sendmail(
                         from_addr=P2F_EMAIL_ADDRESS,
                         to_addrs=recipient,
                         msg=message.as_string()
-                    )
-            else:
-                with smtplib.SMTP_SSL(
-                    host=P2F_EMAIL_SA_SERVER,
-                    port=P2F_EMAIL_SA_PORT
-                ) as server:
-                    server.login(user=P2F_EMAIL_SA_USERNAME,
-                                password=P2F_EMAIL_SA_PASSWORD)
-                    server.sendmail(
-                        from_addr=P2F_EMAIL_ADDRESS,
-                        to_addrs=recipient,
-                        msg=message.as_string()
-                    )
-        except Exception as e:
-            logger.debug(f"Error encountered in Email {e}")
-            logger.debug(f"{traceback.format_exc()}")
-            tc += 1
-            if minimum_TLS_version in [ssl.TLSVersion.TLSv1_3, ssl.TLSVersion.TLSv1_2, ssl.TLSVersion.TLSv1_1]:
-                if minimum_TLS_version == ssl.TLSVersion.TLSv1_3:
-                    logger.debug("TLS version downgraded to TLSv1_2")
-                    minimum_TLS_version = ssl.TLSVersion.TLSv1_2
-                elif minimum_TLS_version == ssl.TLSVersion.TLSv1_2:
-                    logger.debug("TLS version downgraded to TLSv1_1")
-                    minimum_TLS_version = ssl.TLSVersion.TLSv1_1
-                elif minimum_TLS_version == ssl.TLSVersion.TLSv1_1:
-                    logger.debug("TLS version downgraded to no TLS")
-                    minimum_TLS_version = None
-        if tc >= 5:
-            raise ConnectionAbortedError(f"Could not auth and connect with {P2F_EMAIL_SA_SERVER}")
+                        )
+        logger.debug("Sent email")
+    
+    # while email_sending_status == False and tc < 5:
+    #     try:
+    #         context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    #         context.minimum_version = minimum_TLS_version
+    #         context.maximum_version = ssl.TLSVersion.TLSv1_3
+    #         if minimum_TLS_version in [ssl.TLSVersion.TLSv1_3, ssl.TLSVersion.TLSv1_2, ssl.TLSVersion.TLSv1_1]:
+    #             with smtplib.SMTP_SSL(
+    #                 host=P2F_EMAIL_SA_SERVER,
+    #                 port=P2F_EMAIL_SA_PORT,
+    #                 context=context
+    #             ) as server:
+    #                 server.login(user=P2F_EMAIL_SA_USERNAME,
+    #                             password=P2F_EMAIL_SA_PASSWORD)
+    #                 server.sendmail(
+    #                     from_addr=P2F_EMAIL_ADDRESS,
+    #                     to_addrs=recipient,
+    #                     msg=message.as_string()
+    #                 )
+    #         else:
+    #             with smtplib.SMTP_SSL(
+    #                 host=P2F_EMAIL_SA_SERVER,
+    #                 port=P2F_EMAIL_SA_PORT
+    #             ) as server:
+    #                 server.login(user=P2F_EMAIL_SA_USERNAME,
+    #                             password=P2F_EMAIL_SA_PASSWORD)
+    #                 server.sendmail(
+    #                     from_addr=P2F_EMAIL_ADDRESS,
+    #                     to_addrs=recipient,
+    #                     msg=message.as_string()
+    #                 )
+    #     except Exception as e:
+    #         logger.debug(f"Error encountered in Email {e}")
+    #         logger.debug(f"{traceback.format_exc()}")
+    #         tc += 1
+    #         if minimum_TLS_version in [ssl.TLSVersion.TLSv1_3, ssl.TLSVersion.TLSv1_2, ssl.TLSVersion.TLSv1_1]:
+    #             if minimum_TLS_version == ssl.TLSVersion.TLSv1_3:
+    #                 logger.debug("TLS version downgraded to TLSv1_2")
+    #                 minimum_TLS_version = ssl.TLSVersion.TLSv1_2
+    #             elif minimum_TLS_version == ssl.TLSVersion.TLSv1_2:
+    #                 logger.debug("TLS version downgraded to TLSv1_1")
+    #                 minimum_TLS_version = ssl.TLSVersion.TLSv1_1
+    #             elif minimum_TLS_version == ssl.TLSVersion.TLSv1_1:
+    #                 logger.debug("TLS version downgraded to no TLS")
+    #                 minimum_TLS_version = None
+    #     if tc >= 5:
+    #         raise ConnectionAbortedError(f"Could not auth and connect with {P2F_EMAIL_SA_SERVER}")
 
 def check_host_ip() -> bool:
     """Check the IP address of the host so we don't accidentally try to send an email from outside our requested IP range.
