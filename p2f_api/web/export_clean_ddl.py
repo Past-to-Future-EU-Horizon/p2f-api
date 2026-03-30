@@ -9,7 +9,7 @@ from fastapi.responses import PlainTextResponse
 # Batteries included libraries
 from inspect import stack
 
-router = APIRouter(prefix="/ddl")
+router = APIRouter(prefix="/ddl", include_in_schema=False)
 
 
 @router.get("/")
