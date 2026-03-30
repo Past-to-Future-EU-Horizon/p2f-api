@@ -139,10 +139,11 @@ def send_email(message: MIMEMultipart,
     minimum_TLS_version = ssl.TLSVersion.TLSv1_2
     tc = 0
     ssl_context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
-    with smtplib.SMTP_SSL(host=P2F_EMAIL_SA_SERVER, 
-                     port=P2F_EMAIL_SA_PORT,
-                     context=ssl_context) as server:
+    with smtplib.SMTP(host=P2F_EMAIL_SA_SERVER, 
+                     port=P2F_EMAIL_SA_PORT) as server:
         logger.debug("Server intiated")
+        server.starttls()
+        logger.debug("TLS Started")
         server.login(user=P2F_EMAIL_SA_USERNAME, password=P2F_EMAIL_SA_PASSWORD)
         logger.debug("Logged into server")
         server.sendmail(

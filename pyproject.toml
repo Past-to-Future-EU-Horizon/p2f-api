@@ -9,7 +9,7 @@ namespace = true
 
 [project]
 name = "p2f_api"
-version = "0.0.34"
+version = "0.0.35"
 description = "FastAPI based API for the Past to Future project."
 requires-python = ">=3.13"
 dependencies = [
