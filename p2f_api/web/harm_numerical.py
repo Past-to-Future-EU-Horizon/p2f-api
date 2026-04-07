@@ -2,12 +2,9 @@
 from p2f_api.apilogs import logger, fa
 from ..service import harm_numerical
 from .temp_accounts import combined_auth
-from p2f_pydantic.harm_data_numerical import harmonized_int_confidence as Harmonized_int_confidence
-from p2f_pydantic.harm_data_numerical import harmonized_float_confidence as Harmonized_float_confidence
-from p2f_pydantic.harm_data_numerical import harmonized_int as Harmonized_int
-from p2f_pydantic.harm_data_numerical import harmonized_float as Harmonized_float
-from p2f_pydantic.harm_data_numerical import insert_harm_numerical as Insert_harm_numerical
-from p2f_pydantic.harm_data_numerical import return_harm_numerical as Return_harm_numerical
+from p2f_pydantic.harm_data_numerical import HARM_Int, HARM_Int_Confidence
+from p2f_pydantic.harm_data_numerical import HARM_Float, HARM_Float_Confidence
+from p2f_pydantic.harm_data_numerical import Insert_HARM_Numerical, Return_HARM_Numerical
 from p2f_pydantic.temp_accounts import Temp_Account
 
 # Third Party Libraries
@@ -21,10 +18,7 @@ from inspect import stack
 router = APIRouter(prefix="/harm-numerical")
 
 Harm_numerical_union = Union[
-    Harmonized_float_confidence,
-    Harmonized_float,
-    Harmonized_int_confidence,
-    Harmonized_int,
+    HARM_Float_Confidence, HARM_Float, HARM_Int, HARM_Int_Confidence
 ]
 
 
@@ -38,7 +32,7 @@ def list_harm_numerical(
     ] = None,
     data_type: Optional[uuid.UUID] = None,
     dataset_id: Optional[uuid.UUID] = None,
-) -> Return_harm_numerical:
+) -> Return_HARM_Numerical:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     logger.debug(f"Received params: {locals()}")
     return harm_numerical.list_numerics(
@@ -60,7 +54,7 @@ def get_harm_numerical(auth: Annotated[Temp_Account, Depends(combined_auth)],
 # Create
 @router.post("/")
 def create_harm_numerical(auth: Annotated[Temp_Account, Depends(combined_auth)],
-                          new_numeric: Insert_harm_numerical) -> Harm_numerical_union:
+                          new_numeric: Insert_HARM_Numerical) -> Harm_numerical_union:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_numerical.create_numeric(new_numeric=new_numeric)
 

@@ -1,6 +1,6 @@
 from p2f_api.apilogs import logger, fa
 from ..service import dq_comment
-from p2f_pydantic.data_quality import dq_comment as DQ_Comment
+from p2f_pydantic.data_quality import DQ_Comment
 
 # Third Party Libraries
 from fastapi import Body, APIRouter, Request

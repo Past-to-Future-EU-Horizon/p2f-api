@@ -1,7 +1,7 @@
 from p2f_api.apilogs import logger, fa
 from ..service import harm_data_types
 from .temp_accounts import combined_auth
-from p2f_pydantic.harm_data_types import harm_data_type as Harm_data_type
+from p2f_pydantic.harm_data_types import HARM_Data_Type
 from p2f_pydantic.temp_accounts import Temp_Account
 
 # Third Party Libraries
@@ -22,7 +22,7 @@ def list_harm_data_types(
     unit_of_measure: Optional[str] = None,
     method: Optional[str] = None,
     dataset_id: Optional[uuid.UUID] = None,
-) -> List[Harm_data_type]:
+) -> List[HARM_Data_Type]:
     logger.debug(
         f"{fa.web}{fa.list} {__name__} {stack()[0][3]}({measure}, {unit_of_measure}, {method}, {dataset_id})"
     )
@@ -37,14 +37,14 @@ def list_harm_data_types(
 @router.get("/{datatype_id}")
 def get_harm_data_type(
     auth: Annotated[Temp_Account, Depends(combined_auth)],
-    datatype_id: uuid.UUID) -> Harm_data_type:
+    datatype_id: uuid.UUID) -> HARM_Data_Type:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}({datatype_id})")
     return harm_data_types.get_harm_data_type(datatype_id=datatype_id)
 
 
 @router.post("/")
 def insert_harm_data_type(auth: Annotated[Temp_Account, Depends(combined_auth)],
-                          new_harm_data_type: Harm_data_type) -> Harm_data_type:
+                          new_harm_data_type: HARM_Data_Type) -> HARM_Data_Type:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_data_types.create_harm_data_type(new_harm_data_type=new_harm_data_type)
 

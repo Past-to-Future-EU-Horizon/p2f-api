@@ -5,12 +5,9 @@ from ..data.db_connection import engine
 from ..data.harm_data_numerical import harmonized_float_confidence, harmonized_float
 from ..data.harm_data_numerical import harmonized_int_confidence, harmonized_int
 from ..data.harm_data_numerical import harmonized_numeric_id_map
-from p2f_pydantic.harm_data_numerical import harmonized_float_confidence as Harmonized_float_confidence
-from p2f_pydantic.harm_data_numerical import harmonized_int_confidence as Harmonized_int_confidence
-from p2f_pydantic.harm_data_numerical import harmonized_float as Harmonized_float
-from p2f_pydantic.harm_data_numerical import harmonized_int as Harmonized_int
-from p2f_pydantic.harm_data_numerical import insert_harm_numerical as Insert_harm_numerical
-from p2f_pydantic.harm_data_numerical import return_harm_numerical as Return_harm_numerical
+from p2f_pydantic.harm_data_numerical import HARM_Int, HARM_Int_Confidence
+from p2f_pydantic.harm_data_numerical import HARM_Float, HARM_Float_Confidence
+from p2f_pydantic.harm_data_numerical import Insert_HARM_Numerical, Return_HARM_Numerical
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
@@ -20,24 +17,41 @@ from typing import List, Union, Literal, Optional
 from uuid import UUID
 from inspect import stack
 
-Harm_numerical_union = Union[
-    Harmonized_float_confidence,
-    Harmonized_float,
-    Harmonized_int_confidence,
-    Harmonized_int,
-]
+Harm_numerical_union = Union[HARM_Int, HARM_Int_Confidence, HARM_Float, HARM_Float_Confidence]
 
 harm_table_matching = {
     "float_confidence": {
         "db": harmonized_float_confidence,
-        "pydantic": Harmonized_float_confidence,
+        "pydantic": HARM_Float_Confidence,
     },
-    "float": {"db": harmonized_float, "pydantic": Harmonized_float},
+    "float": {
+        "db": harmonized_float, 
+        "pydantic": HARM_Float
+    },
     "int_confidence": {
         "db": harmonized_int_confidence,
-        "pydantic": Harmonized_int_confidence,
+        "pydantic": HARM_Int_Confidence,
     },
-    "int": {"db": harmonized_int, "pydantic": Harmonized_int},
+    "int": {
+        "db": harmonized_int, 
+        "pydantic": HARM_Int
+    },
+    "float_confidence".upper(): {
+        "db": harmonized_float_confidence,
+        "pydantic": HARM_Float_Confidence,
+    },
+    "float".upper(): {
+        "db": harmonized_float, 
+        "pydantic": HARM_Float
+    },
+    "int_confidence".upper(): {
+        "db": harmonized_int_confidence,
+        "pydantic": HARM_Int_Confidence,
+    },
+    "int".upper(): {
+        "db": harmonized_int, 
+        "pydantic": HARM_Int
+    },
 }
 
 
@@ -51,18 +65,8 @@ def get_numeric_table_by_uuid(numeric_id: UUID):
     # logger.debug(dir())
     numeric_class = result.tuple()[0].table_class
     logger.debug(f"•• Numeric Class set as {numeric_class}")
-    if numeric_class == "INT_CONFIDENCE":
-        numeric_table = harmonized_int_confidence
-        pydantic_class = Harmonized_int_confidence
-    elif numeric_class == "INT":
-        numeric_table = harmonized_int
-        pydantic_class = Harmonized_int
-    elif numeric_class == "FLOAT_CONFIDENCE":
-        numeric_table = harmonized_float_confidence
-        pydantic_class = Harmonized_float_confidence
-    elif numeric_class == "FLOAT":
-        numeric_table = harmonized_float
-        pydantic_class = Harmonized_float
+    numeric_table = harm_table_matching[numeric_class]["db"]
+    pydantic_class = harm_table_matching[numeric_class]["pydantic"]
     return (numeric_table, pydantic_class)
 
 
@@ -73,7 +77,7 @@ def list_numerics(
     ] = None,
     data_type: Optional[UUID] = None,
     dataset_id: Optional[UUID] = None,
-) -> Return_harm_numerical:
+) -> Return_HARM_Numerical:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     logger.debug(f"{locals()}")
     if dataset_id is not None:
@@ -121,7 +125,7 @@ def list_numerics(
                 session_results[table]["pydantic"](**x[0].__dict__) for x in results
             ]
     logger.debug("•  All results collected")
-    return_results = Return_harm_numerical()
+    return_results = Return_HARM_Numerical()
     for table in session_results.keys():
         match table:
             case "int":
@@ -173,7 +177,7 @@ def get_numeric(numeric_id: UUID) -> Harm_numerical_union:
     return numeric_object
 
 
-def create_numeric(new_numeric: Insert_harm_numerical) -> Insert_harm_numerical:
+def create_numeric(new_numeric: Insert_HARM_Numerical) -> Insert_HARM_Numerical:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     numeric_class = new_numeric.numerical_type
     if numeric_class == "INT":

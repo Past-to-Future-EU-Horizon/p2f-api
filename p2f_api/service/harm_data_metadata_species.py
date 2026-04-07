@@ -1,7 +1,7 @@
 from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
 from ..data.harm_data_metadata import harm_species_to_record, harm_data_species
-from p2f_pydantic.harm_data_metadata import harm_data_species as Harm_data_species
+from p2f_pydantic.harm_data_metadata import HARM_Data_Species
 
 # Third Party Libraries
 from sqlalchemy.orm import Session
@@ -31,7 +31,7 @@ def list_harm_metadata_species(
     tax_subspecies: Optional[str] = None,
     common_name: Optional[str] = None,
     display_species: Optional[str] = None,
-) -> List[Harm_data_species]:
+) -> List[HARM_Data_Species]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_data_species)
@@ -75,13 +75,13 @@ def list_harm_metadata_species(
         if display_species is not None:
             stmt = stmt.where(harm_data_species.display_species == display_species)
         results = session.execute(stmt).all()
-    return [Harm_data_species(**x[0].__dict__) for x in results]
+    return [HARM_Data_Species(**x[0].__dict__) for x in results]
 
 
 def get_harm_metadata_species(
     species_id: Optional[UUID] = None,
     pk_harm_species: Optional[int] = None
-):
+) -> HARM_Data_Species:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_data_species)
@@ -91,10 +91,10 @@ def get_harm_metadata_species(
             stmt = stmt.where(harm_data_species.pk_harm_species == pk_harm_species)
         result = session.execute(stmt).first()
         logger.debug(result[0])
-    return Harm_data_species(**result[0].__dict__)
+    return HARM_Data_Species(**result[0].__dict__)
 
 
-def create_harm_metadata_species(new_species: Harm_data_species) -> Harm_data_species:
+def create_harm_metadata_species(new_species: HARM_Data_Species) -> HARM_Data_Species:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_data_species)

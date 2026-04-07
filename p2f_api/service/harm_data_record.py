@@ -4,7 +4,7 @@ from p2f_api.apilogs import logger, fa
 # from ..service.harm_numerical import list_numerics
 from ..data.db_connection import engine
 from ..data.harm_data_record import harm_data_record
-from p2f_pydantic.harm_data_record import harm_data_record as Harm_data_record
+from p2f_pydantic.harm_data_record import HARM_Data_Record
 
 # Third Party Libraries
 from sqlalchemy.orm import Session
@@ -21,7 +21,7 @@ def list_harm_data_record(
     # data_type: Optional[int]=None,  ## Disabling this for now
     ## I would need to duplicate the code in the numerical service
     ## as this is currently causing circular import issues.
-) -> List[Harm_data_record]:
+) -> List[HARM_Data_Record]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
@@ -32,13 +32,13 @@ def list_harm_data_record(
         #     subqry = (select().subquery())
         results = session.execute(stmt).all()
         logger.debug(f"\tFound {len(results)} results")
-    return [Harm_data_record(**x[0].__dict__) for x in results]
+    return [HARM_Data_Record(**x[0].__dict__) for x in results]
 
 
 def get_harm_data_record(
     record_hash: Optional[str] = None,
     pk_harm_data_record: Optional[int] = None
-) -> Harm_data_record:
+) -> HARM_Data_Record:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
@@ -50,10 +50,10 @@ def get_harm_data_record(
                 harm_data_record.pk_harm_data_record == pk_harm_data_record
             )
         result = session.execute(stmt).first()
-    return Harm_data_record(**result.tuple()[0].__dict__)
+    return HARM_Data_Record(**result.tuple()[0].__dict__)
 
 
-def create_harm_data_record(new_dataset: Harm_data_record) -> Harm_data_record:
+def create_harm_data_record(new_dataset: HARM_Data_Record) -> HARM_Data_Record:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
@@ -66,8 +66,8 @@ def create_harm_data_record(new_dataset: Harm_data_record) -> Harm_data_record:
 
 def update_harm_data_record(
     record_hash: str,
-    dataset_update: Harm_data_record
-) -> Harm_data_record:
+    dataset_update: HARM_Data_Record
+) -> HARM_Data_Record:
     logger.debug(f"{fa.service}{fa.update} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("\tCreated session")

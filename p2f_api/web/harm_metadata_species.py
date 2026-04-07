@@ -2,7 +2,7 @@
 from p2f_api.apilogs import logger, fa
 from ..service import harm_data_metadata_species
 from .temp_accounts import combined_auth
-from p2f_pydantic.harm_data_metadata import harm_data_species as Harm_data_species
+from p2f_pydantic.harm_data_metadata import HARM_Data_Species
 from p2f_pydantic.temp_accounts import Temp_Account
 
 # Third Party Libraries
@@ -37,7 +37,7 @@ def list_harm_metadata_species(
     tax_subspecies: Optional[str] = None,
     common_name: Optional[str] = None,
     display_species: Optional[str] = None,
-) -> List[Harm_data_species]:
+) -> List[HARM_Data_Species]:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_species.list_harm_metadata_species(
         tax_domain=tax_domain,
@@ -73,7 +73,7 @@ def get_harm_metadata_species(auth: Annotated[Temp_Account, Depends(combined_aut
 # Create
 @router.post("/")
 def create_harm_metadata_species(auth: Annotated[Temp_Account, Depends(combined_auth)],
-                                 new_species: Harm_data_species) -> Harm_data_species:
+                                 new_species: HARM_Data_Species) -> HARM_Data_Species:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_species.create_harm_metadata_species(
         new_species=new_species

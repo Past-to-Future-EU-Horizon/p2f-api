@@ -5,7 +5,7 @@ from ..service.harm_data_record import list_harm_data_record
 from ..data.db_connection import engine
 from ..data.harm_data_types import harm_data_type
 from ..data import harm_data_numerical
-from p2f_pydantic.harm_data_types import harm_data_type as Harm_data_type
+from p2f_pydantic.harm_data_types import HARM_Data_Type
 
 # Third Party Libraries
 from sqlalchemy.orm import Session
@@ -54,7 +54,7 @@ def list_harm_data_types(
     unit_of_measure: Optional[str] = None,
     method: Optional[str] = None,
     dataset_id: Optional[UUID] = None,
-) -> List[Harm_data_type]:
+) -> List[HARM_Data_Type]:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
@@ -70,7 +70,7 @@ def list_harm_data_types(
             stmt = stmt.where(harm_data_type.method == method)
         results = session.execute(stmt).all()
     logger.debug(f"• Found {len(results)} results")
-    results = [Harm_data_type(**x[0].__dict__) for x in results]
+    results = [HARM_Data_Type(**x[0].__dict__) for x in results]
     if dataset_id is not None:
         logger.debug("•  dataset_id is not None")
         dataset_datatypes = list_harm_data_types_by_dataset_id()
@@ -83,7 +83,7 @@ def list_harm_data_types(
 def get_harm_data_type(
     datatype_id: Optional[UUID] = None,
     pk_harm_data_type: Optional[int] = None
-) -> Harm_data_type:
+) -> HARM_Data_Type:
     logger.debug(f"{fa.service}{fa.get} {__name__}  {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_data_type)
@@ -92,10 +92,10 @@ def get_harm_data_type(
         if pk_harm_data_type is not None:
             stmt = stmt.where(harm_data_type.pk_harm_data_type == pk_harm_data_type)
         result = session.execute(stmt).first()
-    return Harm_data_type(**result.tuple()[0].__dict__)
+    return HARM_Data_Type(**result.tuple()[0].__dict__)
 
 
-def create_harm_data_type(new_harm_data_type: Harm_data_type) -> Harm_data_type:
+def create_harm_data_type(new_harm_data_type: HARM_Data_Type) -> HARM_Data_Type:
     logger.debug(f"{fa.service}{fa.create} {__name__}  {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_data_type)
@@ -123,7 +123,7 @@ def create_harm_data_type(new_harm_data_type: Harm_data_type) -> Harm_data_type:
     return return_harm_data_type
 
 
-def update_harm_data_type(update_harm_data_type: Harm_data_type) -> Harm_data_type:
+def update_harm_data_type(update_harm_data_type: HARM_Data_Type) -> HARM_Data_Type:
     logger.debug(f"{fa.service}{fa.update} {__name__}  {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = update(harm_data_type)

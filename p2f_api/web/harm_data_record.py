@@ -2,7 +2,7 @@
 from p2f_api.apilogs import logger, fa
 from ..service import harm_data_record
 from .temp_accounts import combined_auth
-from p2f_pydantic.harm_data_record import harm_data_record as Harm_data_record
+from p2f_pydantic.harm_data_record import HARM_Data_Record
 from p2f_pydantic.temp_accounts import Temp_Account
 
 # Third Party Libraries
@@ -22,7 +22,7 @@ def list_harm_data_records(
     auth: Annotated[Temp_Account, Depends(combined_auth)],
     dataset: Optional[str] = None,
     # data_type: Optional[int]=None, ### Disabled for now, see note in service
-) -> List[Harm_data_record]:
+) -> List[HARM_Data_Record]:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     return harm_data_record.list_harm_data_record(dataset=dataset)
 
@@ -30,7 +30,7 @@ def list_harm_data_records(
 # Get Single
 @router.get("/{record_hash}")
 def get_harm_data_record(auth: Annotated[Temp_Account, Depends(combined_auth)],
-                         record_hash: str) -> Harm_data_record:
+                         record_hash: str) -> HARM_Data_Record:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_data_record.get_harm_data_record(record_hash=record_hash)
 
@@ -38,7 +38,7 @@ def get_harm_data_record(auth: Annotated[Temp_Account, Depends(combined_auth)],
 # Create
 @router.post("/")
 def create_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
-                   new_data_record: Harm_data_record) -> Harm_data_record:
+                   new_data_record: HARM_Data_Record) -> HARM_Data_Record:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_data_record.create_harm_data_record(new_data_record)
 

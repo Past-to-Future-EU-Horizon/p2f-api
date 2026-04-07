@@ -1,7 +1,7 @@
 from p2f_api.apilogs import logger, fa
 from ..service import harm_age
 from .temp_accounts import combined_auth
-from p2f_pydantic.harm_age import harm_data_age as Harm_data_age
+from p2f_pydantic.harm_age import HARM_Data_Age
 from p2f_pydantic.temp_accounts import Temp_Account
 
 # Third Party Libraries
@@ -19,7 +19,7 @@ def list_harm_ages(
     auth: Annotated[Temp_Account, Depends(combined_auth)],
     recent_year_search: Optional[int] = None,
     older_year_search: Optional[int] = None
-) -> List[Harm_data_age]:
+) -> List[HARM_Data_Age]:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_age.list_harm_ages(
         recent_year_search=recent_year_search,
@@ -29,21 +29,21 @@ def list_harm_ages(
 
 @router.get("/{record_hash}")
 def get_harm_age(auth: Annotated[Temp_Account, Depends(combined_auth)],
-                 record_hash: Optional[str] = None) -> Harm_data_age:
+                 record_hash: Optional[str] = None) -> HARM_Data_Age:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_age.get_harm_age(record_hash=record_hash)
 
 
 @router.post("/")
-def create_new_harm_data_age(auth: Annotated[Temp_Account, Depends(combined_auth)],
-                             new_harm_age: Harm_data_age) -> Harm_data_age:
+def create_new_HARM_Data_Age(auth: Annotated[Temp_Account, Depends(combined_auth)],
+                             new_harm_age: HARM_Data_Age) -> HARM_Data_Age:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_age.create_new_harm_data_age(new_harm_age=new_harm_age)
 
 
 @router.put("/")
 def update_age(auth: Annotated[Temp_Account, Depends(combined_auth)],
-               update_harm_age: Harm_data_age) -> Harm_data_age:
+               update_harm_age: HARM_Data_Age) -> HARM_Data_Age:
     logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
     return harm_age.update_age(update_harm_age=update_harm_age)
 

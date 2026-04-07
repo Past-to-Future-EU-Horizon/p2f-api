@@ -2,8 +2,8 @@
 from p2f_api.apilogs import logger, fa
 from ..service import harm_data_metadata_location
 from .temp_accounts import combined_auth
-from p2f_pydantic.harm_data_metadata import harm_location as Harm_location
-from p2f_pydantic.harm_data_metadata import harm_bounding_box as Harm_bounding_box
+from p2f_pydantic.harm_data_metadata import HARM_Location
+from p2f_pydantic.harm_data_metadata import HARM_Bounding_Box
 from p2f_pydantic.temp_accounts import Temp_Account
 # Third Party Libraries
 from fastapi import Body, APIRouter, Depends
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/harm-data-locations")
 @router.get("/")
 def list_harm_data_records(
     auth: Annotated[Temp_Account, Depends(combined_auth)],
-    bounding_box: Optional[Harm_bounding_box] = None,
+    bounding_box: Optional[HARM_Bounding_Box] = None,
     location_name: Optional[str] = None,
     location_code: Optional[str] = None,
     minimum_elevation: Optional[float] = None,
@@ -28,7 +28,7 @@ def list_harm_data_records(
     min_location_age: Optional[float] = None,
     max_location_age: Optional[float] = None,
     dataset_id: Optional[uuid.UUID] = None,
-) -> List[Harm_location]:
+) -> List[HARM_Location]:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_location.list_harm_metadata_location(
         bounding_box=bounding_box,
@@ -45,7 +45,7 @@ def list_harm_data_records(
 # Get Single
 @router.get("/{location_identifier}")
 def get_harm_data_record(auth: Annotated[Temp_Account, Depends(combined_auth)],
-                         location_identifier: uuid.UUID) -> Harm_location:
+                         location_identifier: uuid.UUID) -> HARM_Location:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_location.get_location(
         location_identifier=location_identifier
@@ -55,14 +55,14 @@ def get_harm_data_record(auth: Annotated[Temp_Account, Depends(combined_auth)],
 # Create
 @router.post("/")
 def create_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
-                   new_location: Harm_location) -> Harm_location:
+                   new_location: HARM_Location) -> HARM_Location:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_location.create_location(new_location=new_location)
 
 
 @router.put("/")
 def update_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
-                   update_location: Harm_location) -> Harm_location:
+                   update_location: HARM_Location) -> HARM_Location:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_location.update_location(update_location=update_location)
 

@@ -1,6 +1,6 @@
 # Local libraries
 from p2f_api.apilogs import logger, fa
-from p2f_pydantic.data_quality import dq_comment as DQ_Comment
+from p2f_pydantic.data_quality import DQ_Comment
 from ..data.db_connection import engine
 from ..data.data_quality import dq_comment
 from ..service.datasets import get_dataset

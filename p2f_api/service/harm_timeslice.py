@@ -2,7 +2,7 @@
 from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
 from ..data.harm_timeslice import harm_timeslice, harm_timeslice_to_record
-from p2f_pydantic.harm_timeslices import harm_timeslice as Harm_timeslice
+from p2f_pydantic.harm_timeslices import HARM_Timeslice
 
 # Third Party Libraries
 from sqlalchemy.orm import Session
@@ -18,7 +18,7 @@ def list_harm_timeslices(
     named_time_period: Optional[str] = None,
     older_search_age: Optional[int] = None,
     recent_search_age: Optional[int] = None,
-) -> List[Harm_timeslice]:
+) -> List[HARM_Timeslice]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_timeslice)
@@ -29,13 +29,13 @@ def list_harm_timeslices(
         if recent_search_age is not None:
             stmt = stmt.where(harm_timeslice.timeslice_age_mean >= recent_search_age)
         results = session.execute(stmt).all()
-    return [Harm_timeslice(**x[0].__dict__) for x in results]
+    return [HARM_Timeslice(**x[0].__dict__) for x in results]
 
 
 def get_harm_timeslice(
     timeslice_id: Optional[UUID] = None,
     pk_timeslice: Optional[int] = None,
-) -> Harm_timeslice:
+) -> HARM_Timeslice:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_timeslice)
@@ -44,10 +44,10 @@ def get_harm_timeslice(
         if pk_timeslice is not None:
             stmt = stmt.where(harm_timeslice.pk_harm_timeslice == pk_timeslice)
         result = session.execute(stmt)
-    return Harm_timeslice(**result.tuple()[0].__dict__)
+    return HARM_Timeslice(**result.tuple()[0].__dict__)
 
 
-def create_new_timeslice(new_harm_timeslice: Harm_timeslice) -> Harm_timeslice:
+def create_new_timeslice(new_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_timeslice)
@@ -57,7 +57,7 @@ def create_new_timeslice(new_harm_timeslice: Harm_timeslice) -> Harm_timeslice:
     return get_harm_timeslice(pk_timeslice=commit.inserted_primary_key[0])
 
 
-def update_timeslice(update_harm_timeslice: Harm_timeslice) -> Harm_timeslice:
+def update_timeslice(update_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
     logger.debug(f"{fa.service}{fa.update} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = update(harm_timeslice)

@@ -2,7 +2,7 @@
 from p2f_api.apilogs import logger, fa
 from ..service import harm_reference
 from .temp_accounts import combined_auth
-from p2f_pydantic.harm_reference import harm_reference as Harm_reference
+from p2f_pydantic.harm_reference import HARM_Reference
 from p2f_pydantic.temp_accounts import Temp_Account
 
 # Third Party Libraries
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/harm-reference")
 
 # List
 @router.get("/")
-def list_references(auth: Annotated[Temp_Account, Depends(combined_auth)]) -> List[Harm_reference]:
+def list_references(auth: Annotated[Temp_Account, Depends(combined_auth)]) -> List[HARM_Reference]:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     return harm_reference.list_references()
 
@@ -29,7 +29,7 @@ def get_reference(
     auth: Annotated[Temp_Account, Depends(combined_auth)],
     doi: Optional[str] = None,
     reference_id: Optional[uuid.UUID] = None
-) -> Harm_reference:
+) -> HARM_Reference:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_reference.get_reference(doi=doi, reference_id=reference_id)
 
@@ -38,7 +38,7 @@ def get_reference(
 @router.post("/")
 def create_reference(
     auth: Annotated[Temp_Account, Depends(combined_auth)],
-    new_reference: Harm_reference) -> Harm_reference:
+    new_reference: HARM_Reference) -> HARM_Reference:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     logger.debug(f"• new_reference: {new_reference.model_dump(exclude_unset=True)}")
     return harm_reference.create_reference(new_reference=new_reference)

@@ -2,8 +2,8 @@ from p2f_api.apilogs import logger, fa
 from .harm_data_record import list_harm_data_record
 from ..data.db_connection import engine
 from ..data.harm_data_metadata import harm_location_to_record, harm_locations
-from p2f_pydantic.harm_data_metadata import harm_location as Harm_location
-from p2f_pydantic.harm_data_metadata import harm_bounding_box as Harm_bounding_box
+from p2f_pydantic.harm_data_metadata import HARM_Location
+from p2f_pydantic.harm_data_metadata import HARM_Bounding_Box
 
 # Third Party Libraries
 from sqlalchemy.orm import Session
@@ -16,7 +16,7 @@ from inspect import stack
 
 
 def list_harm_metadata_location(
-    bounding_box: Optional[Harm_bounding_box] = None,
+    bounding_box: Optional[HARM_Bounding_Box] = None,
     location_name: Optional[str] = None,
     location_code: Optional[str] = None,
     minimum_elevation: Optional[float] = None,
@@ -24,7 +24,7 @@ def list_harm_metadata_location(
     min_location_age: Optional[float] = None,
     max_location_age: Optional[float] = None,
     dataset_id: Optional[float] = None,
-) -> List[Harm_location]:
+) -> List[HARM_Location]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     if dataset_id is not None:
         logger.debug(f"•  Dataset_id is not None: {dataset_id}")
@@ -68,13 +68,13 @@ def list_harm_metadata_location(
             logger.debug(f"•• Dataset identifier statement alteration: {stmt}")
         results = session.execute(stmt).all()
         logger.debug(f"• Found {len(results)} results. ")
-    return [Harm_location(**x[0].__dict__) for x in results]
+    return [HARM_Location(**x[0].__dict__) for x in results]
 
 
 def get_location(
     location_identifier: Optional[UUID] = None, 
     pk_harm_location: Optional[int] = None
-) -> Harm_location:
+) -> HARM_Location:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_locations)
@@ -84,10 +84,10 @@ def get_location(
             stmt = stmt.where(harm_locations.pk_harm_location == pk_harm_location)
         result = session.execute(stmt).first()
     result = result.tuple()[0]
-    return Harm_location(**result.__dict__)
+    return HARM_Location(**result.__dict__)
 
 
-def create_location(new_location: Harm_location) -> Harm_location:
+def create_location(new_location: HARM_Location) -> HARM_Location:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_locations)
@@ -97,7 +97,7 @@ def create_location(new_location: Harm_location) -> Harm_location:
     return get_location(pk_harm_location=execute.inserted_primary_key[0])
 
 
-def update_location(update_location: Harm_location) -> Harm_location:
+def update_location(update_location: HARM_Location) -> HARM_Location:
     logger.debug(f"{fa.service}{fa.update} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = update(harm_locations)
