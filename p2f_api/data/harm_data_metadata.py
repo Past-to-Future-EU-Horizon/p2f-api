@@ -7,12 +7,17 @@ from sqlalchemy import BigInteger
 from sqlalchemy import Double
 from sqlalchemy import Text
 from sqlalchemy import Uuid
+from sqlalchemy import DateTime
+from sqlalchemy import func
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func
 from sqlalchemy import ForeignKey
 
 # Batteries included libraries
 from uuid import UUID
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 
 logger.debug(f"{fa.data} {__name__}")
 
@@ -29,7 +34,12 @@ class harm_locations(baseSQL):
     longitude: Mapped[float] = mapped_column(Double)
     elevation: Mapped[float] = mapped_column(Double)
     location_age: Mapped[int] = mapped_column(BigInteger)
-
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 class harm_location_to_record(baseSQL):
     __tablename__ = "p2f_harm_location_to_record"
@@ -42,7 +52,12 @@ class harm_location_to_record(baseSQL):
     fk_data_record: Mapped[str] = mapped_column(
         ForeignKey("p2f_harm_data_record.record_hash")
     )
-
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 class harm_data_species(baseSQL):
     __tablename__ = "p2f_harm_species"
@@ -67,7 +82,12 @@ class harm_data_species(baseSQL):
     tax_genus: Mapped[str] = mapped_column(Text, nullable=True)
     tax_species: Mapped[str] = mapped_column(Text, nullable=True)
     tax_subspecies: Mapped[str] = mapped_column(Text, nullable=True)
-
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 class harm_species_to_record(baseSQL):
     __tablename__ = "p2f_harm_species_to_record"
@@ -77,4 +97,10 @@ class harm_species_to_record(baseSQL):
     )
     fk_data_record: Mapped[str] = mapped_column(
         ForeignKey("p2f_harm_data_record.record_hash")
+    )
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
     )

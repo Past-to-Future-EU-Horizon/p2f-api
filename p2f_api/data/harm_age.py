@@ -6,11 +6,15 @@ from sqlalchemy import BigInteger
 from sqlalchemy import Text
 from sqlalchemy import Uuid
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime
 from sqlalchemy import func
 from sqlalchemy import ForeignKey
 
 # Batteries included libraries
 from uuid import UUID
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 
 logger.debug(f"{fa.data} {__name__}")
 
@@ -24,3 +28,9 @@ class harm_data_age(baseSQL):
     age_mean: Mapped[int] = mapped_column(BigInteger)
     age_recent: Mapped[int] = mapped_column(BigInteger, nullable=True)
     age_oldest: Mapped[int] = mapped_column(BigInteger, nullable=True)
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )

@@ -7,6 +7,7 @@ from sqlalchemy import BigInteger
 from sqlalchemy import Double, Float
 from sqlalchemy import Uuid
 from sqlalchemy import Text
+from sqlalchemy import DateTime
 from sqlalchemy import func
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
@@ -14,6 +15,9 @@ from sqlalchemy import UniqueConstraint, PrimaryKeyConstraint
 
 # Batteries included libraries
 from uuid import UUID
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 
 logger.debug(f"{fa.data} {__name__}")
 
@@ -36,7 +40,13 @@ class harmonized_int_confidence(baseSQL):
     fk_data_type: Mapped[UUID] = mapped_column(
         ForeignKey("p2f_harm_data_types.datatype_id")
     )
-
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
+    
 
 class harmonized_int(baseSQL):
     __tablename__ = "p2f_harm_integer"
@@ -52,7 +62,12 @@ class harmonized_int(baseSQL):
     fk_data_type: Mapped[UUID] = mapped_column(
         ForeignKey("p2f_harm_data_types.datatype_id")
     )
-
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 class harmonized_float_confidence(baseSQL):
     __tablename__ = "p2f_harm_float_confidence"
@@ -72,7 +87,12 @@ class harmonized_float_confidence(baseSQL):
     fk_data_type: Mapped[UUID] = mapped_column(
         ForeignKey("p2f_harm_data_types.datatype_id")
     )
-
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 class harmonized_float(baseSQL):
     __tablename__ = "p2f_harm_float"
@@ -88,7 +108,18 @@ class harmonized_float(baseSQL):
     fk_data_type: Mapped[UUID] = mapped_column(
         ForeignKey("p2f_harm_data_types.datatype_id")
     )
-
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 class harmonized_numeric_id_map(baseSQL):
     __tablename__ = "p2f_harm_id_map"
@@ -97,3 +128,15 @@ class harmonized_numeric_id_map(baseSQL):
         Uuid, index=True, unique=True, nullable=False
     )
     table_class: Mapped[str] = mapped_column(Text)  # TODO Make this a ENUM
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )

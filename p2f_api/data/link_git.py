@@ -28,6 +28,12 @@ class git_repository(baseSQL):
     )
     git_repo_url: Mapped[str] = mapped_column(Text, nullable=False)
     is_p2f_repo: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 
 class git_repository_to_dataset(baseSQL):
@@ -38,4 +44,10 @@ class git_repository_to_dataset(baseSQL):
     )
     fk_dataset_id: Mapped[UUID] = mapped_column(
         ForeignKey("p2f_datasets.dataset_identifier")
+    )
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
     )

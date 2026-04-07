@@ -6,11 +6,15 @@ from sqlalchemy import BigInteger
 from sqlalchemy import Text, String
 from sqlalchemy import Uuid
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime
 from sqlalchemy import func
 from sqlalchemy import ForeignKey
 
 # Batteries included libraries
 from uuid import UUID
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 
 logger.debug(f"{fa.data} {__name__}")
 
@@ -28,6 +32,12 @@ class harm_text(baseSQL):
     text_data_type: Mapped[str] = mapped_column(
         ForeignKey("p2f_harm_text_data_types.text_data_type_id")
     )
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 
 class harm_text_types(baseSQL):
@@ -38,3 +48,9 @@ class harm_text_types(baseSQL):
     )
     text_data_type: Mapped[str] = mapped_column(Text, nullable=False)
     text_data_measure: Mapped[str] = mapped_column(Text, nullable=True)
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )

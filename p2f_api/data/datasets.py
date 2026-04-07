@@ -9,12 +9,15 @@ from sqlalchemy import Date
 from sqlalchemy import JSON
 from sqlalchemy import Boolean
 from sqlalchemy import Uuid
+from sqlalchemy import DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func
 import pytz
 
 # Batteries included libraries
 from datetime import date
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from uuid import UUID
 
 logger.debug(f"{fa.data} {__name__}")
@@ -32,3 +35,9 @@ class datasets(baseSQL):
     publication_date: Mapped[date] = mapped_column(Date)
     is_new_p2f: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_sub_dataset: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )

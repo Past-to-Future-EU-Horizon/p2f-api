@@ -15,8 +15,9 @@ from sqlalchemy import func
 
 # Batteries included libraries
 from datetime import date
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from uuid import UUID
-import enum
 
 logger.debug(f"{fa.data} {__name__}")
 
@@ -32,7 +33,12 @@ class dq_comment(baseSQL):
     dataset_id: Mapped[UUID] = mapped_column(
         ForeignKey(f"{datasets.__tablename__}.{datasets.dataset_identifier}")
     )
-
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 class dq_rating(baseSQL):
     __tablename__ = "p2f_dq_rating"
@@ -42,7 +48,12 @@ class dq_rating(baseSQL):
     dataset_id: Mapped[UUID] = mapped_column(
         ForeignKey(f"{datasets.__tablename__}.{datasets.dataset_identifier}")
     )
-
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 # Below needs to be discussed with the consortium
 # class classification_enum(enum.Enum):

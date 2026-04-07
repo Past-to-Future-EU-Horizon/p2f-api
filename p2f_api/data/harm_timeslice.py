@@ -6,11 +6,15 @@ from sqlalchemy import BigInteger
 from sqlalchemy import Text
 from sqlalchemy import Uuid
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime
 from sqlalchemy import func
 from sqlalchemy import ForeignKey
 
 # Batteries included libraries
 from uuid import UUID
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 
 logger.debug(f"{fa.data} {__name__}")
 
@@ -25,7 +29,12 @@ class harm_timeslice(baseSQL):
     timeslice_age_mean: Mapped[int] = mapped_column(BigInteger)
     timeslice_age_recent: Mapped[int] = mapped_column(BigInteger, nullable=True)
     timeslice_age_oldest: Mapped[int] = mapped_column(BigInteger, nullable=True)
-
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 class harm_timeslice_to_record(baseSQL):
     __tablename__ = "p2f_harm_timeslice_to_record"
@@ -35,4 +44,10 @@ class harm_timeslice_to_record(baseSQL):
     )
     fk_record_hash: Mapped[str] = mapped_column(
         ForeignKey("p2f_harm_data_record.record_hash")
+    )
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
     )

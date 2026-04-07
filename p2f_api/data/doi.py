@@ -26,3 +26,9 @@ class doi_metadata(baseSQL):
     request_time: Mapped[datetime] = mapped_column(DateTime(timezone=ZoneInfo("UTC")))
     metadata_json: Mapped[dict] = mapped_column(JSONB, nullable=True)
     metadata_xml: Mapped[str] = mapped_column(Text, nullable=True)
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )

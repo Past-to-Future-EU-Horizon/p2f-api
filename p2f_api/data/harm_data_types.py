@@ -6,11 +6,15 @@ from sqlalchemy import BigInteger
 from sqlalchemy import Text
 from sqlalchemy import Boolean
 from sqlalchemy import Uuid
+from sqlalchemy import DateTime
 from sqlalchemy import func
 from sqlalchemy.orm import Mapped, mapped_column
 
 # Batteries included libraries
 from uuid import UUID
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 
 logger.debug(f"{fa.data} {__name__}")
 
@@ -25,3 +29,9 @@ class harm_data_type(baseSQL):
     unit_of_measurement: Mapped[str] = mapped_column(Text)
     method: Mapped[str] = mapped_column(Text, index=True, nullable=True)
     is_proxy: Mapped[bool] = mapped_column(Boolean, default=False)
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )

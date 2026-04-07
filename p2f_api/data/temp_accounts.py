@@ -24,7 +24,12 @@ class temp_tokens(baseSQL):
     email_address: Mapped[str] = mapped_column(String(127), nullable=False)
     token: Mapped[str] = mapped_column(String(128), nullable=False)
     expiration: Mapped[datetime] = mapped_column(DateTime(ZoneInfo('UTC')), nullable=False)
-
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
 
 class permitted_addresses(baseSQL):
     __tablename__ = "p2f_accounts"
@@ -33,6 +38,12 @@ class permitted_addresses(baseSQL):
     permissions: Mapped[str] = mapped_column(Text, nullable=False)
     timezone: Mapped[str] = mapped_column(
         String, nullable=True, default="Europe/Amsterdam"
+    )
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
     )
 
 
