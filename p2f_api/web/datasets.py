@@ -34,28 +34,32 @@ def list_datasets(
 
 # Get Single
 @router.get("/{dataset_id}")
-def get_dataset(dataset_id) -> Datasets:
+def get_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
+                dataset_id: uuid.UUID) -> Datasets:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return datasets.get_dataset(dataset_id=dataset_id)
 
 
 # Create
 @router.post("/")
-def create_dataset(dataset: Datasets) -> Datasets:
+def create_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
+                   dataset: Datasets) -> Datasets:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return datasets.create_dataset(dataset)
 
 
 # Update
 @router.put("/")
-def update_dataset(dataset_updates: Datasets) -> Datasets:
+def update_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
+                   dataset_updates: Datasets) -> Datasets:
     logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
     return datasets.update_dataset(dataset_updates)
 
 
 # Delete
 @router.delete("/{dataset_id}")
-def delete_dataset(dataset_id: str) -> None:
+def delete_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
+                   dataset_id: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     if type(dataset_id) == str:
         return datasets.delete_dataset(dataset_id)

@@ -17,7 +17,7 @@ from inspect import stack
 router = APIRouter(prefix="/token")
 
 
-@router.post("/foo")
+@router.post("/request")
 def request_token(request_token: Temp_Account) -> JSONResponse:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     temp_accounts.token_request(request_token.email)

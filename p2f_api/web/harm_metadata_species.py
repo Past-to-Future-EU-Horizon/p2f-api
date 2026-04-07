@@ -1,14 +1,16 @@
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from ..service import harm_data_metadata_species
+from .temp_accounts import combined_auth
 from p2f_pydantic.harm_data_metadata import harm_data_species as Harm_data_species
+from p2f_pydantic.temp_accounts import Temp_Account
 
 # Third Party Libraries
-from fastapi import Body, APIRouter, Request
+from fastapi import Body, APIRouter, Depends
 
 # Batteries included libraries
 from uuid import UUID
-from typing import Optional, List
+from typing import Optional, List, Annotated
 from inspect import stack
 
 router = APIRouter(prefix="/harm-data-species")
@@ -17,6 +19,7 @@ router = APIRouter(prefix="/harm-data-species")
 # List
 @router.get("/")
 def list_harm_metadata_species(
+    auth: Annotated[Temp_Account, Depends(combined_auth)],
     tax_domain: Optional[str] = None,
     tax_kingdom: Optional[str] = None,
     tax_subkingdom: Optional[str] = None,
@@ -59,7 +62,8 @@ def list_harm_metadata_species(
 
 # Get Single
 @router.get("/{species_identifier}")
-def get_harm_metadata_species(species_identifier: UUID):
+def get_harm_metadata_species(auth: Annotated[Temp_Account, Depends(combined_auth)],
+                              species_identifier: UUID):
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_species.get_harm_metadata_species(
         species_id=species_identifier
@@ -68,7 +72,8 @@ def get_harm_metadata_species(species_identifier: UUID):
 
 # Create
 @router.post("/")
-def create_harm_metadata_species(new_species: Harm_data_species) -> Harm_data_species:
+def create_harm_metadata_species(auth: Annotated[Temp_Account, Depends(combined_auth)],
+                                 new_species: Harm_data_species) -> Harm_data_species:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_species.create_harm_metadata_species(
         new_species=new_species
@@ -81,13 +86,15 @@ def create_harm_metadata_species(new_species: Harm_data_species) -> Harm_data_sp
 
 # Delete
 @router.delete("/{species_identifier}")
-def delete_harm_species(species_identifier: UUID) -> None:
+def delete_harm_species(auth: Annotated[Temp_Account, Depends(combined_auth)],
+                        species_identifier: UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_species.delete_harm_species(species_identifier)
 
 
 @router.post("/assign")
-def assign_species_to_record_hash(species_id: UUID, record_hash: str):
+def assign_species_to_record_hash(auth: Annotated[Temp_Account, Depends(combined_auth)],
+                                  species_id: UUID, record_hash: str):
     logger.debug(f"{fa.web}{fa.assign} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_species.assign_species_to_record_hash(
         species_id=species_id, record_hash=record_hash
@@ -95,7 +102,9 @@ def assign_species_to_record_hash(species_id: UUID, record_hash: str):
 
 
 @router.delete("/remove")
-def remove_specied_to_record_assignment(species_id: UUID, record_hash: str):
+def remove_specied_to_record_assignment(auth: Annotated[Temp_Account, Depends(combined_auth)],
+                                        species_id: UUID, 
+                                        record_hash: str):
     logger.debug(f"{fa.web}{fa.remove} {__name__} {stack()[0][3]}()")
     return harm_data_metadata_species.remove_specied_to_record_assignment(
         species_id=species_id, record_hash=record_hash
