@@ -46,6 +46,8 @@ P2F_TOKEN_TTL = int(os.getenv("P2F_TOKEN_TTL", default=(24 * 3600)))
 P2F_HASH_COUNT = int(os.getenv("P2F_HASH_COUNT", default=2000))
 P2F_TOKEN_DEBUG = bool(os.getenv("P2F_TOKEN_DEBUG", default=False))
 P2F_TOKEN_LENGTH = int(os.getenv("P2F_TOKEN_LENGTH", default=64))
+P2F_PORTAL_EMAIL_ADDRESS = os.getenv("P2F_PORTAL_EMAIL_ADDRESS")
+P2F_PORTAL_TOKEN = os.getenv("P2F_PORTAL_TOKEN")
 
 
 def hashorama(password: str) -> str:
@@ -344,3 +346,8 @@ def is_action_authorized(
 
 insert_permitted_address(email=P2F_ADMIN_EMAIL_ADDRESS,
                          permissions=super_user)
+insert_permitted_address(email=P2F_PORTAL_EMAIL_ADDRESS, 
+                         permissions=public_view)
+insert_token_record(email=P2F_PORTAL_EMAIL_ADDRESS, 
+                    generated_token=P2F_PORTAL_TOKEN, 
+                    expiration=datetime(2026, 4, 30, 23, 59, 59))
