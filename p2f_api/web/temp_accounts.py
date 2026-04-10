@@ -51,8 +51,11 @@ def combined_auth(request: Request,
                   auth: Optional[Temp_Account]=None):
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
     operation = request.method.lower()
+    logger.debug(f"Operation: {operation}")
     path_furl = furl(request.url)
+    logger.debug(f"path_furl: {path_furl}")
     endpoint = path_furl.path.segments[0]
+    logger.debug(f"endpoint: {endpoint}")
     # Generally we will allow GET operations, if an operation is allowed by public 
     #    return true
     if auth is None:
