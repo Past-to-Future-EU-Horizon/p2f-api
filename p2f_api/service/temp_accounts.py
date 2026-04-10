@@ -327,6 +327,8 @@ def is_action_authorized(
     email: Optional[EmailStr]=None,
 ) -> bool:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
+    endpoint = endpoint.replace("-", "_")
+    logger.debug(f"New endpoint value: {endpoint}")
     if email is not None:
         with Session(engine) as session:
             stmt = select(permitted_addresses.permissions)

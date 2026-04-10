@@ -105,6 +105,16 @@ spec:
                   key: PG_HOST
             - name: PG_PORT
               value: '5432'
+            - name: P2F_PORTAL_EMAIL_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-portal
+                  key: P2F_PORTAL_EMAIL_ADDRESS
+            - name: P2F_PORTAL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: p2f-portal
+                  key: P2F_PORTAL_TOKEN
           imagePullPolicy: Always
       restartPolicy: Always
   strategy:
