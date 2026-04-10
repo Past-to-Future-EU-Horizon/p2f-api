@@ -45,7 +45,7 @@ def authorization(
     email: Optional[str]=None,
 ) -> bool:
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
-    return temp_accounts.is_action_authorized(email, endpoint, operation)
+    return temp_accounts.is_action_authorized(email=email, endpoint=endpoint, operation=operation)
 
 def combined_auth(request: Request,
                   auth: Optional[Temp_Account]=None):
@@ -59,9 +59,11 @@ def combined_auth(request: Request,
     # Generally we will allow GET operations, if an operation is allowed by public 
     #    return true
     if auth is None:
+        logger.debug("Auth is None path taken")
         return authorization(endpoint=endpoint, 
                              operation=operation)
     else:
+        logger.debug("Authentication and authorization paths taken")
         a1 = authentication(auth=auth)
         a2 = authorization(endpoint=endpoint, 
                         email=auth.email,
