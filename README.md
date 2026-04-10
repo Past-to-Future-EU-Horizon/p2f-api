@@ -1,7 +1,7 @@
 # p2f-api
 API Layer for the Past to Future projects Portal. Past to Future is an EU Horizon funded project. 
 
-*v0.0.54*
+*v0.0.55*
 
 ## Environment Variables
 

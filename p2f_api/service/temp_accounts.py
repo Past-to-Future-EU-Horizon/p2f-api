@@ -343,7 +343,7 @@ def is_action_authorized(
         else:
             return False
     else: 
-        return public_view[endpoint][operation]
+        return public_view.model_dump(exclude_unset=True)[endpoint][operation]
 
 
 insert_permitted_address(email=P2F_ADMIN_EMAIL_ADDRESS,
