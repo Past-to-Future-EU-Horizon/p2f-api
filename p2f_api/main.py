@@ -15,6 +15,7 @@ from p2f_api.web import doi
 from p2f_api.web import dq_comment
 from p2f_api.web import temp_accounts
 from p2f_api.web import health
+from p2f_pydantic import system as p2fsystem
 # Third Party Libraries
 from fastapi import FastAPI
 # Batteries included libraries
@@ -23,7 +24,7 @@ import os
 app = FastAPI(
     title="Past to Future Dataset API",
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
-    version="0.0.55",
+    version="0.0.56",
 )
 logger.debug(f"{fa.background} {__name__}")
 logger.debug("▶️  FastAPI() Started")
@@ -45,6 +46,18 @@ app.include_router(link_git.router)
 app.include_router(doi.router)
 # app.include_router(dq_comment.router)
 app.include_router(temp_accounts.router)
+
+@app.get("/version")
+def get_api_metadata() -> p2fsystem.api_metadata:
+    minimum_p2f_client_py = p2fsystem.semantic_version(major=0, 
+                                                       minor=0, 
+                                                       patch=11)
+    api_version = p2fsystem.semantic_version(major=0, 
+                                             minor=0, 
+                                             patch=56)
+    return_class = p2fsystem.api_metadata(pyclient_minimum_version=minimum_p2f_client_py, 
+                                          api_system_version=api_version)
+    return return_class
 
 # Debugging features
 P2F_DDL = bool(os.getenv("P2F_DDL", default=False))
