@@ -335,11 +335,11 @@ def is_action_authorized(
             stmt = stmt.where(permitted_addresses.email_address == email)
             result = session.execute(stmt).first()
         if result:
-            # logger.debug(result)
-            permission_json = json.loads(result[0])
-            # logger.debug(permission_json)
-            # permissions = Account_Permissions(permission_json).model_dump(exclude_unset=True)
-            return permission_json[endpoint][operation]
+            logger.debug(result[0])
+            permissions = Account_Permissions(**result[0])
+            permissions = permissions.model_dump(exclude_unset=True)
+            logger.debug(permissions)
+            return permissions[endpoint][operation]
         else:
             return False
     else: 
