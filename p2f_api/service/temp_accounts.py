@@ -323,7 +323,7 @@ def is_permitted_address(email: EmailStr) -> bool:
 
 def is_action_authorized(
     endpoint: str,
-    operation: Literal["get", "insert", "update", "delete"],
+    operation: Literal["get", "post", "put", "delete"],
     email: Optional[EmailStr]=None,
 ) -> bool:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")

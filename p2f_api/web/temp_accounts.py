@@ -41,7 +41,7 @@ def authentication(auth: Temp_Account) -> bool:
 
 def authorization(
     endpoint: str,
-    operation: Literal["get", "insert", "update", "delete"],
+    operation: Literal["get", "post", "put", "delete"],
     email: Optional[str]=None,
 ) -> bool:
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
