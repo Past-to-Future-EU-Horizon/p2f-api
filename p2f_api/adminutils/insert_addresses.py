@@ -39,11 +39,11 @@ def args_collect():
 def read_address_file(filename: str):
     fpath = pathlib.Path(filename)
     match fpath.suffix:
-        case "csv":
+        case ".csv":
             # df = pd.read_csv(filename, header=None)
             with open(fpath, "r") as f:
-                all_emails = list(f.readlines())
-        # case "xlsx":
+                all_emails = [clean_address(x) for x in list(f.readlines())]
+        # case ".xlsx":
         #     df = pd.read_excel(filename, header=None)
     # all_emails = []
     # for ix, row in df.iterrows():
