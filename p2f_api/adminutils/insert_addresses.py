@@ -31,8 +31,8 @@ PERMISSIONS_MAP = {"default_consortium_permissions": default_consortium_permissi
 
 def args_collect():
     parser = ArgumentParser()
-    parser.add_argument("-f", "--address-file", help="The file with the valid email addresses.")
-    parser.add_argument("-i", "--individual-email", help="Individual email address")
+    parser.add_argument("-f", "--address-file", help="The file with the valid email addresses.", default=None)
+    parser.add_argument("-i", "--individual-email", help="Individual email address", default=None)
     parser.add_argument("-p", "--permissions", default="default_consortium_permissions")
     return parser.parse_args()
 
@@ -73,9 +73,8 @@ def handle_email_address_file(addresses: list):
 
 if __name__ == "__main__":
     args = args_collect()
-    print(dir(args))
-    if args.i is not None:
+    if args.individual_email is not None:
         address = clean_address(args.i)
-    if args.f is not None:
+    if args.address_file is not None:
         addrs = read_address_file(args.f)
         handle_email_address_file(addresses=addrs)
