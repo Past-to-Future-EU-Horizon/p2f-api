@@ -352,11 +352,11 @@ def is_action_authorized(
     else: 
         return public_view.model_dump(exclude_unset=True)[endpoint][operation]
 
-
-insert_permitted_address(email=P2F_ADMIN_EMAIL_ADDRESS,
-                         permissions=super_user)
-insert_permitted_address(email=P2F_PORTAL_EMAIL_ADDRESS, 
-                         permissions=public_view)
-insert_token_record(email=P2F_PORTAL_EMAIL_ADDRESS, 
-                    generated_token=P2F_PORTAL_TOKEN, 
-                    expiration=datetime(2026, 4, 30, 23, 59, 59))
+def api_init():
+    insert_permitted_address(email=P2F_ADMIN_EMAIL_ADDRESS,
+                            permissions=super_user)
+    insert_permitted_address(email=P2F_PORTAL_EMAIL_ADDRESS, 
+                            permissions=public_view)
+    insert_token_record(email=P2F_PORTAL_EMAIL_ADDRESS, 
+                        generated_token=P2F_PORTAL_TOKEN, 
+                        expiration=datetime(2026, 4, 30, 23, 59, 59))

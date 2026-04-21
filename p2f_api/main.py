@@ -15,6 +15,7 @@ from p2f_api.web import doi
 from p2f_api.web import dq_comment
 from p2f_api.web import temp_accounts
 from p2f_api.web import health
+from p2f_api.service import api_init
 from p2f_pydantic import system as p2fsystem
 # Third Party Libraries
 from fastapi import FastAPI
@@ -24,10 +25,12 @@ import os
 app = FastAPI(
     title="Past to Future Dataset API",
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
-    version="0.0.61",
+    version="0.0.62",
 )
 logger.debug(f"{fa.background} {__name__}")
 logger.debug("▶️  FastAPI() Started")
+
+api_init()
 
 # For Kubernetes heartbeat/healthchecks
 app.include_router(health.router)
@@ -54,7 +57,7 @@ def get_api_metadata() -> p2fsystem.API_Metadata:
                                                        patch=13)
     api_version = p2fsystem.Semantic_Version(major=0, 
                                              minor=0, 
-                                             patch=61)
+                                             patch=62)
     return_class = p2fsystem.API_Metadata(pyclient_minimum_version=minimum_p2f_client_py, 
                                           api_system_version=api_version)
     return return_class
