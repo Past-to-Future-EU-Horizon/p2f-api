@@ -2,9 +2,8 @@
 from p2f_api.apilogs import logger, fa
 from p2f_api.doi import doi as DOI
 from ..data.db_connection import engine
-from ..data.doi import doi_metadata
+from ..data.doi import doi_metadata, doi_lastrequests
 from ..service.datasets import get_dataset
-
 # Third Party Libraries
 from sqlalchemy import insert, select
 from sqlalchemy.orm import Session
@@ -22,9 +21,11 @@ from inspect import stack
 
 datacite_api_url = "https://api.datacite.org/"
 crossref_api_url = "https://api.crossref.org/"
+zenodo_api_url = "https://zenodo.org/api"
 
 datacite_api_furl = furl.furl(datacite_api_url)
 crossref_api_furl = furl.furl(crossref_api_url)
+zenodo_api_furl = furl.furl(zenodo_api_url)
 
 
 def insert_doi_metadata(
@@ -88,12 +89,29 @@ def request_insert_crossref_doi(doi: str) -> str:
 
 def request_insert_zenodo_doi(doi: str) -> str:
     # This is an extra for the future
-    pass
+    logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
+    zenodo_record_id = doi.split(".")[-1]
+    doi_url = zenodo_api_furl / zenodo_record_id
+    r = requests.get(doi_url)
+    if r.ok:
+        return r.json()
 
 
 def request_insert_doi_metadata(doi: str):
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
 
+
+## Look at me, writing code that would block the API until our timeout lifts.
+## This really is a future tast that needs a backend cron job
+## Perhaps a second container
+# def time_restricted_request(endpoint=furl.furl, params=None, data=None):
+#     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
+#     with Session(engine) as session:
+#         stmt = select(doi_lastrequests)
+#         stmt = stmt.where(doi_lastrequests.website == endpoint.host)
+#         result = session.execute(stmt).first()
+#     while datetime.now(tz=ZoneInfo("UTC")) < (result[0].last_request + timedelta(seconds=5)):
+#         wait = 1 + 1
 
 def get_doi(
     dataset_id: Optional[UUID] = None,

@@ -32,3 +32,26 @@ class doi_metadata(baseSQL):
     update_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
     )
+
+class doi_lastrequests(baseSQL):
+    __tablename__  = "doi_lastrequests"
+    pk_doi_lastrequests: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    website: Mapped[str] = mapped_column(String(31), unique=True)
+    last_request: Mapped[datetime] = mapped_column(DateTime(timezone=ZoneInfo("UTC")), nullable=False, default=datetime.now(tz=ZoneInfo("UTC")))
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
+
+class doi_metadata_queue(baseSQL):
+    __tablename__ = "doi_queue"
+    pk_doi_queue: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    doi_url: Mapped[str] = mapped_column(Text, nullable=False)
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
