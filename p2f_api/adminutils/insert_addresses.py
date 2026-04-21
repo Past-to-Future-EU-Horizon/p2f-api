@@ -1,7 +1,7 @@
 from p2f_api.service.temp_accounts  import insert_permitted_address
 from p2f_api.service.account_permissions_json import Account_Permissions
 from p2f_api.service.account_permissions_json import default_consortium_permissions, super_user, public_view
-import pandas as pd
+# import pandas as pd
 from email_validator import validate_email
 from furl import furl
 from argparse import ArgumentParser
@@ -40,17 +40,19 @@ def read_address_file(filename: str):
     fpath = pathlib.Path(filename)
     match fpath.suffix:
         case "csv":
-            df = pd.read_csv(filename, header=None)
-        case "xlsx":
-            df = pd.read_excel(filename, header=None)
-    all_emails = []
-    for ix, row in df.iterrows():
-        raw_email = row[0]
-        all_emails.append(clean_address(raw_email))
+            # df = pd.read_csv(filename, header=None)
+            with open(fpath, "r") as f:
+                all_emails = list(f.readlines())
+        # case "xlsx":
+        #     df = pd.read_excel(filename, header=None)
+    # all_emails = []
+    # for ix, row in df.iterrows():
+    #     raw_email = row[0]
+    #     all_emails.append(clean_address(raw_email))
     return all_emails
 
 def clean_address(address: str):
-    while address[-1] in [" "]:
+    while address[-1] in [" ", "\n"]:
         address = address[:-1]
     while address[0] in [" "]:
         address = address[1:]
