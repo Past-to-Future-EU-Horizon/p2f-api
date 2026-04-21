@@ -74,7 +74,7 @@ def handle_email_address_file(addresses: list):
 if __name__ == "__main__":
     args = args_collect()
     if args.individual_email is not None:
-        address = clean_address(args.i)
+        address = clean_address(args.individual_email)
     if args.address_file is not None:
-        addrs = read_address_file(args.f)
+        addrs = read_address_file(args.address_file)
         handle_email_address_file(addresses=addrs)
