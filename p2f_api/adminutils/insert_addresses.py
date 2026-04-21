@@ -73,6 +73,7 @@ def handle_email_address_file(addresses: list):
 
 if __name__ == "__main__":
     args = args_collect()
+    print(dir(args))
     if args.i is not None:
         address = clean_address(args.i)
     if args.f is not None:
