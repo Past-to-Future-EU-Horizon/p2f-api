@@ -1,6 +1,6 @@
-from ..service.temp_accounts  import insert_permitted_address
-from ..service.account_permissions_json import Account_Permissions
-from ..service.account_permissions_json import default_consortium_permissions, super_user, public_view
+from p2f_api.service.temp_accounts  import insert_permitted_address
+from p2f_api.service.account_permissions_json import Account_Permissions
+from p2f_api.service.account_permissions_json import default_consortium_permissions, super_user, public_view
 import pandas as pd
 from email_validator import validate_email
 from furl import furl
