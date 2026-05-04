@@ -1,9 +1,9 @@
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from ..service import datasets
-from .temp_accounts import combined_auth
+from .temp_accounts import combined_auth, api_token_annotation, api_token_annotation
 from p2f_pydantic.datasets import Datasets
-from p2f_pydantic.temp_accounts import Temp_Account
+# from p2f_pydantic.temp_accounts import Temp_Account
 
 # Third Party Libraries
 from fastapi import APIRouter, Security, Depends
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/datasets")
 # List
 @router.get("/")
 def list_datasets(
-    auth: Annotated[Temp_Account, Depends(combined_auth)],
+    auth: api_token_annotation,
     is_new_p2f: Optional[bool] = None,
     is_sub_dataset: Optional[bool] = None,
     doi: Optional[str] = None,
@@ -34,7 +34,7 @@ def list_datasets(
 
 # Get Single
 @router.get("/{dataset_id}")
-def get_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
+def get_dataset(auth: api_token_annotation,
                 dataset_id: uuid.UUID) -> Datasets:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return datasets.get_dataset(dataset_id=dataset_id)
@@ -42,23 +42,23 @@ def get_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
 
 # Create
 @router.post("/")
-def create_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
+def create_dataset(auth: api_token_annotation,
                    dataset: Datasets) -> Datasets:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return datasets.create_dataset(dataset)
 
 
 # Update
-@router.put("/")
-def update_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
+@router.put("/", include_in_schema=False)
+def update_dataset(auth: api_token_annotation,
                    dataset_updates: Datasets) -> Datasets:
     logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
     return datasets.update_dataset(dataset_updates)
 
 
 # Delete
-@router.delete("/{dataset_id}")
-def delete_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
+@router.delete("/{dataset_id}", include_in_schema=False)
+def delete_dataset(auth: api_token_annotation,
                    dataset_id: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     if type(dataset_id) == str:

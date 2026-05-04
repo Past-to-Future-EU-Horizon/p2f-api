@@ -124,7 +124,7 @@ def assign_species_to_record_hash(species_id: UUID, record_hash: str):
         commit = session.commit()
 
 
-def remove_specied_to_record_assignment(species_id: UUID, record_hash: str):
+def remove_species_to_record_assignment(species_id: UUID, record_hash: str):
     logger.debug(f"{fa.service}{fa.remove} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_species_to_record)

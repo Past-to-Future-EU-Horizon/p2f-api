@@ -1,7 +1,7 @@
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from ..service import harm_data_record
-from .temp_accounts import combined_auth
+from .temp_accounts import combined_auth, api_token_annotation
 from p2f_pydantic.harm_data_record import HARM_Data_Record
 from p2f_pydantic.temp_accounts import Temp_Account
 
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/harm-data-records")
 # List
 @router.get("/")
 def list_harm_data_records(
-    auth: Annotated[Temp_Account, Depends(combined_auth)],
+    auth: api_token_annotation,
     dataset: Optional[str] = None,
     # data_type: Optional[int]=None, ### Disabled for now, see note in service
 ) -> List[HARM_Data_Record]:
@@ -29,7 +29,7 @@ def list_harm_data_records(
 
 # Get Single
 @router.get("/{record_hash}")
-def get_harm_data_record(auth: Annotated[Temp_Account, Depends(combined_auth)],
+def get_harm_data_record(auth: api_token_annotation,
                          record_hash: str) -> HARM_Data_Record:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_data_record.get_harm_data_record(record_hash=record_hash)
@@ -37,7 +37,7 @@ def get_harm_data_record(auth: Annotated[Temp_Account, Depends(combined_auth)],
 
 # Create
 @router.post("/")
-def create_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
+def create_dataset(auth: api_token_annotation,
                    new_data_record: HARM_Data_Record) -> HARM_Data_Record:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_data_record.create_harm_data_record(new_data_record)
@@ -55,8 +55,8 @@ def create_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
 
 
 # Delete
-@router.delete("/{record_hash}")
-def delete_dataset(auth: Annotated[Temp_Account, Depends(combined_auth)],
+@router.delete("/{record_hash}", include_in_schema=False)
+def delete_dataset(auth: api_token_annotation,
                    record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     if type(record_hash) == str:

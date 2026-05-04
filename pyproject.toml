@@ -9,7 +9,7 @@ namespace = true
 
 [project]
 name = "p2f_api"
-version = "0.0.69"
+version = "0.0.70"
 description = "FastAPI based API for the Past to Future project."
 requires-python = ">=3.13"
 dependencies = [
@@ -23,6 +23,7 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "pytz>=2025.2",
     "requests>=2.32.5",
+    "ruff>=0.15.12",
     "sqlalchemy>=2.0.40",
     "starlette<1.0.0",
     "uvicorn[standard]>=0.38.0",

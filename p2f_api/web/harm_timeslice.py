@@ -1,6 +1,6 @@
 from p2f_api.apilogs import logger, fa
 from ..service import harm_timeslice
-from .temp_accounts import combined_auth
+from .temp_accounts import combined_auth, api_token_annotation
 from p2f_pydantic.harm_timeslices import HARM_Timeslice
 from p2f_pydantic.temp_accounts import Temp_Account
 
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/harm-timeslice")
 
 @router.get("/")
 def list_harm_timeslices(
-    auth: Annotated[Temp_Account, Depends(combined_auth)],
+    auth: api_token_annotation,
     named_time_period: Optional[str] = None,
     older_search_age: Optional[int] = None,
     recent_search_age: Optional[int] = None,
@@ -32,7 +32,7 @@ def list_harm_timeslices(
 
 @router.get("/")
 def get_harm_timeslice(
-    auth: Annotated[Temp_Account, Depends(combined_auth)],
+    auth: api_token_annotation,
     timeslice_id: uuid.UUID,
 ) -> HARM_Timeslice:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
@@ -40,28 +40,28 @@ def get_harm_timeslice(
 
 
 @router.post("/")
-def create_new_timeslice(auth: Annotated[Temp_Account, Depends(combined_auth)],
+def create_new_timeslice(auth: api_token_annotation,
                          new_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_timeslice.create_new_timeslice(new_harm_timeslice=new_harm_timeslice)
 
 
-@router.put("/")
-def update_timeslice(auth: Annotated[Temp_Account, Depends(combined_auth)],
+@router.put("/", include_in_schema=False)
+def update_timeslice(auth: api_token_annotation,
                      update_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
     logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
     return harm_timeslice.update_timeslice(update_harm_timeslice=update_harm_timeslice)
 
 
-@router.delete("/{timeslice_id}")
-def delete_timeslice(auth: Annotated[Temp_Account, Depends(combined_auth)],
+@router.delete("/{timeslice_id}", include_in_schema=False)
+def delete_timeslice(auth: api_token_annotation,
                      timeslice_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_timeslice.delete_timeslice(timeslice_id=timeslice_id)
 
 
 @router.post("/assign")
-def assign_timeslice(auth: Annotated[Temp_Account, Depends(combined_auth)],
+def assign_timeslice(auth: api_token_annotation,
                      timeslice_id: uuid.UUID, record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_timeslice.assign_timeslice(
@@ -70,7 +70,7 @@ def assign_timeslice(auth: Annotated[Temp_Account, Depends(combined_auth)],
 
 
 @router.delete("/remove")
-def remove_timeslice(auth: Annotated[Temp_Account, Depends(combined_auth)],
+def remove_timeslice(auth: api_token_annotation,
                      timeslice_id: uuid.UUID, record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_timeslice.remove_timeslice(

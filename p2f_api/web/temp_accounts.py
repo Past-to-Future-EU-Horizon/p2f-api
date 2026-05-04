@@ -7,15 +7,21 @@ from p2f_pydantic.generic import Message
 from fastapi import APIRouter
 from fastapi import HTTPException
 from fastapi import Request
+from fastapi import Security
+from fastapi import Header
 from fastapi.responses import JSONResponse
+from fastapi.security import APIKeyHeader
 from furl import furl
 
 # Batteries included libraries
-from typing import Literal, Optional
+from typing import Literal, Optional, Annotated
 from inspect import stack
 
 router = APIRouter(prefix="/token")
 
+api_token = APIKeyHeader(name="x-p2f-token")
+
+api_email = Header(alias="x-p2f-email")
 
 @router.post("/request")
 def request_token(request_token: Temp_Account) -> JSONResponse:
@@ -28,9 +34,9 @@ def request_token(request_token: Temp_Account) -> JSONResponse:
     return JSONResponse(content={"status": msg})
 
 
-def authentication(auth: Temp_Account) -> bool:
+def authentication(email: str, token: str) -> bool:
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
-    token_match = temp_accounts.evaluate_token(email=auth.email, token=auth.token)
+    token_match = temp_accounts.evaluate_token(email=email, token=token)
     if token_match == "NotFound":
         raise HTTPException(status_code=401, detail="Unauthorized: Token not found")
     elif token_match == "Expired":
@@ -48,7 +54,8 @@ def authorization(
     return temp_accounts.is_action_authorized(email=email, endpoint=endpoint, operation=operation)
 
 def combined_auth(request: Request,
-                  auth: Optional[Temp_Account]=None):
+                  token: str = Security(api_token), 
+                  email: str = api_email):
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
     operation = request.method.lower()
     logger.debug(f"Operation: {operation}")
@@ -58,15 +65,17 @@ def combined_auth(request: Request,
     logger.debug(f"endpoint: {endpoint}")
     # Generally we will allow GET operations, if an operation is allowed by public 
     #    return true
-    if auth is None:
+    if email is None:
         logger.debug("Auth is None path taken")
         return authorization(endpoint=endpoint, 
                              operation=operation)
     else:
         logger.debug("Authentication and authorization paths taken")
-        a1 = authentication(auth=auth)
+        a1 = authentication(email=email, token=token)
         a2 = authorization(endpoint=endpoint, 
-                        email=auth.email,
+                        email=email,
                         operation=operation)
         logger.debug(f"Authentication: {a1} -- Authorization: {a2}")
         return a1 and a2
+    
+api_token_annotation = Annotated[api_token, Security(combined_auth)]

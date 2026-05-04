@@ -359,4 +359,4 @@ def api_init():
                             permissions=public_view)
     insert_token_record(email=P2F_PORTAL_EMAIL_ADDRESS, 
                         generated_token=P2F_PORTAL_TOKEN, 
-                        expiration=datetime(2026, 4, 30, 23, 59, 59))
+                        expiration=datetime(2026, 5, 31, 23, 59, 59))

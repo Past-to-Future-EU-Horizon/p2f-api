@@ -12,7 +12,7 @@ from inspect import stack
 router = APIRouter(prefix="/ddl", include_in_schema=False)
 
 
-@router.get("/")
+@router.get("/", include_in_schema=False)
 def web_get_clean_ddl(request: Request) -> str:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     logger.debug(f"RECEIVED DDL REQUEST FROM {request.client.host}")

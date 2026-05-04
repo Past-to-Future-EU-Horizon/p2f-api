@@ -1,6 +1,6 @@
 from p2f_api.apilogs import logger, fa
 from ..service import harm_age
-from .temp_accounts import combined_auth
+from .temp_accounts import combined_auth, api_token_annotation
 from p2f_pydantic.harm_age import HARM_Data_Age
 from p2f_pydantic.temp_accounts import Temp_Account
 
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/harm-data-age")
 
 @router.get("/")
 def list_harm_ages(
-    auth: Annotated[Temp_Account, Depends(combined_auth)],
+    auth: api_token_annotation,
     recent_year_search: Optional[int] = None,
     older_year_search: Optional[int] = None
 ) -> List[HARM_Data_Age]:
@@ -28,28 +28,28 @@ def list_harm_ages(
 
 
 @router.get("/{record_hash}")
-def get_harm_age(auth: Annotated[Temp_Account, Depends(combined_auth)],
+def get_harm_age(auth: api_token_annotation,
                  record_hash: Optional[str] = None) -> HARM_Data_Age:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_age.get_harm_age(record_hash=record_hash)
 
 
 @router.post("/")
-def create_new_HARM_Data_Age(auth: Annotated[Temp_Account, Depends(combined_auth)],
+def create_new_HARM_Data_Age(auth: api_token_annotation,
                              new_harm_age: HARM_Data_Age) -> HARM_Data_Age:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_age.create_new_harm_data_age(new_harm_age=new_harm_age)
 
 
-@router.put("/")
-def update_age(auth: Annotated[Temp_Account, Depends(combined_auth)],
+@router.put("/", include_in_schema=False)
+def update_age(auth: api_token_annotation,
                update_harm_age: HARM_Data_Age) -> HARM_Data_Age:
     logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
     return harm_age.update_age(update_harm_age=update_harm_age)
 
 
-@router.delete("/{record_hash}")
-def delete_age(auth: Annotated[Temp_Account, Depends(combined_auth)],
+@router.delete("/{record_hash}", include_in_schema=False)
+def delete_age(auth: api_token_annotation,
                record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_age.delete_age(record_hash=record_hash)
