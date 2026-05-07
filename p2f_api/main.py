@@ -26,7 +26,7 @@ import os
 app = FastAPI(
     title="Past to Future Dataset API",
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
-    version="0.0.72"
+    version="0.0.73"
 )
 
 logger.debug(f"{fa.background} {__name__}")
@@ -56,10 +56,10 @@ app.include_router(temp_accounts.router)
 def get_api_metadata() -> p2fsystem.API_Metadata:
     minimum_p2f_client_py = p2fsystem.Semantic_Version(major=0, 
                                                        minor=0, 
-                                                       patch=20)
+                                                       patch=21)
     api_version = p2fsystem.Semantic_Version(major=0, 
                                              minor=0, 
-                                             patch=72)
+                                             patch=73)
     return_class = p2fsystem.API_Metadata(pyclient_minimum_version=minimum_p2f_client_py, 
                                           api_system_version=api_version)
     return return_class

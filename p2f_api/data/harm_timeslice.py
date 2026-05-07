@@ -44,7 +44,7 @@ class harm_timeslice_to_record(baseSQL):
         ForeignKey(f"{harm_timeslice.__tablename__}.pk_harm_timeslice")
     )
     fk_record_hash: Mapped[str] = mapped_column(
-        ForeignKey(f"{harm_data_record}.record_hash")
+        ForeignKey(f"{harm_data_record.__tablename__}.record_hash")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now()
