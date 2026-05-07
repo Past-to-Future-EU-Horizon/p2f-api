@@ -1,6 +1,7 @@
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
+from .datasets import datasets
 
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -40,10 +41,10 @@ class git_repository_to_dataset(baseSQL):
     __tablename__ = "p2f_gitrepo_to_dataset"
     pk_gitrepo_to_dataset: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     fk_git_repository: Mapped[UUID] = mapped_column(
-        ForeignKey("p2f_git_repositories.git_repo_id")
+        ForeignKey(f"{git_repository.__tablename__}.git_repo_id")
     )
     fk_dataset_id: Mapped[UUID] = mapped_column(
-        ForeignKey("p2f_datasets.dataset_identifier")
+        ForeignKey(f"{datasets.__tablename__}.dataset_id")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now()

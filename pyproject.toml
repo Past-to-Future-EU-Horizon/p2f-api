@@ -38,6 +38,3 @@ readme = {file = "README.md", content-type = "text/markdown"}
 [project.urls]
 Homepage = "https://past2future.org/"
 Repository = "https://github.com/Past-to-Future-EU-Horizon/p2f-api.git"
-
-[tool.uv.sources]
-p2f-pydantic = { git = "https://github.com/Past-to-Future-EU-Horizon/p2f-pydantic" }

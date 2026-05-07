@@ -1,5 +1,6 @@
 from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
+from .harm_data_record import harm_data_record
 
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -18,28 +19,6 @@ from zoneinfo import ZoneInfo
 
 logger.debug(f"{fa.data} {__name__}")
 
-
-class harm_text(baseSQL):
-    __tablename__ = "p2f_harm_text"
-    pk_harm_text: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    fk_record_hash: Mapped[str] = mapped_column(
-        ForeignKey("p2f_harm_data_record.record_hash")
-    )
-    text_id: Mapped[UUID] = mapped_column(
-        Uuid, unique=True, nullable=False, default=func.gen_random_uuid()
-    )
-    text_content: Mapped[str] = mapped_column(Text, nullable=False)
-    text_data_type: Mapped[str] = mapped_column(
-        ForeignKey("p2f_harm_text_data_types.text_data_type_id")
-    )
-    creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
-    )
-    update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
-    )
-
-
 class harm_text_types(baseSQL):
     __tablename__ = "p2f_harm_text_data_types"
     pk_harm_text_data_types: Mapped[int] = mapped_column(BigInteger, primary_key=True)
@@ -48,6 +27,26 @@ class harm_text_types(baseSQL):
     )
     text_data_type: Mapped[str] = mapped_column(Text, nullable=False)
     text_data_measure: Mapped[str] = mapped_column(Text, nullable=True)
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
+
+class harm_text(baseSQL):
+    __tablename__ = "p2f_harm_text"
+    pk_harm_text: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    fk_record_hash: Mapped[str] = mapped_column(
+        ForeignKey(f"{harm_data_record.__tablename__}.record_hash")
+    )
+    text_id: Mapped[UUID] = mapped_column(
+        Uuid, unique=True, nullable=False, default=func.gen_random_uuid()
+    )
+    text_content: Mapped[str] = mapped_column(Text, nullable=False)
+    text_data_type: Mapped[str] = mapped_column(
+        ForeignKey(f"{harm_text_types.__tablename__}.text_data_type_id")
+    )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now()
     )

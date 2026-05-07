@@ -1,9 +1,9 @@
 # Local libraries
 from p2f_api.apilogs import logger, fa
-from ..service import harm_data_metadata_location
+from ..service import harm_locations
 from .temp_accounts import combined_auth, api_token_annotation
-from p2f_pydantic.harm_data_metadata import HARM_Location
-from p2f_pydantic.harm_data_metadata import HARM_Bounding_Box
+from p2f_pydantic.harm_location import HARM_Location
+from p2f_pydantic.harm_location import HARM_Bounding_Box
 from p2f_pydantic.temp_accounts import Temp_Account
 # Third Party Libraries
 from fastapi import Body, APIRouter, Depends
@@ -30,7 +30,7 @@ def list_harm_data_records(
     dataset_id: Optional[uuid.UUID] = None,
 ) -> List[HARM_Location]:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
-    return harm_data_metadata_location.list_harm_metadata_location(
+    return harm_locations.list_harm_metadata_location(
         bounding_box=bounding_box,
         location_name=location_name,
         location_code=location_code,
@@ -43,12 +43,12 @@ def list_harm_data_records(
 
 
 # Get Single
-@router.get("/{location_identifier}")
+@router.get("/{location_id}")
 def get_harm_data_record(auth: api_token_annotation,
-                         location_identifier: uuid.UUID) -> HARM_Location:
+                         location_id: uuid.UUID) -> HARM_Location:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
-    return harm_data_metadata_location.get_location(
-        location_identifier=location_identifier
+    return harm_locations.get_location(
+        location_id=location_id
     )
 
 
@@ -57,41 +57,41 @@ def get_harm_data_record(auth: api_token_annotation,
 def create_dataset(auth: api_token_annotation,
                    new_location: HARM_Location) -> HARM_Location:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
-    return harm_data_metadata_location.create_location(new_location=new_location)
+    return harm_locations.create_location(new_location=new_location)
 
 
 @router.put("/", include_in_schema=False)
 def update_dataset(auth: api_token_annotation,
                    update_location: HARM_Location) -> HARM_Location:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
-    return harm_data_metadata_location.update_location(update_location=update_location)
+    return harm_locations.update_location(update_location=update_location)
 
 
 # Delete
-@router.delete("/{location_identifier}", include_in_schema=False)
+@router.delete("/{location_id}", include_in_schema=False)
 def delete_dataset(auth: api_token_annotation,
-                   location_identifier: uuid.UUID) -> None:
+                   location_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
-    return harm_data_metadata_location.delete_location(
-        location_identifier=location_identifier
+    return harm_locations.delete_location(
+        location_id=location_id
     )
 
 
 @router.post("/assign")
 def assign_location_to_record(auth: api_token_annotation,
-                              location_identifier: uuid.UUID, record_hash: str):
+                              location_id: uuid.UUID, record_hash: str):
     logger.debug(
-        f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}({location_identifier}, {record_hash})"
+        f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}({location_id}, {record_hash})"
     )
-    return harm_data_metadata_location.assign_location_to_record(
-        location_identifier=location_identifier, record_hash=record_hash
+    return harm_locations.assign_location_to_record(
+        location_id=location_id, record_hash=record_hash
     )
 
 
 @router.delete("/remove")
 def remove_location_from_record(auth: api_token_annotation,
-                                location_identifier: uuid.UUID, record_hash: str):
+                                location_id: uuid.UUID, record_hash: str):
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
-    return harm_data_metadata_location.remove_location_from_record(
-        location_identifier=location_identifier, record_hash=record_hash
+    return harm_locations.remove_location_from_record(
+        location_id=location_id, record_hash=record_hash
     )

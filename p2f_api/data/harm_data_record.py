@@ -1,5 +1,6 @@
 from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
+from .datasets import datasets
 
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -28,7 +29,7 @@ class harm_data_record(baseSQL):
     __tablename__ = "p2f_harm_data_record"
     pk_harm_data_record: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     fk_dataset: Mapped[str] = mapped_column(
-        ForeignKey("p2f_datasets.dataset_identifier")
+        ForeignKey(f"{datasets.__tablename__}.dataset_id")
     )
     record_hash: Mapped[str] = mapped_column(String(32), index=True, unique=True)
     creation_timestamp: Mapped[datetime] = mapped_column(

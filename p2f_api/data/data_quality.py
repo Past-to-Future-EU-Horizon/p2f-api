@@ -31,7 +31,7 @@ class dq_comment(baseSQL):
     email: Mapped[str] = mapped_column(Text, nullable=False)
     comment: Mapped[str] = mapped_column(Text, nullable=False)
     dataset_id: Mapped[UUID] = mapped_column(
-        ForeignKey(f"{datasets.__tablename__}.{datasets.dataset_identifier}")
+        ForeignKey(f"{datasets.__tablename__}.dataset_id")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now()
@@ -46,7 +46,7 @@ class dq_rating(baseSQL):
     email: Mapped[str] = mapped_column(Text, nullable=False)
     rating: Mapped[int] = mapped_column(Integer)
     dataset_id: Mapped[UUID] = mapped_column(
-        ForeignKey(f"{datasets.__tablename__}.{datasets.dataset_identifier}")
+        ForeignKey(f"{datasets.__tablename__}.dataset_id")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now()

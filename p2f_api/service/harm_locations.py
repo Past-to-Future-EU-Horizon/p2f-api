@@ -1,9 +1,9 @@
 from p2f_api.apilogs import logger, fa
 from .harm_data_record import list_harm_data_record
 from ..data.db_connection import engine
-from ..data.harm_data_metadata import harm_location_to_record, harm_locations
-from p2f_pydantic.harm_data_metadata import HARM_Location
-from p2f_pydantic.harm_data_metadata import HARM_Bounding_Box
+from ..data.harm_locations import harm_location_to_rec, harm_location_to_ds, harm_locations
+from p2f_pydantic.harm_location import HARM_Location
+from p2f_pydantic.harm_location import HARM_Bounding_Box
 
 # Third Party Libraries
 from sqlalchemy.orm import Session
@@ -61,25 +61,25 @@ def list_harm_metadata_location(
             stmt = stmt.where(harm_locations.location_age <= max_location_age)
         if dataset_id is not None:
             logger.debug("•• Dataset id is not none")
-            subqry = select(harm_location_to_record.fk_harm_location).where(
-                harm_location_to_record.fk_data_record.in_(data_record_list)
+            subqry = select(harm_location_to_rec.fk_harm_location).where(
+                harm_location_to_rec.fk_data_record.in_(data_record_list)
             )
-            stmt = stmt.where(harm_locations.location_identifier.in_(subqry))
-            logger.debug(f"•• Dataset identifier statement alteration: {stmt}")
+            stmt = stmt.where(harm_locations.location_id.in_(subqry))
+            logger.debug(f"•• Dataset id statement alteration: {stmt}")
         results = session.execute(stmt).all()
         logger.debug(f"• Found {len(results)} results. ")
     return [HARM_Location(**x[0].__dict__) for x in results]
 
 
 def get_location(
-    location_identifier: Optional[UUID] = None, 
+    location_id: Optional[UUID] = None, 
     pk_harm_location: Optional[int] = None
 ) -> HARM_Location:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_locations)
-        if location_identifier is not None:
-            stmt = stmt.where(harm_locations.location_identifier == location_identifier)
+        if location_id is not None:
+            stmt = stmt.where(harm_locations.location_id == location_id)
         if pk_harm_location is not None:
             stmt = stmt.where(harm_locations.pk_harm_location == pk_harm_location)
         result = session.execute(stmt).first()
@@ -101,30 +101,30 @@ def update_location(update_location: HARM_Location) -> HARM_Location:
     logger.debug(f"{fa.service}{fa.update} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = update(harm_locations)
-        stmt = stmt.where(update_location.location_identifier)
+        stmt = stmt.where(update_location.location_id)
         stmt = stmt.values(update_location)
         execute = session.execute(stmt)
         commit = session.commit()
     return get_location(update_location.pk_harm_location)
 
 
-def delete_location(location_identifier: UUID) -> None:
+def delete_location(location_id: UUID) -> None:
     logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_locations)
-        stmt = stmt.where(harm_locations.location_identifier == location_identifier)
+        stmt = stmt.where(harm_locations.location_id == location_id)
         execute = session.execute(stmt)
         commit = session.commit()
     return None
 
 
-def assign_location_to_record(location_identifier: UUID, record_hash: str):
+def assign_location_to_record(location_id: UUID, record_hash: str):
     logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("Session created")
-        stmt = insert(harm_location_to_record)
+        stmt = insert(harm_location_to_rec)
         stmt = stmt.values(
-            {"fk_harm_location": location_identifier,
+            {"fk_harm_location": location_id,
               "fk_data_record": record_hash}
         )
         logger.debug(stmt)
@@ -133,13 +133,13 @@ def assign_location_to_record(location_identifier: UUID, record_hash: str):
     return None
 
 
-def remove_location_from_record(location_identifier: UUID, record_hash: str):
+def remove_location_from_record(location_id: UUID, record_hash: str):
     logger.debug(f"{fa.service}{fa.remove} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
-        stmt = delete(harm_location_to_record)
-        stmt = stmt.where(harm_location_to_record.fk_data_record == record_hash)
+        stmt = delete(harm_location_to_rec)
+        stmt = stmt.where(harm_location_to_rec.fk_data_record == record_hash)
         stmt = stmt.where(
-            harm_location_to_record.fk_harm_location == location_identifier
+            harm_location_to_rec.fk_harm_location == location_id
         )
         execute = session.execute(stmt)
         commit = session.commit()

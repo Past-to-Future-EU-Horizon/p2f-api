@@ -42,7 +42,7 @@ def get_dataset(dataset_id=None, pk_datasets=None) -> Datasets:
         logger.debug("•  Created session")
         stmt = select(datasets)
         if dataset_id is not None:
-            stmt = stmt.where(datasets.dataset_identifier == dataset_id)
+            stmt = stmt.where(datasets.dataset_id == dataset_id)
         if pk_datasets is not None:
             stmt = stmt.where(datasets.pk_datasets == pk_datasets)
         result = session.execute(stmt).first()
@@ -72,19 +72,19 @@ def update_dataset(dataset_update: Datasets) -> Datasets:
         logger.debug("•  Created session")
         stmt = update(datasets)
         stmt = stmt.where(
-            datasets.dataset_identifier == dataset_update.dataset_identifier
+            datasets.dataset_id == dataset_update.dataset_id
         )
         stmt = stmt.values(**dataset_update.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
-    return get_dataset(dataset_id=dataset_update.dataset_identifier)
+    return get_dataset(dataset_id=dataset_update.dataset_id)
 
 
-def delete_dataset(dataset_identifier) -> None:
+def delete_dataset(dataset_id) -> None:
     logger.debug(f"{fa.service}{fa.delete} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
-        stmt = delete(datasets).where(datasets.dataset_identifier == dataset_identifier)
+        stmt = delete(datasets).where(datasets.dataset_id == dataset_id)
         execute = session.execute(stmt)
         commit = session.commit()
     return None

@@ -12,7 +12,6 @@ from sqlalchemy import Uuid
 from sqlalchemy import DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func
-import pytz
 
 # Batteries included libraries
 from datetime import date
@@ -26,7 +25,7 @@ logger.debug(f"{fa.data} {__name__}")
 class datasets(baseSQL):
     __tablename__ = "p2f_datasets"
     pk_datasets: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    dataset_identifier: Mapped[UUID] = mapped_column(
+    dataset_id: Mapped[UUID] = mapped_column(
         Uuid, unique=True, nullable=False, default=func.gen_random_uuid()
     )
     doi: Mapped[str] = mapped_column(Text, index=True, unique=False)

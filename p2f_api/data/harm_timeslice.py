@@ -1,5 +1,6 @@
 from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
+from .harm_data_record import harm_data_record
 
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -40,10 +41,10 @@ class harm_timeslice_to_record(baseSQL):
     __tablename__ = "p2f_harm_timeslice_to_record"
     pk_timeslice_to_record: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     fk_timeslice_id: Mapped[UUID] = mapped_column(
-        ForeignKey("p2f_harm_timeslice.pk_harm_timeslice")
+        ForeignKey(f"{harm_timeslice.__tablename__}.pk_harm_timeslice")
     )
     fk_record_hash: Mapped[str] = mapped_column(
-        ForeignKey("p2f_harm_data_record.record_hash")
+        ForeignKey(f"{harm_data_record}.record_hash")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now()

@@ -1,7 +1,7 @@
 from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
-from ..data.harm_data_metadata import harm_species_to_record, harm_data_species
-from p2f_pydantic.harm_data_metadata import HARM_Data_Species
+from ..data.harm_species import harm_species_to_record, harm_species
+from p2f_pydantic.harm_species import HARM_Species
 
 # Third Party Libraries
 from sqlalchemy.orm import Session
@@ -31,73 +31,73 @@ def list_harm_metadata_species(
     tax_subspecies: Optional[str] = None,
     common_name: Optional[str] = None,
     display_species: Optional[str] = None,
-) -> List[HARM_Data_Species]:
+) -> List[HARM_Species]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
-        stmt = select(harm_data_species)
+        stmt = select(harm_species)
         tax_values = {
             x: y
             for x, y in dict(locals()).items()
             if x.startswith("tax_") and y != None
         }
         if tax_domain is not None:
-            stmt = stmt.where(harm_data_species.tax_domain == tax_domain)
+            stmt = stmt.where(harm_species.tax_domain == tax_domain)
         if tax_kingdom is not None:
-            stmt = stmt.where(harm_data_species.tax_kingdom == tax_kingdom)
+            stmt = stmt.where(harm_species.tax_kingdom == tax_kingdom)
         if tax_subkingdom is not None:
-            stmt = stmt.where(harm_data_species.tax_kingdom == tax_subkingdom)
+            stmt = stmt.where(harm_species.tax_kingdom == tax_subkingdom)
         if tax_infrakingdom is not None:
-            stmt = stmt.where(harm_data_species.tax_kingdom == tax_infrakingdom)
+            stmt = stmt.where(harm_species.tax_kingdom == tax_infrakingdom)
         if tax_phylum is not None:
-            stmt = stmt.where(harm_data_species.tax_phylum == tax_phylum)
+            stmt = stmt.where(harm_species.tax_phylum == tax_phylum)
         if tax_class is not None:
-            stmt = stmt.where(harm_data_species.tax_class == tax_class)
+            stmt = stmt.where(harm_species.tax_class == tax_class)
         if tax_subclass is not None:
-            stmt = stmt.where(harm_data_species.tax_class == tax_subclass)
+            stmt = stmt.where(harm_species.tax_class == tax_subclass)
         if tax_order is not None:
-            stmt = stmt.where(harm_data_species.tax_order == tax_order)
+            stmt = stmt.where(harm_species.tax_order == tax_order)
         if tax_suborder is not None:
-            stmt = stmt.where(harm_data_species.tax_order == tax_suborder)
+            stmt = stmt.where(harm_species.tax_order == tax_suborder)
         if tax_superfamily is not None:
-            stmt = stmt.where(harm_data_species.tax_family == tax_superfamily)
+            stmt = stmt.where(harm_species.tax_family == tax_superfamily)
         if tax_family is not None:
-            stmt = stmt.where(harm_data_species.tax_family == tax_family)
+            stmt = stmt.where(harm_species.tax_family == tax_family)
         if tax_subfamily is not None:
-            stmt = stmt.where(harm_data_species.tax_family == tax_subfamily)
+            stmt = stmt.where(harm_species.tax_family == tax_subfamily)
         if tax_genus is not None:
-            stmt = stmt.where(harm_data_species.tax_genus == tax_genus)
+            stmt = stmt.where(harm_species.tax_genus == tax_genus)
         if tax_species is not None:
-            stmt = stmt.where(harm_data_species.tax_species == tax_species)
+            stmt = stmt.where(harm_species.tax_species == tax_species)
         if tax_subspecies is not None:
-            stmt = stmt.where(harm_data_species.tax_species == tax_subspecies)
+            stmt = stmt.where(harm_species.tax_species == tax_subspecies)
         if common_name is not None:
-            stmt = stmt.where(harm_data_species.common_name == common_name)
+            stmt = stmt.where(harm_species.common_name == common_name)
         if display_species is not None:
-            stmt = stmt.where(harm_data_species.display_species == display_species)
+            stmt = stmt.where(harm_species.display_species == display_species)
         results = session.execute(stmt).all()
-    return [HARM_Data_Species(**x[0].__dict__) for x in results]
+    return [HARM_Species(**x[0].__dict__) for x in results]
 
 
 def get_harm_metadata_species(
     species_id: Optional[UUID] = None,
     pk_harm_species: Optional[int] = None
-) -> HARM_Data_Species:
+) -> HARM_Species:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
-        stmt = select(harm_data_species)
+        stmt = select(harm_species)
         if species_id is not None:
-            stmt = stmt.where(harm_data_species.species_identifier == species_id)
+            stmt = stmt.where(harm_species.species_id == species_id)
         if pk_harm_species is not None:
-            stmt = stmt.where(harm_data_species.pk_harm_species == pk_harm_species)
+            stmt = stmt.where(harm_species.pk_harm_species == pk_harm_species)
         result = session.execute(stmt).first()
         logger.debug(result[0])
-    return HARM_Data_Species(**result[0].__dict__)
+    return HARM_Species(**result[0].__dict__)
 
 
-def create_harm_metadata_species(new_species: HARM_Data_Species) -> HARM_Data_Species:
+def create_harm_metadata_species(new_species: HARM_Species) -> HARM_Species:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
-        stmt = insert(harm_data_species)
+        stmt = insert(harm_species)
         stmt = stmt.values(**new_species.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
@@ -108,8 +108,8 @@ def create_harm_metadata_species(new_species: HARM_Data_Species) -> HARM_Data_Sp
 def delete_harm_species(species_id: UUID) -> None:
     logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
-        stmt = delete(harm_data_species)
-        stmt = stmt.where(harm_data_species.species_identifier == species_id)
+        stmt = delete(harm_species)
+        stmt = stmt.where(harm_species.species_id == species_id)
         execute = session.execute(stmt)
         commit = session.commit()
 
@@ -118,7 +118,7 @@ def assign_species_to_record_hash(species_id: UUID, record_hash: str):
     logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_species_to_record)
-        stmt = stmt.values(fk_species_identifier=species_id,
+        stmt = stmt.values(fk_species_id=species_id,
                            fk_data_record=record_hash)
         execute = session.execute(stmt)
         commit = session.commit()
@@ -128,7 +128,7 @@ def remove_species_to_record_assignment(species_id: UUID, record_hash: str):
     logger.debug(f"{fa.service}{fa.remove} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_species_to_record)
-        stmt = stmt.where(harm_species_to_record.fk_species_identifier == species_id)
+        stmt = stmt.where(harm_species_to_record.fk_species_id == species_id)
         stmt = stmt.where(harm_species_to_record.fk_data_record == record_hash)
         execute = session.execute(stmt)
         commit = session.commit()
