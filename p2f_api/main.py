@@ -13,6 +13,7 @@ from p2f_api.web import export_clean_ddl
 from p2f_api.web import link_git
 from p2f_api.web import doi
 from p2f_api.web import dq_comment
+from p2f_api.web import age_model
 from p2f_api.web import temp_accounts
 from p2f_api.web import health
 from p2f_api.service.temp_accounts import api_init
@@ -49,6 +50,7 @@ app.include_router(harm_age.router)
 app.include_router(harm_reference.router)
 app.include_router(link_git.router)
 app.include_router(doi.router)
+app.include_router(age_model.router)
 # app.include_router(dq_comment.router)
 app.include_router(temp_accounts.router)
 
