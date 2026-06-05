@@ -20,6 +20,7 @@ from zoneinfo import ZoneInfo
 from uuid import UUID
 
 class seasonality_ds(baseSQL):
+    __tablename__ = "p2f_seasonality_ds"
     pk_seasonality_ds: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     dataset_id: Mapped[UUID] = mapped_column(ForeignKey(f"{datasets.__tablename__}.dataset_id"))
     seasonlity_type: Mapped[str] = mapped_column(Text)
@@ -31,6 +32,7 @@ class seasonality_ds(baseSQL):
     )
 
 class season(baseSQL):
+    __tablename__ = "p2f_season_rec"
     pk_season: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     record_hash: Mapped[str] = mapped_column(ForeignKey(f"{harm_data_record.__tablename__}.record_hash"))
     season: Mapped[str] = mapped_column(Text)
