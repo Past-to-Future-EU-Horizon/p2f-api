@@ -23,7 +23,7 @@ logger.debug(f"{fa.data} {__name__}")
 class keywords(baseSQL):
     __tablename__ = "p2f_keywords"
     pk_keywords: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    dataset_id: Mapped[UUID] = mapped_column(ForeignKey(f"{datasets.__tablename__}.dataset_id"))
+    fk_dataset_id: Mapped[UUID] = mapped_column(ForeignKey(f"{datasets.__tablename__}.dataset_id"))
     keyword: Mapped[str] = mapped_column(String(255), nullable=False)
     taxon: Mapped[str] = mapped_column(String(127), nullable=True)
     creation_timestamp: Mapped[datetime] = mapped_column(
