@@ -18,30 +18,42 @@ router_rec = APIRouter(prefix="/season")
 
 # Get
 @router_ds.get("/{dataset_id}")
-def get_seasonality_ds(dataset_id: uuid.UUID) -> Seasonality_DS:
+def get_seasonality_ds(auth: api_token_annotation,
+                       dataset_id: uuid.UUID) -> Seasonality_DS:
+    logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return season_svc.get_seasonality_ds(dataset_id=dataset_id)
 
 @router_rec.get("/{record_hash}")
-def get_season_rec(record_hash: str) -> Season:
+def get_season_rec(auth: api_token_annotation,
+                   record_hash: str) -> Season:
+    logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return season_svc.get_season_rec(record_hash=record_hash)
 
 # Create
 @router_ds.post("/{dataset_id}")
-def add_seasonality_ds(dataset_id: uuid.UUID,
+def add_seasonality_ds(auth: api_token_annotation,
+                       dataset_id: uuid.UUID,
                        seasonality: str) -> Seasonality_DS:
+    logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return season_svc.add_seasonality_ds(dataset_id=dataset_id,
                                           seasonality=seasonality)
     
 @router_rec.post("/{record_hash}")
-def add_season_rec(record_hash: str, 
+def add_season_rec(auth: api_token_annotation,
+                   record_hash: str, 
                    season: str) -> Season:
+    logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return season_svc.add_season_rec(record_hash=record_hash,
                                      season=season)
 # Delete
 @router_ds.delete("/{dataset_id}")
-def delete_seasonality_ds(dataset_id: uuid.UUID) -> None:
+def delete_seasonality_ds(auth: api_token_annotation,
+                          dataset_id: uuid.UUID) -> None:
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return season_svc.delete_seasonality_ds(dataset_id=dataset_id)
 
 @router_rec.delete("/{record_hash}")
-def delete_season_rec(record_hash: str) -> None:
+def delete_season_rec(auth: api_token_annotation,
+                      record_hash: str) -> None:
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return season_svc.delete_season_rec(record_hash==record_hash)

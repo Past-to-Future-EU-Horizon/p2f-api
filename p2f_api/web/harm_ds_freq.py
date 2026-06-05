@@ -17,15 +17,21 @@ router = APIRouter(prefix="/data-frequency")
 
 # Get
 @router.get("/{dataset_id}")
-def get_ds_freq(dataset_id: uuid.UUID) -> HARM_DS_Frequency:
+def get_ds_freq(auth: api_token_annotation,
+                dataset_id: uuid.UUID) -> HARM_DS_Frequency:
+    logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_ds_freq.get_ds_freq(dataset_id=dataset_id)
 
 # Create
 @router.post("/")
-def create_ds_freq(new_frequency: HARM_DS_Frequency) -> HARM_DS_Frequency:
+def create_ds_freq(auth: api_token_annotation,
+                   new_frequency: HARM_DS_Frequency) -> HARM_DS_Frequency:
+    logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_ds_freq.create_ds_freq(new_frequency=new_frequency)
 
 # Delete
 @router.delete("/{dataset_id}")
-def delete_ds_freq(dataset_id: uuid.UUID) -> None:
+def delete_ds_freq(auth: api_token_annotation,
+                   dataset_id: uuid.UUID) -> None:
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_ds_freq.delete_ds_freq(dataset_id=dataset_id)

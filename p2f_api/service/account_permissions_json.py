@@ -19,6 +19,15 @@ class Account_Permissions(BaseModel):
     harm_reference: Aspect_Permissions
     harm_timeslice: Aspect_Permissions
     link_git: Aspect_Permissions
+    age_models: Aspect_Permissions
+    data_frequency: Aspect_Permissions
+    seasonality: Aspect_Permissions
+    season: Aspect_Permissions
+    time_coverage: Aspect_Permissions
+
+TFFF = Aspect_Permissions(get=True, post=False, put=False, delete=False)
+TTFF = Aspect_Permissions(get=True, post=True, put=False, delete=False)
+TTTT = Aspect_Permissions(get=True, post=True, put=True, delete=True)
 
 default_consortium_permissions = Account_Permissions(
     datasets=Aspect_Permissions(get=True, post=True, put=False, delete=False), 
@@ -31,6 +40,11 @@ default_consortium_permissions = Account_Permissions(
     harm_reference=Aspect_Permissions(get=True, post=True, put=False, delete=False), 
     harm_timeslice=Aspect_Permissions(get=True, post=True, put=False, delete=False), 
     link_git=Aspect_Permissions(get=True, post=True, put=False, delete=False), 
+    age_models=TTFF,
+    data_frequency=TTFF,
+    seasonality=TTFF, 
+    season=TTFF,
+    time_coverage=TTFF
 )
 
 public_view = Account_Permissions(
@@ -43,7 +57,12 @@ public_view = Account_Permissions(
     harm_numerical=Aspect_Permissions(get=True, post=False, put=False, delete=False), 
     harm_reference=Aspect_Permissions(get=True, post=False, put=False, delete=False), 
     harm_timeslice=Aspect_Permissions(get=True, post=False, put=False, delete=False), 
-    link_git=Aspect_Permissions(get=True, post=False, put=False, delete=False), 
+    link_git=Aspect_Permissions(get=True, post=False, put=False, delete=False),
+    age_models=TFFF,
+    data_frequency=TFFF,
+    seasonality=TFFF, 
+    season=TFFF,
+    time_coverage=TFFF 
 )
 
 super_user = Account_Permissions(
@@ -57,4 +76,9 @@ super_user = Account_Permissions(
     harm_reference=Aspect_Permissions(get=True, post=True, put=True, delete=True), 
     harm_timeslice=Aspect_Permissions(get=True, post=True, put=True, delete=True), 
     link_git=Aspect_Permissions(get=True, post=True, put=True, delete=True), 
+    age_models=TTTT,
+    data_frequency=TTTT,
+    seasonality=TTTT, 
+    season=TTTT,
+    time_coverage=TTTT
 )

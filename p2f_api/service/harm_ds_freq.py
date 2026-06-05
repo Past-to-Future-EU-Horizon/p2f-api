@@ -14,6 +14,7 @@ from inspect import stack
 
 # Get
 def get_ds_freq(dataset_id: uuid.UUID) -> HARM_DS_Frequency:
+    logger.debug(f"{fa.service}{fa.get} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_ds_frequency)
         stmt = stmt.where(harm_ds_frequency.dataset_id == dataset_id)
@@ -22,6 +23,7 @@ def get_ds_freq(dataset_id: uuid.UUID) -> HARM_DS_Frequency:
 
 # Create
 def create_ds_freq(new_frequency: HARM_DS_Frequency) -> HARM_DS_Frequency:
+    logger.debug(f"{fa.service}{fa.create} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_ds_frequency)
         stmt = stmt.values(
@@ -33,6 +35,7 @@ def create_ds_freq(new_frequency: HARM_DS_Frequency) -> HARM_DS_Frequency:
 
 # Delete
 def delete_ds_freq(dataset_id: uuid.UUID) -> None:
+    logger.debug(f"{fa.service}{fa.delete} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_ds_frequency)
         stmt = stmt.where(harm_ds_frequency.dataset_id == dataset_id)
