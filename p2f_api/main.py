@@ -16,6 +16,8 @@ from p2f_api.web import dq_comment
 from p2f_api.web import age_model
 from p2f_api.web import temp_accounts
 from p2f_api.web import health
+from p2f_api.web import keywords
+from p2f_api.web import seasonality
 from p2f_api.service.temp_accounts import api_init
 from p2f_pydantic import system as p2fsystem
 # Third Party Libraries
@@ -27,7 +29,7 @@ import os
 app = FastAPI(
     title="Past to Future Dataset API",
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
-    version="0.0.74"
+    version="0.0.75"
 )
 
 logger.debug(f"{fa.background} {__name__}")
@@ -51,6 +53,9 @@ app.include_router(harm_reference.router)
 app.include_router(link_git.router)
 app.include_router(doi.router)
 app.include_router(age_model.router)
+app.include_router(keywords.router)
+app.include_router(seasonality.router_ds)
+app.include_router(seasonality.router_rec)
 # app.include_router(dq_comment.router)
 app.include_router(temp_accounts.router)
 
@@ -61,7 +66,7 @@ def get_api_metadata() -> p2fsystem.API_Metadata:
                                                        patch=21)
     api_version = p2fsystem.Semantic_Version(major=0, 
                                              minor=0, 
-                                             patch=74)
+                                             patch=75)
     return_class = p2fsystem.API_Metadata(pyclient_minimum_version=minimum_p2f_client_py, 
                                           api_system_version=api_version)
     return return_class
