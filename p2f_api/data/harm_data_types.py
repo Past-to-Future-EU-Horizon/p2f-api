@@ -29,6 +29,7 @@ class harm_data_type(baseSQL):
     unit_of_measurement: Mapped[str] = mapped_column(Text)
     method: Mapped[str] = mapped_column(Text, index=True, nullable=True)
     is_proxy: Mapped[bool] = mapped_column(Boolean, default=False)
+    calibration: Mapped[str] = mapped_column(Text, nullable=True)
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now()
     )
