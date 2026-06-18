@@ -8,7 +8,7 @@ from sqlalchemy import BigInteger
 from sqlalchemy import String
 from sqlalchemy import DateTime
 from sqlalchemy import Integer
-from sqlalchemy import Boolean
+from sqlalchemy import Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func
 from sqlalchemy import ForeignKey
@@ -25,7 +25,6 @@ class keywords(baseSQL):
     pk_keywords: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     fk_dataset_id: Mapped[UUID] = mapped_column(ForeignKey(f"{datasets.__tablename__}.dataset_id"))
     keyword: Mapped[str] = mapped_column(String(255), nullable=False)
-    taxon: Mapped[str] = mapped_column(String(127), nullable=True)
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now()
     )
@@ -33,12 +32,28 @@ class keywords(baseSQL):
         DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
     )
 
-class keyword_dictionary(baseSQL):
-    __tablename__ = "p2f_keyword_dictionary"
-    pk_keyword_dictionary: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+class taxonomic_dict(baseSQL):
+    __tablename__ = "p2f_taxonomy_dict"
+    pk_taxdict: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    taxdict_id: Mapped[UUID] = mapped_column(
+        Uuid, unique=True, nullable=False, default=func.gen_random_uuid()
+    )
     keyword: Mapped[str] = mapped_column(String(255), nullable=False)
-    taxon: Mapped[str] = mapped_column(String(127), nullable=True)
-    usage: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    taxonomy: Mapped[str] = mapped_column(String(255), nullable=False)
+    parent_keyword: Mapped[str] = mapped_column(String(255), nullable=True)
+    taxonomy_id: Mapped[str] = mapped_column(String(255), nullable=True)
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+    )
+
+class taxonomic_keyword(baseSQL):
+    __tablename__ = "p2f_taxonomic_keywords"
+    pk_taxkeywords: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    fk_dataset_id: Mapped[UUID] = mapped_column(ForeignKey(f"{datasets.__tablename__}.dataset_id"))
+    fk_taxdict_id: Mapped[UUID] = mapped_column(ForeignKey(f"{taxonomic_dict.__tablename__}.taxdict_id"))
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now()
     )
