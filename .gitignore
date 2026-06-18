@@ -179,3 +179,4 @@ domain_list.py
 kubernetes/test.ds.yml
 kubernetes/test.ingress.yml
 kubernetes/test.emaildeployment.yml
+p2f_api/adminutils/gemet.rdf
