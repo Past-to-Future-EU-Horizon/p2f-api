@@ -35,6 +35,12 @@ def list_taxonomic_dictionary(taxonomy: Optional[str]=None,
         results = session.execute(stmt).all()
     return [TaxonomicDict(x) for x in results]
 
+def list_taxonomies()-> List[str]:
+    with Session(engine) as session:
+        stmt = select(taxonomic_dict.taxonomy.distinct)
+        results = session.execute(stmt).all()
+    return [x[0] for x in results]
+
 # Get
 def get_keyword_from_dictionary(taxdict_id: Optional[str]=None, 
                                 pk_kd: Optional[int]=None):

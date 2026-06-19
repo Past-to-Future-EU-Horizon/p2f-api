@@ -16,7 +16,7 @@ from inspect import stack
 router = APIRouter(prefix="/keywords")
 
 # List
-@router.get("/dataset/{dataset_id}")
+@router.get("/")
 def list_keywords(auth: api_token_annotation,
                   dataset_id: Optional[str]=None,
                   contains: Optional[str]=None) -> List[Keywords]:
@@ -26,11 +26,15 @@ def list_keywords(auth: api_token_annotation,
 @router.get("/dictionary")
 def list_taxonomic_dictionary(taxonomy: Optional[str]=None,
                               contains: Optional[str]=None) -> List[TaxonomicDict]:
-    pass
+    return keywords.list_taxonomic_dictionary(taxonomy=taxonomy, contains=contains)
+
+@router.get("/taxonomies")
+def list_taxonomies() -> List[str]:
+    return keywords.list_taxonomies()
 
 @router.get("/dictionary/{taxdict_id}")
 def get_keyword_from_dictionary(taxdict_id: Optional[str]=None) -> TaxonomicDict:
-    pass
+    return keywords.get_keyword_from_dictionary(taxdict_id=taxdict_id)
 
 # Create
 @router.post("/dataset/{dataset_id}")
@@ -49,10 +53,14 @@ def delete_general_keyword(auth: api_token_annotation,
 
 # Assign
 @router.post("/dictionary/{taxdict_id}")
-def assign_taxon_to_dataset(taxdict_id: str, dataset_id: uuid):
-    pass
+def assign_taxon_to_dataset(taxdict_id: str, 
+                            dataset_id: uuid):
+    return keywords.assign_taxon_to_dataset(taxdict_id=taxdict_id, 
+                                            dataset_id=dataset_id)
 
 # Remove
 @router.delete("/dictionary/{taxdict_id}")
-def remove_taxon_from_datase(taxdict_id: str, dataset_id: uuid):
-    pass
+def remove_taxon_from_datase(taxdict_id: str, 
+                             dataset_id: uuid):
+    return keywords.remove_taxon_from_datase(taxdict_id=taxdict_id, 
+                                             dataset_id=dataset_id)
