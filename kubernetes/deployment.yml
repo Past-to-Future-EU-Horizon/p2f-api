@@ -86,22 +86,22 @@ spec:
             - name: PG_USER
               valueFrom:
                 secretKeyRef:
-                  name: pg-temp
+                  name: pg-p2f-config
                   key: PG_USER
             - name: PG_PASS
               valueFrom:
                 secretKeyRef:
-                  name: pg-temp
+                  name: pg-p2f-config
                   key: PG_PASS
             - name: PG_DB
               valueFrom:
                 secretKeyRef:
-                  name: pg-temp
+                  name: pg-p2f-config
                   key: PG_DB
             - name: PG_HOST
               valueFrom:
                 secretKeyRef:
-                  name: pg-temp
+                  name: pg-p2f-config
                   key: PG_HOST
             - name: PG_PORT
               value: '5432'

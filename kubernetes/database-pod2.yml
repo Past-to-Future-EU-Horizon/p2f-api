@@ -1,0 +1,109 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: p2f-pg-temp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: p2f-pg-temp
+  template:
+    metadata:
+      labels:
+        app: p2f-pg-temp
+    spec:
+      containers:
+        - name: container
+          image: 'docker.io/library/postgres:18'
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-p2f-config
+                  key: PG_PASS
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-p2f-config
+                  key: PG_USER
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: pg-p2f-config
+                  key: PG_DB
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+  strategy:
+    type: RollingUpdate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: p2f-tempdb-service
+spec:
+  selector:
+    app: p2f-pg-temp
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: p2f-pg-backups-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: netapp
+  volumeMode: Filesystem
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: p2f-tempdb-backup-cron
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: pg-tempdb-backup-container
+            image: 'docker.io/library/postgres:18'
+            imagePullPolicy: IfNotPresent
+            env:
+              - name: POSTGRES_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: pg-p2f-config
+                    key: PG_PASS
+              - name: POSTGRES_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: pg-p2f-config
+                    key: PG_USER
+              - name: POSTGRES_DB
+                valueFrom:
+                  secretKeyRef:
+                    name: pg-p2f-config
+                    key: PG_DB
+            command: ['pg_dump', '-d', 'p2f', '-h', 'p2f-tempdb-service', '-U', $(POSTGRES_USER), '-W', '-f', '/db/$(date +%Y%m%d_%H%M%S)_backup.sql']
+            args: ['$(POSTGRES_PASS)']
+            volumeMounts:
+              - name: database-backup
+                mountPath: /db
+          restartPolicy: OnFailure
+          volumes:
+            - name: database-backup
+              persistentVolumeClaim:
+                claimName: p2f-pg-backups-pvc
+    

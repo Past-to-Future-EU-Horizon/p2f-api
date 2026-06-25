@@ -1,0 +1,72 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: p2f-pg-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: netapp
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: p2f-pg-pod
+spec:
+  # initContainers:
+  #   - name: set-permissions
+  #     image: busybox:latest
+  #     securityContext:
+  #       runAsUser: 0
+  #       runAsGroup: 0
+  #     volumeMounts: 
+  #       - name: p2f-pg-mount
+  #         mountPath: /db
+  #     command: ["chown", "-Rh", "100936000", "/db"]
+    
+  securityContext:
+    runAsUser:  1001292450
+    runAsGroup: 1001292450
+  containers:
+  - name: p2f-pg-pod
+    image: postgres:18
+    ports:
+    - containerPort: 5432
+    volumeMounts:
+      - name: p2f-pg-mount
+        mountPath: /var/lib/postgresql
+    env:
+      - name: POSTGRES_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: pg-p2f-config
+            key: PG_PASS
+      - name: POSTGRES_USER
+        valueFrom:
+          secretKeyRef:
+            name: pg-p2f-config
+            key: PG_USER
+      - name: POSTGRES_DB
+        valueFrom: 
+          secretKeyRef:
+            name: pg-p2f-config
+            key: PG_DB
+  volumes: 
+    - name: p2f-pg-mount
+      persistentVolumeClaim:
+        claimName: p2f-pg-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: p2f-pg-svc
+spec:
+  selector:
+    app: p2f-pg-pod
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432

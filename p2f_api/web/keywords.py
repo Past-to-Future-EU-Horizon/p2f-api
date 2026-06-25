@@ -54,13 +54,13 @@ def delete_general_keyword(auth: api_token_annotation,
 # Assign
 @router.post("/dictionary/{taxdict_id}")
 def assign_taxon_to_dataset(taxdict_id: str, 
-                            dataset_id: uuid):
+                            dataset_id: uuid.UUID):
     return keywords.assign_taxon_to_dataset(taxdict_id=taxdict_id, 
                                             dataset_id=dataset_id)
 
 # Remove
 @router.delete("/dictionary/{taxdict_id}")
 def remove_taxon_from_datase(taxdict_id: str, 
-                             dataset_id: uuid):
+                             dataset_id: uuid.UUID):
     return keywords.remove_taxon_from_datase(taxdict_id=taxdict_id, 
                                              dataset_id=dataset_id)
