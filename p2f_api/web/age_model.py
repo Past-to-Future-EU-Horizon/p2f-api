@@ -18,54 +18,61 @@ router = APIRouter(prefix="/age-models")
 # List
 
 @router.get("/")
-def list_age_models() -> List[Age_Model]:
+def list_age_models(auth: api_token_annotation,) -> List[Age_Model]:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     return age_model.list_age_models()
 
 # Get
 @router.get("/{age_model_id}")
-def get_age_model(age_model_id: Optional[uuid.UUID]=None) -> Age_Model:
+def get_age_model(auth: api_token_annotation,
+                  age_model_id: Optional[uuid.UUID]=None) -> Age_Model:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return age_model.get_age_model(age_model_id=age_model_id)
 
 # Create
 @router.post("/")
-def create_age_model(new_age_model: Age_Model) -> Age_Model:
+def create_age_model(auth: api_token_annotation,
+                     new_age_model: Age_Model) -> Age_Model:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return age_model.create_age_model(new_age_model=new_age_model)
 
 # Delete
 @router.delete("/{age_model_id}")
-def delete_age_model(age_model_id: uuid.UUID) -> None:
+def delete_age_model(auth: api_token_annotation,
+                     age_model_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return age_model.delete_age_model(age_model_id=age_model_id)
 
 # Assign
 @router.post("/assign-dataset")
-def assign_age_model_to_dataset(age_model_id: uuid.UUID, 
+def assign_age_model_to_dataset(auth: api_token_annotation,
+                                age_model_id: uuid.UUID, 
                                 dataset_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.assign} {__name__} {stack()[0][3]}()")
     return age_model.assign_age_model_to_dataset(age_model_id=age_model_id, 
                                                  dataset_id=dataset_id)
     
 @router.post("/assign-record")
-def assign_age_model_to_record(age_model_id: uuid.UUID, 
-                                record_hash: str) -> None:
+def assign_age_model_to_record(auth: api_token_annotation,
+                               age_model_id: uuid.UUID, 
+                               record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.assign} {__name__} {stack()[0][3]}()")
     return age_model.assign_age_model_to_record(age_model_id=age_model_id,
                                                 record_hash=record_hash)
 
 # Remove
 @router.delete("/remove-dataset")
-def remove_age_model_to_dataset(age_model_id: uuid.UUID, 
+def remove_age_model_to_dataset(auth: api_token_annotation,
+                                age_model_id: uuid.UUID, 
                                 dataset_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.remove} {__name__} {stack()[0][3]}()")
     return age_model.remove_age_model_to_dataset(age_model_id=age_model_id,
                                                  dataset_id=dataset_id)
 
 @router.delete("/remove-record")
-def remove_age_model_to_record(age_model_id: uuid.UUID, 
-                                record_hash: str) -> None:
+def remove_age_model_to_record(auth: api_token_annotation,
+                               age_model_id: uuid.UUID, 
+                               record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.remove} {__name__} {stack()[0][3]}()")
     return age_model.remove_age_model_to_record(age_model_id=age_model_id,
                                                 record_hash=record_hash)

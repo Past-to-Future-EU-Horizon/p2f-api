@@ -1,5 +1,6 @@
 from p2f_api.apilogs import logger, fa
 from ..service import dq_comment
+from .temp_accounts import combined_auth, api_token_annotation, api_token_annotation
 from p2f_pydantic.data_quality import DQ_Comment
 
 # Third Party Libraries
@@ -14,22 +15,26 @@ router = APIRouter(prefix="/dq-comment")
 
 
 @router.get("/{dataset_id}")
-def list_dq_comments(dataset_id: uuid.UUID) -> List[DQ_Comment]:
+def list_dq_comments(auth: api_token_annotation,
+                     dataset_id: uuid.UUID) -> List[DQ_Comment]:
     return dq_comment.list_dq_comments(dataset_id=dataset_id)
 
 
 @router.post("/")
-def create_dq_comment(new_comment: DQ_Comment) -> List[DQ_Comment]:
+def create_dq_comment(auth: api_token_annotation,
+                      new_comment: DQ_Comment) -> List[DQ_Comment]:
     # TODO check for email in new comment is authorized with provided token
     return dq_comment.create_dq_comment(new_comment=new_comment)
 
 
 @router.put("/")
-def update_dq_comment(update_comment: DQ_Comment) -> List[DQ_Comment]:
+def update_dq_comment(auth: api_token_annotation,
+                      update_comment: DQ_Comment) -> List[DQ_Comment]:
     # TODO check for email in updating comment is authorized with provided token
     return dq_comment.update_dq_comment(update_comment=update_comment)
 
 
 @router.delete("/{comment_id}")
-def delete_dq_comment(comment_id: uuid.UUID):
+def delete_dq_comment(auth: api_token_annotation,
+                      comment_id: uuid.UUID):
     return delete_dq_comment(comment_id=comment_id)

@@ -24,21 +24,24 @@ def list_keywords(auth: api_token_annotation,
                                   contains=contains)
 
 @router.get("/dictionary")
-def list_taxonomic_dictionary(taxonomy: Optional[str]=None,
+def list_taxonomic_dictionary(auth: api_token_annotation,
+                              taxonomy: Optional[str]=None,
                               contains: Optional[str]=None) -> List[TaxonomicDict]:
     return keywords.list_taxonomic_dictionary(taxonomy=taxonomy, contains=contains)
 
 @router.get("/taxonomies")
-def list_taxonomies() -> List[str]:
+def list_taxonomies(auth: api_token_annotation,) -> List[str]:
     return keywords.list_taxonomies()
 
 @router.get("/dictionary/{taxdict_id}")
-def get_keyword_from_dictionary(taxdict_id: Optional[str]=None) -> TaxonomicDict:
+def get_keyword_from_dictionary(auth: api_token_annotation,
+                                taxdict_id: Optional[str]=None) -> TaxonomicDict:
     return keywords.get_keyword_from_dictionary(taxdict_id=taxdict_id)
 
 # Create
 @router.post("/dataset/{dataset_id}")
-def add_general_keyword(dataset_id: uuid.UUID, 
+def add_general_keyword(auth: api_token_annotation,
+                        dataset_id: uuid.UUID, 
                         keyword: str) -> List[Keywords]:
     return keywords.add_general_keyword(dataset_id=dataset_id,
                                         keyword=keyword)
@@ -46,21 +49,23 @@ def add_general_keyword(dataset_id: uuid.UUID,
 # Delete
 @router.delete("/dataset/{dataset_id}")
 def delete_general_keyword(auth: api_token_annotation,
-                   dataset_id: uuid.UUID, 
-                   keyword: str) -> List[Keywords]:
+                           dataset_id: uuid.UUID, 
+                           keyword: str) -> List[Keywords]:
     return keywords.delete_general_keyword(dataset_id=dataset_id,
                                            keyword=keyword)
 
 # Assign
 @router.post("/dictionary/{taxdict_id}")
-def assign_taxon_to_dataset(taxdict_id: str, 
+def assign_taxon_to_dataset(auth: api_token_annotation,
+                            taxdict_id: str, 
                             dataset_id: uuid.UUID):
     return keywords.assign_taxon_to_dataset(taxdict_id=taxdict_id, 
                                             dataset_id=dataset_id)
 
 # Remove
 @router.delete("/dictionary/{taxdict_id}")
-def remove_taxon_from_datase(taxdict_id: str, 
+def remove_taxon_from_datase(auth: api_token_annotation,
+                             taxdict_id: str, 
                              dataset_id: uuid.UUID):
     return keywords.remove_taxon_from_datase(taxdict_id=taxdict_id, 
                                              dataset_id=dataset_id)
