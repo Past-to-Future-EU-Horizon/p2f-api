@@ -35,4 +35,4 @@ timeslices = [
 ]
 
 for timeslice in timeslices:
-    create_new_timeslice(new_harm_timeslice=HARM_Timeslice)
+    create_new_timeslice(new_harm_timeslice=timeslice)
