@@ -10,7 +10,7 @@ from sqlalchemy import select, insert, delete, update
 
 # Batteries included libraries
 from typing import List, Optional
-from uuid import UUID
+from uuid import UUID, uuid4
 from inspect import stack
 
 
@@ -49,9 +49,11 @@ def get_harm_timeslice(
 
 def create_new_timeslice(new_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
+    if new_harm_timeslice.timeslice_id is None:
+        new_harm_timeslice.timeslice_id = uuid4()
     with Session(engine) as session:
         stmt = insert(harm_timeslice)
-        stmt = stmt.values(**new_harm_timeslice)
+        stmt = stmt.values(**new_harm_timeslice.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
     return get_harm_timeslice(pk_timeslice=commit.inserted_primary_key[0])
