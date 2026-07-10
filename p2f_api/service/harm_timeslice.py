@@ -49,7 +49,7 @@ def get_harm_timeslice(
 
 def create_new_timeslice(new_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
-    if new_harm_timeslice.timeslice_id is None:
+    if "timeslice_id" not in new_harm_timeslice.model_fields_set:
         new_harm_timeslice.timeslice_id = uuid4()
     with Session(engine) as session:
         stmt = insert(harm_timeslice)
