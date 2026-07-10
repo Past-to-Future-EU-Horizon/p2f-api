@@ -339,13 +339,13 @@ def is_action_authorized(
             #     You get a string representation of the json back from the ORM
             #     Therefore you need to load the string as a json.loads
             #     Now you have a dictionary
-            logger.debug(result[0])
+            # logger.debug(result[0])
             # Load json str to model
             permissions = Account_Permissions.model_validate_json(result[0])
-            logger.debug(permissions)
+            # logger.debug(permissions)
             # Dump as dictionary
             permissions = permissions.model_dump(exclude_unset=True)
-            logger.debug(permissions)
+            # logger.debug(permissions)
             return permissions[endpoint][operation]
         else:
             return False
