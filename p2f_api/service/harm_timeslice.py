@@ -56,7 +56,7 @@ def create_new_timeslice(new_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
         stmt = stmt.values(**new_harm_timeslice.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
-    return get_harm_timeslice(pk_timeslice=commit.inserted_primary_key[0])
+    return get_harm_timeslice(pk_timeslice=execute.inserted_primary_key[0])
 
 
 def update_timeslice(update_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
@@ -68,7 +68,7 @@ def update_timeslice(update_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
         )
         stmt = stmt.values(update_harm_timeslice)
         execute = session.execute(stmt)
-        commit = session.commit(stmt)
+        commit = session.commit()
     return get_harm_timeslice(timeslice_id=update_harm_timeslice.timeslice_id)
 
 
@@ -87,7 +87,7 @@ def assign_timeslice(timeslice_id: UUID, record_hash: str):
         stmt = insert(harm_timeslice_to_record)
         stmt = stmt.values(fk_timeslice_id=timeslice_id, fk_record_hash=record_hash)
         execute = session.execute(stmt)
-        commit = session.commit(stmt)
+        commit = session.commit()
 
 
 def remove_timeslice(timeslice_id: UUID, record_hash: str):
@@ -97,4 +97,4 @@ def remove_timeslice(timeslice_id: UUID, record_hash: str):
         stmt = stmt.where(harm_timeslice_to_record.fk_timeslice_id == timeslice_id)
         stmt = stmt.where(harm_timeslice_to_record.fk_record_hash == record_hash)
         execute = session.execute(stmt)
-        commit = session.commit(stmt)
+        commit = session.commit()

@@ -62,7 +62,7 @@ def assign_age_model_to_dataset(age_model_id: uuid.UUID,
             fk_dataset_id = dataset_id
         )
         session.execute(stmt)
-        session.commit(stmt)
+        session.commit()
 
 def remove_age_model_to_dataset(age_model_id: uuid.UUID, 
                                 dataset_id: uuid.UUID) -> None:
@@ -72,7 +72,7 @@ def remove_age_model_to_dataset(age_model_id: uuid.UUID,
         stmt = stmt.where(age_model_to_dataset.fk_age_model_id == age_model_id)
         stmt = stmt.where(age_model_to_dataset.fk_dataset_id == dataset_id)
         session.execute(stmt)
-        session.commit(stmt)
+        session.commit()
 
 def assign_age_model_to_record(age_model_id: uuid.UUID, 
                                 record_hash: str) -> None:
@@ -84,7 +84,7 @@ def assign_age_model_to_record(age_model_id: uuid.UUID,
             fk_record_hash = record_hash
         )
         session.execute(stmt)
-        session.commit(stmt)
+        session.commit()
 
 def remove_age_model_to_record(age_model_id: uuid.UUID, 
                                 record_hash: str) -> None:
@@ -94,4 +94,4 @@ def remove_age_model_to_record(age_model_id: uuid.UUID,
         stmt = stmt.where(age_model_to_record.fk_age_model_id == age_model_id)
         stmt = stmt.where(age_model_to_record.fk_record_hash == record_hash)
         session.execute(stmt)
-        session.commit(stmt)
+        session.commit()
