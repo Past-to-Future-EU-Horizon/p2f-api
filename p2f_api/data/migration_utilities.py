@@ -1,5 +1,8 @@
 from p2f_api.apilogs import logger, fa
-from .db_connection import engine, baseSQL
+from .db_connection import engine
+from .p2f_decbase import baseSQL
+
+# Third Party Libraries
 from sqlalchemy import text
 from sqlalchemy import BigInteger
 from sqlalchemy import String, Text
@@ -9,6 +12,8 @@ from sqlalchemy import func
 from sqlalchemy import select, insert, update
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session
+
+# Batteries included libraries
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -40,7 +45,7 @@ def get_migration(name, table):
         stmt = select(migration_history)
         stmt = stmt.where(migration_history.mig_name == name)
         stmt = stmt.where(migration_history.mig_table == table)
-        result = session.execute(stmt)
+        result = session.execute(stmt).all()
     return result
 
 def update_migration_status(name, table, status=True):
@@ -74,3 +79,5 @@ def migration(name, table, action):
                 logger.debug(f"MIGRATION {name} experienced an error")
                 logger.debug(f"EXCEPTION:\n e")
                 logger.debug("#"*50)
+
+baseSQL.metadata.create_all(engine)
