@@ -9,12 +9,13 @@ namespace = true
 
 [project]
 name = "p2f_api"
-version = "0.0.91"
+version = "0.0.92"
 description = "FastAPI based API for the Past to Future project."
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.12",
     "furl>=2.1.4",
+    "jupyter>=1.1.1",
     "openpyxl>=3.1.5",
     "p2f-pydantic>=0.0.2",
     "psycopg[binary,pool]>=3.2.8",

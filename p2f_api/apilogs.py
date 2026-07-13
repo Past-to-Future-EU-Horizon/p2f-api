@@ -24,6 +24,7 @@ class FA:  # function annotations
         self.remove = "🔙"
         # Other
         self.auth = "🔐"
+        self.migration = "🌀"
 
 
 fa = FA()

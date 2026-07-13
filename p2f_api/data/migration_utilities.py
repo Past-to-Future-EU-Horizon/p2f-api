@@ -16,6 +16,9 @@ from sqlalchemy.orm import Session
 # Batteries included libraries
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from inspect import stack
+
+logger.debug(f"{fa.data} {__name__}")
 
 class migration_history(baseSQL):
     __tablename__ = "p2f_migration_history"
@@ -31,6 +34,7 @@ class migration_history(baseSQL):
     )
 
 def add_migration(name, table):
+    logger.debug(f"{fa.data}{fa.migration} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(migration_history)
         stmt = stmt.values(
@@ -41,14 +45,17 @@ def add_migration(name, table):
         commit = session.commit()
 
 def get_migration(name, table):
+    logger.debug(f"{fa.data}{fa.migration} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(migration_history)
         stmt = stmt.where(migration_history.mig_name == name)
         stmt = stmt.where(migration_history.mig_table == table)
         result = session.execute(stmt).all()
+    logger.debug(result)
     return result
 
 def update_migration_status(name, table, status=True):
+    logger.debug(f"{fa.data}{fa.migration} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = update(migration_history)
         stmt = stmt.where(migration_history.mig_name == name)
@@ -58,6 +65,7 @@ def update_migration_status(name, table, status=True):
         session.commit()
 
 def migration(name, table, action):
+    logger.debug(f"{fa.data}{fa.migration} {stack()[0][3]}()")
     exists = get_migration(name=name, table=table)
     # logger.debug(exists)
     if len(exists) == 0:

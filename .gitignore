@@ -181,3 +181,5 @@ kubernetes/test.ingress.yml
 kubernetes/test.emaildeployment.yml
 p2f_api/adminutils/gemet.rdf
 kubernetes/ingress-prod.yml
+p2f_api/devtools/logs/*.logs
+p2f_api/devtools/*.ipynb
