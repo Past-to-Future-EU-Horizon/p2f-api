@@ -81,6 +81,7 @@ def migration(name, table, action):
         with Session(engine) as session:
             try:
                 session.execute(text(action))
+                session.commit()
                 update_migration_status(name=name, 
                                         table=table, 
                                         status=True)

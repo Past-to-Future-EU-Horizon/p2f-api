@@ -73,12 +73,12 @@ stmt_mean = f"""ALTER TABLE {harm_timeslice.__tablename__} ALTER COLUMN {harm_ti
 stmt_oldr = f"""ALTER TABLE {harm_timeslice.__tablename__} ALTER COLUMN {harm_timeslice.timeslice_age_oldest.name} DROP NOT NULL;"""
 stmt_rcnt = f"""ALTER TABLE {harm_timeslice.__tablename__} ALTER COLUMN {harm_timeslice.timeslice_age_recent.name} DROP NOT NULL;"""
 
-migration(name=f"2026-07-13 ALTER TABLE {harm_timeslice.__tablename__}.{harm_timeslice.timeslice_age_mean.name} DROP NOT NULL",
+migration(name=f"2026-07-13-b ALTER TABLE {harm_timeslice.__tablename__}.{harm_timeslice.timeslice_age_mean.name} DROP NOT NULL",
           table=harm_timeslice.__tablename__,
           action=stmt_mean)
-migration(name=f"2026-07-13 ALTER TABLE {harm_timeslice.__tablename__}.{harm_timeslice.timeslice_age_oldest.name} DROP NOT NULL",
+migration(name=f"2026-07-13-b ALTER TABLE {harm_timeslice.__tablename__}.{harm_timeslice.timeslice_age_oldest.name} DROP NOT NULL",
           table=harm_timeslice.__tablename__,
           action=stmt_oldr)
-migration(name=f"2026-07-13 ALTER TABLE {harm_timeslice.__tablename__}.{harm_timeslice.timeslice_age_recent.name} DROP NOT NULL",
+migration(name=f"2026-07-13-b ALTER TABLE {harm_timeslice.__tablename__}.{harm_timeslice.timeslice_age_recent.name} DROP NOT NULL",
           table=harm_timeslice.__tablename__,
           action=stmt_rcnt)
