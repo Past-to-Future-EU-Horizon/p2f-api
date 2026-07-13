@@ -43,8 +43,9 @@ def get_harm_timeslice(
             stmt = stmt.where(harm_timeslice.timeslice_id == timeslice_id)
         if pk_timeslice is not None:
             stmt = stmt.where(harm_timeslice.pk_harm_timeslice == pk_timeslice)
-        result = session.execute(stmt)
-    return HARM_Timeslice(**result.tuple()[0].__dict__)
+        result = session.execute(stmt).first()
+    result = result.tuple()[0]
+    return HARM_Timeslice(**result.__dict__)
 
 
 def create_new_timeslice(new_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
