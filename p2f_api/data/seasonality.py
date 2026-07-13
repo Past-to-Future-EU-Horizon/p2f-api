@@ -1,6 +1,7 @@
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
+from .db_connection import engine
 from .datasets import datasets
 from .harm_data_record import harm_data_record
 
@@ -8,8 +9,6 @@ from .harm_data_record import harm_data_record
 from sqlalchemy import BigInteger
 from sqlalchemy import Text
 from sqlalchemy import DateTime
-from sqlalchemy import Integer
-from sqlalchemy import Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func
 from sqlalchemy import ForeignKey
@@ -42,3 +41,5 @@ class season(baseSQL):
     update_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
     )
+
+baseSQL.metadata.create_all(engine)

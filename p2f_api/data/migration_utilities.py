@@ -59,6 +59,7 @@ def update_migration_status(name, table, status=True):
 
 def migration(name, table, action):
     exists = get_migration(name=name, table=table)
+    # logger.debug(exists)
     if len(exists) == 0:
         add_migration(name=name, table=table)
         mig_status = False
@@ -66,18 +67,19 @@ def migration(name, table, action):
         if len(exists) > 1:
             raise IndexError("Multiple records were found for name and table")
         else:
-            mig_status = exists[0].mig_status
+            # logger.debug(dir(exists[0][0]))
+            mig_status = exists[0][0].mig_status
     if mig_status == False:
         with Session(engine) as session:
             try:
-                session.execute(action)
+                session.execute(text(action))
                 update_migration_status(name=name, 
                                         table=table, 
                                         status=True)
             except Exception as e:
                 logger.debug("#"*50)
                 logger.debug(f"MIGRATION {name} experienced an error")
-                logger.debug(f"EXCEPTION:\n e")
+                logger.debug(f"EXCEPTION:\n {e}")
                 logger.debug("#"*50)
 
 baseSQL.metadata.create_all(engine)

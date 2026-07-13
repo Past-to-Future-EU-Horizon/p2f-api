@@ -1,5 +1,6 @@
 from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
+from .db_connection import engine
 from .harm_data_record import harm_data_record
 
 # Third Party Libraries
@@ -36,3 +37,5 @@ class harm_rec_age(baseSQL):
     update_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
     )
+
+baseSQL.metadata.create_all(engine)

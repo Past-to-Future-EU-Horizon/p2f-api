@@ -3,31 +3,17 @@ from p2f_api.apilogs import logger, fa
 
 # from .create_metadata import create_metadata
 from .p2f_decbase import baseSQL
-# from .datasets import *
-# from .harm_locations import *
-# from .harm_species import *
-# from .harm_data_numerical import *
-# from .harm_data_record import *
-# from .harm_data_types import *
-# from .harm_age import *
-# from .harm_reference import *
-# from .harm_text import *
-# from .harm_timeslice import *
-# from .harm_ds_time import *
-# from .link_git import *
-# from .temp_accounts import *
-# from .doi import *
 
 # Third Party Libraries
 from sqlalchemy import create_engine
-from sqlalchemy.schema import CreateTable
+# from sqlalchemy.schema import CreateTable
 from dotenv import load_dotenv
 
 # Batteries included libraries
 import os
 import pathlib
 
-logger.debug(f"{fa.data} {__name__} P2F-API v0.0.90")
+logger.debug(f"{fa.data} {__name__} P2F-API v0.0.91")
 
 p = pathlib.Path(os.getcwd())
 print(p)

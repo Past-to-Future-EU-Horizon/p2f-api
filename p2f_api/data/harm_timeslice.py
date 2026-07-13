@@ -1,5 +1,6 @@
 from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
+from .db_connection import engine
 from .harm_data_record import harm_data_record
 from .migration_utilities import migration
 
@@ -54,7 +55,7 @@ class harm_timeslice_to_record(baseSQL):
         DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
     )
 
-# baseSQL.metadata.create_all(engine)
+baseSQL.metadata.create_all(engine)
 
 ###################################################
 #   MIGRATIONS                                    #
