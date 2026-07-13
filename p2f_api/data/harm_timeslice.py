@@ -1,6 +1,7 @@
 from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
 from .harm_data_record import harm_data_record
+from .migration_utilities import migration
 
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -27,7 +28,7 @@ class harm_timeslice(baseSQL):
         Uuid, unique=True, nullable=False, default=func.gen_random_uuid()
     )
     timeslice_name: Mapped[str] = mapped_column(Text)
-    timeslice_age_mean: Mapped[int] = mapped_column(BigInteger)
+    timeslice_age_mean: Mapped[int] = mapped_column(BigInteger, nullable=True)
     timeslice_age_recent: Mapped[int] = mapped_column(BigInteger, nullable=True)
     timeslice_age_oldest: Mapped[int] = mapped_column(BigInteger, nullable=True)
     creation_timestamp: Mapped[datetime] = mapped_column(
@@ -52,3 +53,30 @@ class harm_timeslice_to_record(baseSQL):
     update_timestamp: Mapped[datetime] = mapped_column(
         DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
     )
+
+
+###################################################
+#   MIGRATIONS                                    #
+###################################################
+
+# ALTER harm_timeslice COLUMNS mean, recent, oldest NULLABLE
+# """-- Source - https://stackoverflow.com/a/35827157
+# -- Posted by Paul LeBeau, modified by community. See post 'Timeline' for change history
+# -- Retrieved 2026-07-13, License - CC BY-SA 4.0
+# https://www.postgresql.org/docs/current/sql-altertable.html
+# ALTER TABLE tableName ALTER COLUMN columnName DROP NOT NULL;
+# """
+
+stmt_mean = f"""ALTER TABLE {harm_timeslice.__tablename__} ALTER COLUMN {harm_timeslice.timeslice_age_mean.name} DROP NOT NULL;"""
+stmt_oldr = f"""ALTER TABLE {harm_timeslice.__tablename__} ALTER COLUMN {harm_timeslice.timeslice_age_oldest.name} DROP NOT NULL;"""
+stmt_rcnt = f"""ALTER TABLE {harm_timeslice.__tablename__} ALTER COLUMN {harm_timeslice.timeslice_age_recent.name} DROP NOT NULL;"""
+
+migration(name=f"2026-07-13 ALTER TABLE {harm_timeslice.__tablename__}.{harm_timeslice.timeslice_age_mean.name} DROP NOT NULL",
+          table={harm_timeslice.__tablename__},
+          action=stmt_mean)
+migration(name=f"2026-07-13 ALTER TABLE {harm_timeslice.__tablename__}.{harm_timeslice.timeslice_age_oldest.name} DROP NOT NULL",
+          table={harm_timeslice.__tablename__},
+          action=stmt_oldr)
+migration(name=f"2026-07-13 ALTER TABLE {harm_timeslice.__tablename__}.{harm_timeslice.timeslice_age_recent.name} DROP NOT NULL",
+          table={harm_timeslice.__tablename__},
+          action=stmt_rcnt)
