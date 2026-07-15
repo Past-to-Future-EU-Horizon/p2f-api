@@ -99,6 +99,8 @@ def create_harm_data_type(new_harm_data_type: HARM_Data_Type) -> HARM_Data_Type:
     logger.debug(f"{fa.service}{fa.create} {__name__}  {stack()[0][3]}()")
     if "datatype_id" not in new_harm_data_type.model_fields_set:
         new_harm_data_type.datatype_id = uuid4()
+    if new_harm_data_type.datatype_id is None:
+        new_harm_data_type.datatype_id = uuid4()
     with Session(engine) as session:
         stmt = insert(harm_data_type)
         stmt = stmt.values(**new_harm_data_type.model_dump(exclude_unset=True))

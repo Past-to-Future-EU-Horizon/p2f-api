@@ -45,6 +45,8 @@ def create_git_repo(
     new_git_repo: Git_Repository, dataset_id: Optional[uuid.UUID] = None
 ) -> Git_Repository:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
+    if new_git_repo.git_repo_id is None:
+        new_git_repo.git_repo_id = uuid.uuid4()
     with Session(engine) as session:
         stmt = insert(git_repository)
         stmt = stmt.values(

@@ -10,7 +10,7 @@ from sqlalchemy import select, insert, delete, update
 
 # Batteries included libraries
 from typing import List, Optional
-from uuid import UUID
+from uuid import UUID, uuid4
 from inspect import stack
 
 
@@ -45,6 +45,8 @@ def get_reference(
 # Create
 def create_reference(new_reference: HARM_Reference) -> HARM_Reference:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
+    if new_reference.reference_id is None:
+        new_reference.reference_id = uuid4()
     with Session(engine) as session:
         stmt = insert(harm_reference)
         stmt = stmt.values(**new_reference.model_dump(exclude_unset=True))

@@ -34,6 +34,8 @@ def get_age_model(age_model_id: Optional[uuid.UUID]=None,
 
 def create_age_model(new_age_model: Age_Model) -> Age_Model:
     logger.debug(f"{fa.service}{fa.create} {stack()[0][3]}()")
+    if Age_Model.age_model_id == None:
+        Age_Model.age_model_id = uuid.uuid4()
     with Session(engine) as session:
         stmt = insert(age_model)
         stmt = stmt.values(

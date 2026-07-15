@@ -11,6 +11,7 @@ from sqlalchemy import select, insert, delete, update
 # Batteries included libraries
 from typing import List, Optional
 from inspect import stack
+import uuid
 
 
 def list_datasets(
@@ -53,7 +54,12 @@ def get_dataset(dataset_id=None, pk_datasets=None) -> Datasets:
 
 def create_dataset(new_dataset: Datasets) -> Datasets:
     logger.debug(f"{fa.service}{fa.create} {stack()[0][3]}()")
-    logger.debug(f"•  received: {new_dataset}")
+    # logger.debug(f"•  received: {new_dataset}")
+    if new_dataset.dataset_id is None:
+        new_dataset.dataset_id = uuid.uuid4()
+    else:
+        if get_dataset(dataset_id=new_dataset.dataset_id) is not None:
+            new_dataset.dataset_id = uuid.uuid4()
     with Session(engine) as session:
         logger.debug("•  Created session")
         stmt = insert(datasets)
