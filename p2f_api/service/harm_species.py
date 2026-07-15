@@ -97,7 +97,7 @@ def get_harm_metadata_species(
 def create_harm_metadata_species(new_species: HARM_Species) -> HARM_Species:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     if new_species.species_id is None:
-        new_species.species_id = uuid4
+        new_species.species_id = uuid4()
     with Session(engine) as session:
         stmt = insert(harm_species)
         stmt = stmt.values(**new_species.model_dump(exclude_unset=True))
