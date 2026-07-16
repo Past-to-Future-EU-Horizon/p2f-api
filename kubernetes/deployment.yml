@@ -116,6 +116,26 @@ spec:
                   name: p2f-portal
                   key: P2F_PORTAL_TOKEN
           imagePullPolicy: Always
+          volumeMounts:
+            - name: email-volume
+              mountPath: /p2f/emails
       restartPolicy: Always
+      volumes:
+        - name: email-volume
+          persistentVolumeClaim:
+            claimName: emails-pvc
   strategy:
     type: RollingUpdate
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: emails-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+  storageClassName: netapp
+  volumeMode: Filesystem

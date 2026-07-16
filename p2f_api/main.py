@@ -24,6 +24,7 @@ from p2f_api.service.temp_accounts import api_init
 from p2f_pydantic import system as p2fsystem
 # Third Party Libraries
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 # from fastapi.security import APIKeyHeader
 # Batteries included libraries
 import os
@@ -31,7 +32,7 @@ import os
 app = FastAPI(
     title="Past to Future Dataset API",
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
-    version="0.0.97"
+    version="0.0.98"
 )
 
 logger.debug(f"{fa.background} {__name__}")
@@ -70,10 +71,14 @@ def get_api_metadata() -> p2fsystem.API_Metadata:
                                                        patch=21)
     api_version = p2fsystem.Semantic_Version(major=0, 
                                              minor=0, 
-                                             patch=97)
+                                             patch=98)
     return_class = p2fsystem.API_Metadata(pyclient_minimum_version=minimum_p2f_client_py, 
                                           api_system_version=api_version)
     return return_class
+
+@app.get("/", include_in_schema=False)
+def redirect_to_docs():
+    return RedirectResponse(url="/docs")
 
 # Debugging features
 P2F_DDL = bool(os.getenv("P2F_DDL", default=False))
