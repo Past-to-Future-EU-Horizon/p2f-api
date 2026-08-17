@@ -33,10 +33,10 @@ class harm_timeslice(baseSQL):
     timeslice_age_recent: Mapped[int] = mapped_column(BigInteger, nullable=True)
     timeslice_age_oldest: Mapped[int] = mapped_column(BigInteger, nullable=True)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class harm_timeslice_to_record(baseSQL):
@@ -49,10 +49,10 @@ class harm_timeslice_to_record(baseSQL):
         ForeignKey(f"{harm_data_record.__tablename__}.record_hash")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 baseSQL.metadata.create_all(engine)

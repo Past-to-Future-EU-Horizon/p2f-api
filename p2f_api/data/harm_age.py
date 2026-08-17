@@ -32,10 +32,10 @@ class harm_rec_age(baseSQL):
     age_oldest: Mapped[int] = mapped_column(BigInteger, nullable=True)
     reference_zero: Mapped[int] = mapped_column(BigInteger, nullable=False)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 baseSQL.metadata.create_all(engine)

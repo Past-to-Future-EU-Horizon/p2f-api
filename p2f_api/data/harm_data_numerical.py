@@ -44,10 +44,10 @@ class harmonized_int_confidence(baseSQL):
         ForeignKey(f"{harm_data_type.__tablename__}.datatype_id")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
     
 
@@ -66,10 +66,10 @@ class harmonized_int(baseSQL):
         ForeignKey(f"{harm_data_type.__tablename__}.datatype_id")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class harmonized_float_confidence(baseSQL):
@@ -91,10 +91,10 @@ class harmonized_float_confidence(baseSQL):
         ForeignKey(f"{harm_data_type.__tablename__}.datatype_id")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class harmonized_float(baseSQL):
@@ -112,16 +112,16 @@ class harmonized_float(baseSQL):
         ForeignKey(f"{harm_data_type.__tablename__}.datatype_id")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class harmonized_numeric_id_map(baseSQL):
@@ -132,16 +132,16 @@ class harmonized_numeric_id_map(baseSQL):
     )
     table_class: Mapped[str] = mapped_column(Text)  # TODO Make this a ENUM
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 baseSQL.metadata.create_all(engine)

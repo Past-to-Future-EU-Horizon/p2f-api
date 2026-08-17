@@ -34,10 +34,10 @@ class harm_ds_timecoverage(baseSQL):
     younger_conf_interval: Mapped[float] = mapped_column(Float, nullable=True)
     assigned_by_human: Mapped[bool] = mapped_column(Boolean, default=False)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class harm_ds_seasonality(baseSQL):
@@ -47,10 +47,10 @@ class harm_ds_seasonality(baseSQL):
     has_seasonality: Mapped[bool] = mapped_column(Boolean, default=False)
     seasonailty_type: Mapped[str] = mapped_column(String(63), nullable=True)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class harm_ds_frequency(baseSQL):
@@ -61,10 +61,10 @@ class harm_ds_frequency(baseSQL):
     shortest_frequency: Mapped[int] = mapped_column(BigInteger, nullable=True)
     longest_frequency: Mapped[int] = mapped_column(BigInteger, nullable=True)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 baseSQL.metadata.create_all(engine)

@@ -24,10 +24,10 @@ class seasonality_ds(baseSQL):
     dataset_id: Mapped[UUID] = mapped_column(ForeignKey(f"{datasets.__tablename__}.dataset_id"))
     seasonlity_type: Mapped[str] = mapped_column(Text)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class season(baseSQL):
@@ -36,10 +36,10 @@ class season(baseSQL):
     record_hash: Mapped[str] = mapped_column(ForeignKey(f"{harm_data_record.__tablename__}.record_hash"))
     season: Mapped[str] = mapped_column(Text)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 baseSQL.metadata.create_all(engine)

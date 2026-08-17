@@ -26,10 +26,10 @@ class temp_tokens(baseSQL):
     token: Mapped[str] = mapped_column(String(128), nullable=False)
     expiration: Mapped[datetime] = mapped_column(DateTime(ZoneInfo('UTC')), nullable=False)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class permitted_addresses(baseSQL):
@@ -41,10 +41,10 @@ class permitted_addresses(baseSQL):
         String, nullable=True, default="Europe/Amsterdam"
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 
@@ -56,16 +56,16 @@ class email_history(baseSQL):
         String(10), default="Created", nullable=False
     )  # Created, Sent, Failure
     sending_time: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")),
+        DateTime(timezone=True),
     )
     email_meta_sender: Mapped[str] = mapped_column(Text, nullable=False)
     email_meta_receiver: Mapped[str] = mapped_column(Text, nullable=False)
     email_meta_subject: Mapped[str] = mapped_column(Text, nullable=False)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 baseSQL.metadata.create_all(engine)

@@ -33,10 +33,10 @@ class harm_reference(baseSQL):
     reference_type: Mapped[str] = mapped_column(String(32), default=None, nullable=True)
     reference_content: Mapped[str] = mapped_column(Text, nullable=True)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class harm_reference_to_record(baseSQL):
@@ -51,10 +51,10 @@ class harm_reference_to_record(baseSQL):
         ForeignKey(f"{harm_data_record.__tablename__}.record_hash")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class harm_reference_to_dataset(baseSQL):
@@ -69,10 +69,10 @@ class harm_reference_to_dataset(baseSQL):
         ForeignKey(f"{datasets.__tablename__}.dataset_id")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
     
 baseSQL.metadata.create_all(engine)

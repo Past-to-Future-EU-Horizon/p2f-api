@@ -32,10 +32,10 @@ class harm_data_type(baseSQL):
     is_proxy: Mapped[bool] = mapped_column(Boolean, default=False)
     calibration: Mapped[str] = mapped_column(Text, nullable=True)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 baseSQL.metadata.create_all(engine)

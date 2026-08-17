@@ -27,10 +27,10 @@ class keywords(baseSQL):
     fk_dataset_id: Mapped[UUID] = mapped_column(ForeignKey(f"{datasets.__tablename__}.dataset_id"))
     keyword: Mapped[str] = mapped_column(String(255), nullable=False)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class taxonomic_dict(baseSQL):
@@ -44,10 +44,10 @@ class taxonomic_dict(baseSQL):
     parent_keyword: Mapped[str] = mapped_column(String(255), nullable=True)
     taxonomy_id: Mapped[str] = mapped_column(String(255), nullable=True)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class taxonomic_keyword(baseSQL):
@@ -56,10 +56,10 @@ class taxonomic_keyword(baseSQL):
     fk_dataset_id: Mapped[UUID] = mapped_column(ForeignKey(f"{datasets.__tablename__}.dataset_id"))
     fk_taxdict_id: Mapped[UUID] = mapped_column(ForeignKey(f"{taxonomic_dict.__tablename__}.taxdict_id"))
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 baseSQL.metadata.create_all(engine)

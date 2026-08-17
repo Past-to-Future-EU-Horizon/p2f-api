@@ -27,10 +27,10 @@ class migration_history(baseSQL):
     mig_table: Mapped[str] = mapped_column(String(255))
     mig_status: Mapped[bool] = mapped_column(Boolean, default=False)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 def add_migration(name, table):

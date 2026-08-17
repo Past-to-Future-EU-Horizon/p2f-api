@@ -28,10 +28,10 @@ class doi_metadata(baseSQL):
     metadata_json: Mapped[dict] = mapped_column(JSONB, nullable=True)
     metadata_xml: Mapped[str] = mapped_column(Text, nullable=True)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class doi_lastrequests(baseSQL):
@@ -40,10 +40,10 @@ class doi_lastrequests(baseSQL):
     website: Mapped[str] = mapped_column(String(31), unique=True)
     last_request: Mapped[datetime] = mapped_column(DateTime(timezone=ZoneInfo("UTC")), nullable=False, default=datetime.now(tz=ZoneInfo("UTC")))
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 class doi_metadata_queue(baseSQL):
@@ -51,10 +51,10 @@ class doi_metadata_queue(baseSQL):
     pk_doi_queue: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     doi_url: Mapped[str] = mapped_column(Text, nullable=False)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 baseSQL.metadata.create_all(engine)

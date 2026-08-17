@@ -36,10 +36,10 @@ class datasets(baseSQL):
     is_new_p2f: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_sub_dataset: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now()
+        DateTime(timezone=True), default=func.now()
     )
     update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(ZoneInfo("UTC")), default=func.now(), onupdate=func.now()
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
 baseSQL.metadata.create_all(engine)
