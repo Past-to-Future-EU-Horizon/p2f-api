@@ -7,6 +7,7 @@ from p2f_pydantic.generic import Message
 from fastapi import APIRouter
 from fastapi import HTTPException
 from fastapi import Request
+from fastapi import BackgroundTasks
 from fastapi import Security
 from fastapi import Header
 from fastapi.responses import JSONResponse
@@ -24,9 +25,11 @@ api_token = APIKeyHeader(name="x-p2f-token")
 api_email = Header(alias="x-p2f-email")
 
 @router.post("/request")
-def request_token(request_token: Temp_Account) -> JSONResponse:
+def request_token(request_token: Temp_Account,
+                  background_task: BackgroundTasks) -> JSONResponse:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
-    temp_accounts.token_request(request_token.email)
+    background_task.add_task(temp_accounts.token_request, request_token.email)
+    # temp_accounts.token_request(request_token.email)
     # We always return the same message.
     ## For security reasons do not reveal permitted email addresses.
     msg = "Your token request has been received, if your email is valid, you will receive a token through your email soon."
