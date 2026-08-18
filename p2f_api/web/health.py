@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 
 # Batteries included libraries
 from inspect import stack
+from pprint import pprint
 
 router = APIRouter(prefix="/health-check", include_in_schema=False)
 
@@ -18,3 +19,8 @@ def get_health():
 # @router.get("/v")
 # def get_verbose_health():
 #     return verbose_health()
+
+# @router.get("/2", include_in_schema=False, operation_id="healthcheck2-eclectic-boogaloo")
+# def eclectic_boogaloo(request: Request) -> str:
+#     pprint(request.scope["fastapi"]["effective_route_context"].operation_id)
+#     return JSONResponse(content={"status": "OK"})
