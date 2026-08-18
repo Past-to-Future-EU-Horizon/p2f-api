@@ -11,7 +11,7 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/harm-data-age")
+router = APIRouter(prefix="/harm-data-age", tags=["HARM Age"])
 
 @router.get("/")
 def list_harm_ages(

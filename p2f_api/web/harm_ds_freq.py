@@ -13,7 +13,7 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/data-frequency")
+router = APIRouter(prefix="/data-frequency", tags=["Dataset Frequency"])
 
 # Get
 @router.get("/{dataset_id}")

@@ -13,7 +13,7 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/harm-data-locations")
+router = APIRouter(prefix="/harm-data-locations", tags=["HARM Location"])
 
 
 # List

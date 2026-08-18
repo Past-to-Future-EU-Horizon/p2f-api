@@ -13,7 +13,7 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/keywords")
+router = APIRouter(prefix="/keywords", tags=["Keywords"])
 
 # List
 @router.get("/")

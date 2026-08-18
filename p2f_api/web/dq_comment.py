@@ -11,7 +11,7 @@ import uuid
 from typing import Optional, List
 from inspect import stack
 
-router = APIRouter(prefix="/dq-comment")
+router = APIRouter(prefix="/dq-comment", tags=["Data Quality Comment"])
 
 
 @router.get("/{dataset_id}")

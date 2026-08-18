@@ -13,7 +13,7 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/time-coverage")
+router = APIRouter(prefix="/time-coverage", tags=["Time Coverage"])
 
 # Get
 @router.get("/{dataset_id}")

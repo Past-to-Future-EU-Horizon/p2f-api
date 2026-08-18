@@ -13,7 +13,7 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/age-models")
+router = APIRouter(prefix="/age-models", tags=["Age Model"])
 
 # List
 

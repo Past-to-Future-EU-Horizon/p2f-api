@@ -13,8 +13,8 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router_ds = APIRouter(prefix="/seasonality")
-router_rec = APIRouter(prefix="/season")
+router_ds = APIRouter(prefix="/seasonality", tags=["Seasonality"])
+router_rec = APIRouter(prefix="/season", tags=["Season"])
 
 # Get
 @router_ds.get("/{dataset_id}")

@@ -14,7 +14,7 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/datasets")
+router = APIRouter(prefix="/datasets", tags=["Datasets"])
 
 
 # List

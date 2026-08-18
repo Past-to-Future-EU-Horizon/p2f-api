@@ -11,7 +11,7 @@ import uuid
 from typing import Optional, List
 from inspect import stack
 
-router = APIRouter(prefix="/doi")
+router = APIRouter(prefix="/doi", tags=["Digital Object Identifier"])
 
 
 @router.get("/")

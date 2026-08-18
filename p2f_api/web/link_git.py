@@ -13,7 +13,7 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/git")
+router = APIRouter(prefix="/git", tags=["Git"])
 
 
 # List

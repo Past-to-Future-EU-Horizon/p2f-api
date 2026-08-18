@@ -12,7 +12,7 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/harm-data-types")
+router = APIRouter(prefix="/harm-data-types", tags=["HARM Data Types"])
 
 
 @router.get("/")

@@ -18,7 +18,7 @@ from furl import furl
 from typing import Literal, Optional, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/token")
+router = APIRouter(prefix="/token", tags=["Basic Account"])
 
 api_token = APIKeyHeader(name="x-p2f-token")
 

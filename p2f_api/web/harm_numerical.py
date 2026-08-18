@@ -15,7 +15,7 @@ import uuid
 from typing import Optional, Annotated, Union, Literal
 from inspect import stack
 
-router = APIRouter(prefix="/harm-numerical")
+router = APIRouter(prefix="/harm-numerical", tags=["HARM Numerical"])
 
 Harm_numerical_union = Union[
     HARM_Float_Confidence, HARM_Float, HARM_Int, HARM_Int_Confidence

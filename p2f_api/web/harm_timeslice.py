@@ -12,7 +12,7 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/harm-timeslice")
+router = APIRouter(prefix="/harm-timeslice", tags=["HARM Timeslice"])
 
 
 @router.get("/")
