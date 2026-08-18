@@ -23,7 +23,7 @@ Harm_numerical_union = Union[
 
 
 # List
-@router.get("/")
+@router.get("/", operation_id="numerical-list")
 def list_harm_numerical(
     auth: api_token_annotation,
     record_hash: Optional[str] = None,
@@ -44,7 +44,7 @@ def list_harm_numerical(
 
 
 # Get Single
-@router.get("/{numeric_id}")
+@router.get("/{numeric_id}", operation_id="numeric-get")
 def get_harm_numerical(auth: api_token_annotation,
                        numeric_id: uuid.UUID) -> Harm_numerical_union:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
@@ -52,7 +52,7 @@ def get_harm_numerical(auth: api_token_annotation,
 
 
 # Create
-@router.post("/")
+@router.post("/", operation_id="numeric-create")
 def create_harm_numerical(auth: api_token_annotation,
                           new_numeric: Insert_HARM_Numerical) -> Harm_numerical_union:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
@@ -60,7 +60,7 @@ def create_harm_numerical(auth: api_token_annotation,
 
 
 # Update
-@router.put("/", include_in_schema=False)
+@router.put("/", include_in_schema=False, operation_id="numeric-update")
 def update_harm_numerical(
     auth: api_token_annotation,
     numerical_updates: Harm_numerical_union,
@@ -70,7 +70,7 @@ def update_harm_numerical(
 
 
 # Delete
-@router.delete("/{numeric_id}", include_in_schema=False)
+@router.delete("/{numeric_id}", include_in_schema=False, operation_id="numeric-delete")
 def delete_harm_numerical(auth: api_token_annotation,
                           numeric_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")

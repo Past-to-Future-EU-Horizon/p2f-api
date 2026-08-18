@@ -17,7 +17,7 @@ router = APIRouter(prefix="/harm-data-locations", tags=["HARM Location"])
 
 
 # List
-@router.get("/")
+@router.get("/", operation_id="location-list")
 def list_harm_data_records(
     auth: api_token_annotation,
     bounding_box: Optional[HARM_Bounding_Box] = None,
@@ -43,7 +43,7 @@ def list_harm_data_records(
 
 
 # Get Single
-@router.get("/{location_id}")
+@router.get("/{location_id}", operation_id="location-get")
 def get_harm_data_record(auth: api_token_annotation,
                          location_id: uuid.UUID) -> HARM_Location:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
@@ -53,14 +53,14 @@ def get_harm_data_record(auth: api_token_annotation,
 
 
 # Create
-@router.post("/")
+@router.post("/", operation_id="location-create")
 def create_dataset(auth: api_token_annotation,
                    new_location: HARM_Location) -> HARM_Location:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_locations.create_location(new_location=new_location)
 
 
-@router.put("/", include_in_schema=False)
+@router.put("/", include_in_schema=False, operation_id="location-update")
 def update_dataset(auth: api_token_annotation,
                    update_location: HARM_Location) -> HARM_Location:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
@@ -68,7 +68,7 @@ def update_dataset(auth: api_token_annotation,
 
 
 # Delete
-@router.delete("/{location_id}", include_in_schema=False)
+@router.delete("/{location_id}", include_in_schema=False, operation_id="location-delete")
 def delete_dataset(auth: api_token_annotation,
                    location_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
@@ -77,7 +77,7 @@ def delete_dataset(auth: api_token_annotation,
     )
 
 
-@router.post("/assign")
+@router.post("/assign", operation_id="location_recordhash-assign")
 def assign_location_to_record(auth: api_token_annotation,
                               location_id: uuid.UUID, record_hash: str):
     logger.debug(
@@ -88,7 +88,7 @@ def assign_location_to_record(auth: api_token_annotation,
     )
 
 
-@router.delete("/remove")
+@router.delete("/remove", operation_id="location_recordhash-remove")
 def remove_location_from_record(auth: api_token_annotation,
                                 location_id: uuid.UUID, record_hash: str):
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")

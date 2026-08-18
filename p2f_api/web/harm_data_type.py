@@ -15,7 +15,7 @@ from inspect import stack
 router = APIRouter(prefix="/harm-data-types", tags=["HARM Data Types"])
 
 
-@router.get("/")
+@router.get("/", operation_id="datatype-list")
 def list_harm_data_types(
     auth: api_token_annotation,
     measure: Optional[str] = None,
@@ -34,7 +34,7 @@ def list_harm_data_types(
     )
 
 
-@router.get("/{datatype_id}")
+@router.get("/{datatype_id}", operation_id="datatype-get")
 def get_harm_data_type(
     auth: api_token_annotation,
     datatype_id: uuid.UUID) -> HARM_Data_Type:
@@ -42,7 +42,7 @@ def get_harm_data_type(
     return harm_data_types.get_harm_data_type(datatype_id=datatype_id)
 
 
-@router.post("/")
+@router.post("/", operation_id="datatype-create")
 def insert_harm_data_type(auth: api_token_annotation,
                           new_harm_data_type: HARM_Data_Type) -> HARM_Data_Type:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
@@ -57,7 +57,7 @@ def insert_harm_data_type(auth: api_token_annotation,
 #     return harm_data_types.update_harm_data_type(update_harm_data_type=update_harm_data_type)
 
 
-@router.delete("/{datatype_id}", include_in_schema=False)
+@router.delete("/{datatype_id}", include_in_schema=False, operation_id="datatype-delete")
 def delete_harm_data_record(auth: api_token_annotation,
                             datatype_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}({datatype_id})")

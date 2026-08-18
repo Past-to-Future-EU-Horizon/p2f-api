@@ -17,7 +17,7 @@ router = APIRouter(prefix="/harm-data-species", tags=["HARM Species"])
 
 
 # List
-@router.get("/")
+@router.get("/", operation_id="species-list")
 def list_harm_metadata_species(
     auth: api_token_annotation,
     tax_domain: Optional[str] = None,
@@ -61,7 +61,7 @@ def list_harm_metadata_species(
 
 
 # Get Single
-@router.get("/{species_id}")
+@router.get("/{species_id}", operation_id="species-get")
 def get_harm_metadata_species(auth: api_token_annotation,
                               species_id: UUID):
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
@@ -71,7 +71,7 @@ def get_harm_metadata_species(auth: api_token_annotation,
 
 
 # Create
-@router.post("/")
+@router.post("/", operation_id="species-create")
 def create_harm_metadata_species(auth: api_token_annotation,
                                  new_species: HARM_Species) -> HARM_Species:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
@@ -85,14 +85,14 @@ def create_harm_metadata_species(auth: api_token_annotation,
 
 
 # Delete
-@router.delete("/{species_id}", include_in_schema=False)
+@router.delete("/{species_id}", include_in_schema=False, operation_id="species-delete")
 def delete_harm_species(auth: api_token_annotation,
                         species_id: UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_species.delete_harm_species(species_id)
 
 
-@router.post("/assign")
+@router.post("/assign", operation_id="species_recordhash-assign")
 def assign_species_to_record_hash(auth: api_token_annotation,
                                   species_id: UUID, 
                                   record_hash: str):
@@ -102,7 +102,7 @@ def assign_species_to_record_hash(auth: api_token_annotation,
     )
 
 
-@router.delete("/remove")
+@router.delete("/remove", operation_id="species_recordhash-remove")
 def remove_species_to_record_assignment(auth: api_token_annotation,
                                         species_id: UUID, 
                                         record_hash: str):

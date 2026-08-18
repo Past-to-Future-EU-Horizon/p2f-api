@@ -17,7 +17,7 @@ router = APIRouter(prefix="/git", tags=["Git"])
 
 
 # List
-@router.get("/")
+@router.get("/", operation_id="git-list")
 def list_git_repositories(
     auth: api_token_annotation,
     dataset_id: Optional[uuid.UUID] = None,
@@ -27,7 +27,7 @@ def list_git_repositories(
 
 
 # Get Single
-@router.get("/{git_repo_id}")
+@router.get("/{git_repo_id}", operation_id="git-get")
 def get_git_repo(auth: api_token_annotation,
                  git_repo_id: Optional[uuid.UUID] = None) -> Git_Repository:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
@@ -35,7 +35,7 @@ def get_git_repo(auth: api_token_annotation,
 
 
 # Create
-@router.post("/")
+@router.post("/", operation_id="git-create")
 def create_git_repo(
     auth: api_token_annotation,
     new_git_repo: Git_Repository, dataset_id: Optional[uuid.UUID] = None
@@ -45,7 +45,7 @@ def create_git_repo(
 
 
 # Delete
-@router.delete("/{git_repo_id}", include_in_schema=False)
+@router.delete("/{git_repo_id}", include_in_schema=False, operation_id="git-delete")
 def delete_git_repo(auth: api_token_annotation,
                     git_repo_id: Optional[uuid.UUID] = None) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
@@ -53,7 +53,7 @@ def delete_git_repo(auth: api_token_annotation,
 
 
 # Assign
-@router.post("/assign")
+@router.post("/assign", operation_id="git_dataset-assign")
 def assign_git_repo(auth: api_token_annotation,
                     git_repo_id: uuid.UUID, dataset_id: uuid.UUID):
     logger.debug(f"{fa.web}{fa.assign} {__name__} {stack()[0][3]}()")
@@ -61,7 +61,7 @@ def assign_git_repo(auth: api_token_annotation,
 
 
 # Remove
-@router.delete("/remove")
+@router.delete("/remove", operation_id="git_dataset-remove")
 def unlink_git_repo(auth: api_token_annotation,
                     git_repo_id: uuid.UUID, dataset_id: uuid.UUID):
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")

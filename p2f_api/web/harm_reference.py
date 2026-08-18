@@ -17,14 +17,14 @@ router = APIRouter(prefix="/harm-reference", tags=["HARM Reference"])
 
 
 # List
-@router.get("/")
+@router.get("/", operation_id="reference-list")
 def list_references(auth: api_token_annotation) -> List[HARM_Reference]:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     return harm_reference.list_references()
 
 
 # Get Single
-@router.get("/{reference_id}")
+@router.get("/{reference_id}", operation_id="reference-get")
 def get_reference(
     auth: api_token_annotation,
     doi: Optional[str] = None,
@@ -35,7 +35,7 @@ def get_reference(
 
 
 # Create
-@router.post("/")
+@router.post("/", operation_id="reference-create")
 def create_reference(
     auth: api_token_annotation,
     new_reference: HARM_Reference) -> HARM_Reference:
@@ -45,7 +45,7 @@ def create_reference(
 
 
 # Delete
-@router.delete("/{reference_id}", include_in_schema=False)
+@router.delete("/{reference_id}", include_in_schema=False, operation_id="reference-delete")
 def delete_reference(auth: api_token_annotation,
                      reference_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
@@ -53,6 +53,7 @@ def delete_reference(auth: api_token_annotation,
 
 
 # Assign
+#@router.post(, operation_id="reference_recordhash-assign")
 def assign_reference(auth: api_token_annotation,
                      reference_id: uuid.UUID,
                      record_hash: str) -> None:
@@ -64,6 +65,7 @@ def assign_reference(auth: api_token_annotation,
 
 
 # Remove
+#@router.delete(, operation_id="reference_recordhash-remove")
 def remove_reference(auth: api_token_annotation,
                      reference_id: uuid.UUID,
                      record_hash: str) -> None:

@@ -18,7 +18,7 @@ router = APIRouter(prefix="/datasets", tags=["Datasets"])
 
 
 # List
-@router.get("/")
+@router.get("/", operation_id="datasets-list")
 def list_datasets(
     auth: api_token_annotation,
     is_new_p2f: Optional[bool] = None,
@@ -33,7 +33,7 @@ def list_datasets(
 
 
 # Get Single
-@router.get("/{dataset_id}")
+@router.get("/{dataset_id}", operation_id="dataset-get")
 def get_dataset(auth: api_token_annotation,
                 dataset_id: uuid.UUID) -> Datasets:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
@@ -41,7 +41,7 @@ def get_dataset(auth: api_token_annotation,
 
 
 # Create
-@router.post("/")
+@router.post("/", operation_id="dataset-create")
 def create_dataset(auth: api_token_annotation,
                    dataset: Datasets) -> Datasets:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
@@ -49,7 +49,7 @@ def create_dataset(auth: api_token_annotation,
 
 
 # Update
-@router.put("/", include_in_schema=False)
+@router.put("/", include_in_schema=False, operation_id="dataset-update")
 def update_dataset(auth: api_token_annotation,
                    dataset_updates: Datasets) -> Datasets:
     logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
@@ -57,7 +57,7 @@ def update_dataset(auth: api_token_annotation,
 
 
 # Delete
-@router.delete("/{dataset_id}", include_in_schema=False)
+@router.delete("/{dataset_id}", include_in_schema=False, operation_id="dataset-delete")
 def delete_dataset(auth: api_token_annotation,
                    dataset_id: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")

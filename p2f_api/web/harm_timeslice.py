@@ -15,7 +15,7 @@ from inspect import stack
 router = APIRouter(prefix="/harm-timeslice", tags=["HARM Timeslice"])
 
 
-@router.get("/")
+@router.get("/", operation_id="timeslices-list")
 def list_harm_timeslices(
     auth: api_token_annotation,
     named_time_period: Optional[str] = None,
@@ -30,7 +30,7 @@ def list_harm_timeslices(
     )
 
 
-@router.get("/")
+@router.get("/", operation_id="timeslice-get")
 def get_harm_timeslice(
     auth: api_token_annotation,
     timeslice_id: uuid.UUID,
@@ -39,28 +39,28 @@ def get_harm_timeslice(
     return harm_timeslice.get_harm_timeslice(timeslice_id=timeslice_id)
 
 
-@router.post("/")
+@router.post("/", operation_id="timeslice-create")
 def create_new_timeslice(auth: api_token_annotation,
                          new_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_timeslice.create_new_timeslice(new_harm_timeslice=new_harm_timeslice)
 
 
-@router.put("/", include_in_schema=False)
+@router.put("/", include_in_schema=False, operation_id="timeslice-update")
 def update_timeslice(auth: api_token_annotation,
                      update_harm_timeslice: HARM_Timeslice) -> HARM_Timeslice:
     logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
     return harm_timeslice.update_timeslice(update_harm_timeslice=update_harm_timeslice)
 
 
-@router.delete("/{timeslice_id}", include_in_schema=False)
+@router.delete("/{timeslice_id}", include_in_schema=False, operation_id="timeslice-delete")
 def delete_timeslice(auth: api_token_annotation,
                      timeslice_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_timeslice.delete_timeslice(timeslice_id=timeslice_id)
 
 
-@router.post("/assign")
+@router.post("/assign", operation_id="timeslice_recordhash-assign")
 def assign_timeslice(auth: api_token_annotation,
                      timeslice_id: uuid.UUID, record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
@@ -69,7 +69,7 @@ def assign_timeslice(auth: api_token_annotation,
     )
 
 
-@router.delete("/remove")
+@router.delete("/remove", operation_id="timeslice_recordhash-remove")
 def remove_timeslice(auth: api_token_annotation,
                      timeslice_id: uuid.UUID, record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")

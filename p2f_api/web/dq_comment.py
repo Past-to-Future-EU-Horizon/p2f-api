@@ -14,27 +14,27 @@ from inspect import stack
 router = APIRouter(prefix="/dq-comment", tags=["Data Quality Comment"])
 
 
-@router.get("/{dataset_id}")
+@router.get("/{dataset_id}", operation_id="comment-list")
 def list_dq_comments(auth: api_token_annotation,
                      dataset_id: uuid.UUID) -> List[DQ_Comment]:
     return dq_comment.list_dq_comments(dataset_id=dataset_id)
 
 
-@router.post("/")
+@router.post("/", operation_id="comment-create")
 def create_dq_comment(auth: api_token_annotation,
                       new_comment: DQ_Comment) -> List[DQ_Comment]:
     # TODO check for email in new comment is authorized with provided token
     return dq_comment.create_dq_comment(new_comment=new_comment)
 
 
-@router.put("/")
+@router.put("/", operation_id="comment-update")
 def update_dq_comment(auth: api_token_annotation,
                       update_comment: DQ_Comment) -> List[DQ_Comment]:
     # TODO check for email in updating comment is authorized with provided token
     return dq_comment.update_dq_comment(update_comment=update_comment)
 
 
-@router.delete("/{comment_id}")
+@router.delete("/{comment_id}", operation_id="comment-delete")
 def delete_dq_comment(auth: api_token_annotation,
                       comment_id: uuid.UUID):
     return delete_dq_comment(comment_id=comment_id)

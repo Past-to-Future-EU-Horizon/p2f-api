@@ -13,7 +13,7 @@ from inspect import stack
 
 router = APIRouter(prefix="/harm-data-age", tags=["HARM Age"])
 
-@router.get("/")
+@router.get("/", operation_id="age-list")
 def list_harm_ages(
     auth: api_token_annotation,
     recent_year_search: Optional[int] = None,
@@ -26,28 +26,28 @@ def list_harm_ages(
     )
 
 
-@router.get("/{record_hash}")
+@router.get("/{record_hash}", operation_id="age-get")
 def get_harm_age(auth: api_token_annotation,
                  record_hash: Optional[str] = None) -> HARM_Rec_Age:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_age.get_harm_age(record_hash=record_hash)
 
 
-@router.post("/")
+@router.post("/", operation_id="age-create")
 def create_new_HARM_Data_Age(auth: api_token_annotation,
                              new_harm_age: HARM_Rec_Age) -> HARM_Rec_Age:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_age.create_new_harm_data_age(new_harm_age=new_harm_age)
 
 
-@router.put("/", include_in_schema=False)
+@router.put("/", include_in_schema=False, operation_id="age-update")
 def update_age(auth: api_token_annotation,
                update_harm_age: HARM_Rec_Age) -> HARM_Rec_Age:
     logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
     return harm_age.update_age(update_harm_age=update_harm_age)
 
 
-@router.delete("/{record_hash}", include_in_schema=False)
+@router.delete("/{record_hash}", include_in_schema=False, operation_id="age-delete")
 def delete_age(auth: api_token_annotation,
                record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")

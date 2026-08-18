@@ -16,21 +16,21 @@ from inspect import stack
 router = APIRouter(prefix="/data-frequency", tags=["Dataset Frequency"])
 
 # Get
-@router.get("/{dataset_id}")
+@router.get("/{dataset_id}", operation_id="datafrequency-get")
 def get_ds_freq(auth: api_token_annotation,
                 dataset_id: uuid.UUID) -> HARM_DS_Frequency:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_ds_freq.get_ds_freq(dataset_id=dataset_id)
 
 # Create
-@router.post("/")
+@router.post("/", operation_id="datafrequency-create")
 def create_ds_freq(auth: api_token_annotation,
                    new_frequency: HARM_DS_Frequency) -> HARM_DS_Frequency:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_ds_freq.create_ds_freq(new_frequency=new_frequency)
 
 # Delete
-@router.delete("/{dataset_id}")
+@router.delete("/{dataset_id}", operation_id="datafrequency-delete")
 def delete_ds_freq(auth: api_token_annotation,
                    dataset_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")

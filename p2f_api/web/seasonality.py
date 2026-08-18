@@ -17,20 +17,20 @@ router_ds = APIRouter(prefix="/seasonality", tags=["Seasonality"])
 router_rec = APIRouter(prefix="/season", tags=["Season"])
 
 # Get
-@router_ds.get("/{dataset_id}")
+@router_ds.get("/{dataset_id}", operation_id="seasonality-get")
 def get_seasonality_ds(auth: api_token_annotation,
                        dataset_id: uuid.UUID) -> Seasonality_DS:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return season_svc.get_seasonality_ds(dataset_id=dataset_id)
 
-@router_rec.get("/{record_hash}")
+@router_rec.get("/{record_hash}", operation_id="season-get")
 def get_season_rec(auth: api_token_annotation,
                    record_hash: str) -> Season:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return season_svc.get_season_rec(record_hash=record_hash)
 
 # Create
-@router_ds.post("/{dataset_id}")
+@router_ds.post("/{dataset_id}", operation_id="seasonality-create")
 def add_seasonality_ds(auth: api_token_annotation,
                        dataset_id: uuid.UUID,
                        seasonality: str) -> Seasonality_DS:
@@ -38,7 +38,7 @@ def add_seasonality_ds(auth: api_token_annotation,
     return season_svc.add_seasonality_ds(dataset_id=dataset_id,
                                           seasonality=seasonality)
     
-@router_rec.post("/{record_hash}")
+@router_rec.post("/{record_hash}", operation_id="season-create")
 def add_season_rec(auth: api_token_annotation,
                    record_hash: str, 
                    season: str) -> Season:
@@ -46,13 +46,13 @@ def add_season_rec(auth: api_token_annotation,
     return season_svc.add_season_rec(record_hash=record_hash,
                                      season=season)
 # Delete
-@router_ds.delete("/{dataset_id}")
+@router_ds.delete("/{dataset_id}", operation_id="seasonality-delete")
 def delete_seasonality_ds(auth: api_token_annotation,
                           dataset_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return season_svc.delete_seasonality_ds(dataset_id=dataset_id)
 
-@router_rec.delete("/{record_hash}")
+@router_rec.delete("/{record_hash}", operation_id="season-delete")
 def delete_season_rec(auth: api_token_annotation,
                       record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")

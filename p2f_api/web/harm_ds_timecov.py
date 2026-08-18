@@ -16,21 +16,21 @@ from inspect import stack
 router = APIRouter(prefix="/time-coverage", tags=["Time Coverage"])
 
 # Get
-@router.get("/{dataset_id}")
+@router.get("/{dataset_id}", operation_id="timecoverage-get")
 def get_ds_timecov(auth: api_token_annotation,
                    dataset_id: uuid.UUID) -> HARM_DS_TimeCoverage:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_ds_timecov.get_ds_timecov(dataset_id=dataset_id)
 
 # Create
-@router.post("/")
+@router.post("/", operation_id="timecoverage-create")
 def create_ds_timecov(auth: api_token_annotation,
                       new_timecov: HARM_DS_TimeCoverage) -> HARM_DS_TimeCoverage:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_ds_timecov.create_ds_timecov(new_timecov=new_timecov)
 
 # Delete
-@router.delete("/{dataset_id}")
+@router.delete("/{dataset_id}", operation_id="timecoverage-delete")
 def delete_ds_timecov(auth: api_token_annotation,
                       dataset_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")

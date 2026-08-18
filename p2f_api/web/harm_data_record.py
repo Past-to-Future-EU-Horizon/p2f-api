@@ -17,7 +17,7 @@ router = APIRouter(prefix="/harm-data-records", tags=["HARM Data Records"])
 
 
 # List
-@router.get("/")
+@router.get("/", operation_id="record-list")
 def list_harm_data_records(
     auth: api_token_annotation,
     dataset: Optional[str] = None,
@@ -28,7 +28,7 @@ def list_harm_data_records(
 
 
 # Get Single
-@router.get("/{record_hash}")
+@router.get("/{record_hash}", operation_id="record-get")
 def get_harm_data_record(auth: api_token_annotation,
                          record_hash: str) -> HARM_Data_Record:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
@@ -36,7 +36,7 @@ def get_harm_data_record(auth: api_token_annotation,
 
 
 # Create
-@router.post("/")
+@router.post("/", operation_id="record-create")
 def create_dataset(auth: api_token_annotation,
                    new_data_record: HARM_Data_Record) -> HARM_Data_Record:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
@@ -55,7 +55,7 @@ def create_dataset(auth: api_token_annotation,
 
 
 # Delete
-@router.delete("/{record_hash}", include_in_schema=False)
+@router.delete("/{record_hash}", include_in_schema=False, operation_id="record-delete")
 def delete_dataset(auth: api_token_annotation,
                    record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
