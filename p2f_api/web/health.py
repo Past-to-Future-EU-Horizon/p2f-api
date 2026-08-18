@@ -7,7 +7,6 @@ from fastapi.responses import JSONResponse
 
 # Batteries included libraries
 from inspect import stack
-from pprint import pprint
 
 router = APIRouter(prefix="/health-check", include_in_schema=False)
 
