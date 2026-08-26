@@ -1,6 +1,6 @@
 from p2f_api.apilogs import logger, fa
 from ..service import temp_accounts
-from p2f_pydantic.temp_accounts import Temp_Account
+from p2f_pydantic.temp_accounts import Temp_Account, Authorization_Check
 from p2f_pydantic.generic import Message
 
 # Third Party Libraries
@@ -36,6 +36,15 @@ def request_token(request_token: Temp_Account,
     # msg = Message(message=msg)
     return JSONResponse(content={"status": msg})
 
+@router.post("/data-upload-check", 
+             operation_id="data-upload-check",
+             include_in_schema=False)
+def data_upload_check(request: Request, 
+                      auth: Temp_Account) -> Authorization_Check:
+    result = combined_auth(request=request,
+                           token=auth.token,
+                           email=auth.email)
+    return Authorization_Check(authorized=result)
 
 def authentication(email: str, token: str) -> bool:
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
@@ -46,7 +55,6 @@ def authentication(email: str, token: str) -> bool:
         raise HTTPException(status_code=401, detail="Unauthorized: Token expired")
     elif token_match == "Authorized":
         return True
-
 
 def authorization(
     endpoint: str,
