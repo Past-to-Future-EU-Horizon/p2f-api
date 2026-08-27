@@ -280,6 +280,7 @@ def evaluate_token(
         stmt = select(temp_tokens)
         stmt = stmt.where(temp_tokens.email_address == email)
         stmt = stmt.where(temp_tokens.token == token)
+        stmt = stmt.order_by(temp_tokens.expiration.desc)
         result = session.execute(stmt).first()
     if result is None:
         return "NotFound"
