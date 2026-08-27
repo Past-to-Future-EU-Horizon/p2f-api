@@ -22,6 +22,7 @@ def list_harm_data_types(
     unit_of_measure: Optional[str] = None,
     method: Optional[str] = None,
     dataset_id: Optional[uuid.UUID] = None,
+    is_proxy: Optional[bool] = None
 ) -> List[HARM_Data_Type]:
     logger.debug(
         f"{fa.web}{fa.list} {__name__} {stack()[0][3]}({measure}, {unit_of_measure}, {method}, {dataset_id})"
@@ -31,6 +32,7 @@ def list_harm_data_types(
         unit_of_measure=unit_of_measure,
         method=method,
         dataset_id=dataset_id,
+        is_proxy=is_proxy
     )
 
 

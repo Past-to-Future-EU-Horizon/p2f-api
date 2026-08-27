@@ -54,6 +54,7 @@ def list_harm_data_types(
     unit_of_measure: Optional[str] = None,
     method: Optional[str] = None,
     dataset_id: Optional[UUID] = None,
+    is_proxy: Optional[bool] = None,
 ) -> List[HARM_Data_Type]:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
@@ -68,6 +69,9 @@ def list_harm_data_types(
         if method is not None:
             logger.debug("•• method is not none")
             stmt = stmt.where(harm_data_type.method == method)
+        if is_proxy is not None:
+            logger.debug("•• is_proxy is not none")
+            stmt = stmt.where(harm_data_type.is_proxy == is_proxy)
         results = session.execute(stmt).all()
     logger.debug(f"• Found {len(results)} results")
     results = [HARM_Data_Type(**x[0].__dict__) for x in results]
