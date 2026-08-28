@@ -64,3 +64,18 @@ def delete_harm_data_record(auth: api_token_annotation,
                             datatype_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}({datatype_id})")
     return harm_data_types.delete_harm_data_type(datatype_id=datatype_id)
+
+
+@router.post("/{datatype_id}/assign/{dataset_id}", operation_id="datatype-assign")
+def assign_datatype_to_dataset(datatype_id: uuid.UUID,
+                               dataset_id: uuid.UUID) -> None:
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}({datatype_id})")
+    return harm_data_types.assign_datatype_to_dataset(datatype_id=datatype_id,
+                                                      dataset_id=dataset_id)
+
+@router.delete("/{datatype_id}/remove/{dataset_id}", operation_id="datatype-remove")
+def remove_datatype_remove_dataset(datatype_id: uuid.UUID,
+                                   dataset_id: uuid.UUID) -> None:
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}({datatype_id})")
+    return harm_data_types.remove_datatype_from_dataset(datatype_id=datatype_id,
+                                                        dataset_id=dataset_id)

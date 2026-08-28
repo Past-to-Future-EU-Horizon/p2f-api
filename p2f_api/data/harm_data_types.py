@@ -1,6 +1,7 @@
 from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
 from .db_connection import engine
+from datasets import datasets
 
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -9,6 +10,7 @@ from sqlalchemy import Boolean
 from sqlalchemy import Uuid
 from sqlalchemy import DateTime
 from sqlalchemy import func
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 # Batteries included libraries
@@ -36,6 +38,16 @@ class harm_data_type(baseSQL):
     )
     update_timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now(), onupdate=func.now()
+    )
+
+class datatype_to_dataset(baseSQL):
+    __tablename__ = "p2f_datatype_dataset"
+    pk_datatype_dataset: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    fk_datatype_id: Mapped[UUID] = mapped_column(
+        ForeignKey(f"{harm_data_type.__tablename__}.datatype_id")
+    )
+    fk_dataset_id: Mapped[UUID] = mapped_column(
+        ForeignKey(f"{datasets.__tablename__}.dataset_id")
     )
 
 baseSQL.metadata.create_all(engine)

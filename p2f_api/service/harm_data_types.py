@@ -3,7 +3,7 @@ from p2f_api.apilogs import logger, fa
 from ..service.harm_numerical import list_numerics
 from ..service.harm_data_record import list_harm_data_record
 from ..data.db_connection import engine
-from ..data.harm_data_types import harm_data_type
+from ..data.harm_data_types import harm_data_type, datatype_to_dataset
 from ..data import harm_data_numerical
 from p2f_pydantic.harm_data_types import HARM_Data_Type
 
@@ -153,3 +153,26 @@ def delete_harm_data_type(datatype_id: UUID) -> None:
         execute = session.execute(stmt)
         commit = session.commit()
     return None
+
+
+def assign_datatype_to_dataset(datatype_id: UUID,
+                               dataset_id: UUID) -> None:
+    logger.debug(f"{fa.service}{fa.delete} {__name__}  {stack()[0][3]}()")
+    with Session(engine) as session:
+        stmt = insert(datatype_to_dataset)
+        stmt = stmt.values(
+            fk_datatype_id=datatype_id,
+            fk_dataset_id=dataset_id
+        )
+        execute = session.execute(stmt)
+        commit = session.commit()
+
+def remove_datatype_from_dataset(datatype_id: UUID,
+                               dataset_id: UUID) -> None:
+    logger.debug(f"{fa.service}{fa.delete} {__name__}  {stack()[0][3]}()")
+    with Session(engine) as session:
+        stmt = delete(datatype_to_dataset)
+        stmt = stmt.where(datatype_to_dataset.fk_dataset_id==dataset_id)
+        stmt = stmt.where(datatype_to_dataset.fk_datatype_id==datatype_id)
+        execute = session.execute(stmt)
+        commit = session.commit()
