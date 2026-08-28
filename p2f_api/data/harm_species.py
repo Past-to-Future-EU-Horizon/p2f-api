@@ -76,7 +76,7 @@ class harm_species_to_ds(baseSQL):
     fk_species_id: Mapped[UUID] = mapped_column(
         ForeignKey(f"{harm_species.__tablename__}.species_id")
     )
-    fk_data_record: Mapped[str] = mapped_column(
+    fk_data_record: Mapped[UUID] = mapped_column(
         ForeignKey(f"{datasets.__tablename__}.dataset_id")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
