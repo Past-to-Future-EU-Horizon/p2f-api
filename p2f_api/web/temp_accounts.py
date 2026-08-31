@@ -81,20 +81,18 @@ def combined_auth(request: Request,
     logger.debug(f"Operation: {operation}")
     path_furl = furl(request.url)
     logger.debug(f"path_furl: {path_furl}")
-    endpoint = path_furl.path.segments[0]
-    logger.debug(f"endpoint: {endpoint}")
+    # endpoint = path_furl.path.segments[0]
+    # logger.debug(f"endpoint: {endpoint}")
     # Generally we will allow GET operations, if an operation is allowed by public 
     #    return true
     if email is None:
         logger.debug("Auth is None path taken")
-        return authorization(endpoint=endpoint, 
-                             operation=operation)
+        return authorization(operation=operation)
     else:
         logger.debug("Authentication and authorization paths taken")
         a1 = authentication(email=email, token=token)
-        a2 = authorization(endpoint=endpoint, 
-                        email=email,
-                        operation=operation)
+        a2 = authorization(email=email,
+                           operation=operation)
         logger.debug(f"Authentication: {a1} -- Authorization: {a2}")
         if a1 == False:
             raise HTTPException(401, "Unauthenticated")
