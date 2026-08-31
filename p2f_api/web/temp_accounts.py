@@ -78,6 +78,7 @@ def combined_auth(request: Request,
                   email: str = api_email):
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
     operation = request.scope["fastapi"]["effective_route_context"].operation_id
+    operation_safe = operation.replace("-", "_")
     logger.debug(f"Operation: {operation}")
     path_furl = furl(request.url)
     logger.debug(f"path_furl: {path_furl}")
@@ -87,12 +88,12 @@ def combined_auth(request: Request,
     #    return true
     if email is None:
         logger.debug("Auth is None path taken")
-        return authorization(operation=operation)
+        return authorization(operation=operation_safe)
     else:
         logger.debug("Authentication and authorization paths taken")
         a1 = authentication(email=email, token=token)
         a2 = authorization(email=email,
-                           operation=operation)
+                           operation=operation_safe)
         logger.debug(f"Authentication: {a1} -- Authorization: {a2}")
         if a1 == False:
             raise HTTPException(401, "Unauthenticated")
