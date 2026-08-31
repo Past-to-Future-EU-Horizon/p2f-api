@@ -343,8 +343,10 @@ def is_action_authorized(
             permissions = Account_Permissions.model_validate_json(result[0])
             # logger.debug(permissions)
             # Dump as dictionary
+            logger.debug(dir(permissions))
             permissions = permissions.model_dump(exclude_unset=True)
-            # logger.debug(permissions)
+            logger.debug(permissions)
+            logger.debug(permissions.keys())
             return permissions[operation]
         else:
             return False
