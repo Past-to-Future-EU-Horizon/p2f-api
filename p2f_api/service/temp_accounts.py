@@ -298,17 +298,23 @@ def insert_permitted_address(
     ):
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
+        logger.debug("• Deleting prior email address records")
         del_stmt = delete(permitted_addresses).where(permitted_addresses == email)
+        logger.debug(f"•• Delete statement: {del_stmt}")
         execute_del_stmt = session.execute(del_stmt)
+        logger.debug("•• Delete statement executed")
         commit_del_stmt = session.commit()
+        logger.debug("•• Delete statement committed")
         stmt = insert(permitted_addresses)
         stmt = stmt.values(
             email_address=email,
-            permissions=permissions.model_dump_json(exclude_unset=True),
+            permissions=permissions.model_dump_json(),
             timezone=timezone,
         )
+        logger.debug(f"• Insert new statement: {stmt}")
         execute = session.execute(stmt)
         commit = session.commit()
+        logger.debug("•• statement executed and committed")
 
 
 def is_permitted_address(email: EmailStr) -> bool:
@@ -338,26 +344,29 @@ def is_action_authorized(
             #     You get a string representation of the json back from the ORM
             #     Therefore you need to load the string as a json.loads
             #     Now you have a dictionary
-            # logger.debug(result[0])
+            logger.debug(result[0])
             # Load json str to model
             permissions = Account_Permissions.model_validate_json(result[0])
             # logger.debug(permissions)
             # Dump as dictionary
-            logger.debug(dir(permissions))
-            permissions = permissions.model_dump(exclude_unset=True)
+            # logger.debug(dir(permissions))
+            permissions = permissions.model_dump()
             logger.debug(permissions)
             logger.debug(permissions.keys())
             return permissions[operation]
         else:
             return False
     else: 
-        return public_view.model_dump(exclude_unset=True)[operation]
+        return public_view.model_dump()[operation]
 
 def api_init():
+    logger.debug("Startup insert P2F ADMIN EMAIL ADDRESS with Super User permissions")
     insert_permitted_address(email=P2F_ADMIN_EMAIL_ADDRESS,
                             permissions=super_user)
+    logger.debug("Startup insert P2F PORTAL EMAIL ADDRESS with Public View permissions")
     insert_permitted_address(email=P2F_PORTAL_EMAIL_ADDRESS, 
                             permissions=public_view)
+    logger.debug("Startup insert P2F PORTAL TOKEN to token store")
     insert_token_record(email=P2F_PORTAL_EMAIL_ADDRESS, 
                         generated_token=P2F_PORTAL_TOKEN, 
                         expiration=datetime(2026, 9, 30, 23, 59, 59))
