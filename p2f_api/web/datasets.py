@@ -18,7 +18,7 @@ router = APIRouter(prefix="/datasets", tags=["Datasets"])
 
 
 # List
-@router.get("/", operation_id="datasets-list")
+@router.get("/", operation_id="dataset-list")
 def list_datasets(
     auth: api_token_annotation,
     is_new_p2f: Optional[bool] = None,

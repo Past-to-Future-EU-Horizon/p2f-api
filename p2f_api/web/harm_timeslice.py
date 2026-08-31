@@ -15,7 +15,7 @@ from inspect import stack
 router = APIRouter(prefix="/harm-timeslice", tags=["HARM Timeslice"])
 
 
-@router.get("/", operation_id="timeslices-list")
+@router.get("/", operation_id="timeslice-list")
 def list_harm_timeslices(
     auth: api_token_annotation,
     named_time_period: Optional[str] = None,

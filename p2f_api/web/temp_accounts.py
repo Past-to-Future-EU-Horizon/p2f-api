@@ -65,12 +65,11 @@ def authentication(email: str, token: str) -> bool:
         return True
 
 def authorization(
-    endpoint: str,
-    operation: Literal["get", "post", "put", "delete"],
+    operation: str,
     email: Optional[str]=None,
 ) -> bool:
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
-    result = temp_accounts.is_action_authorized(email=email, endpoint=endpoint, operation=operation)
+    result = temp_accounts.is_action_authorized(email=email, operation=operation)
     logger.debug(f"AUTHORIZATION RESULT: {result}")
     return result
 
@@ -78,7 +77,7 @@ def combined_auth(request: Request,
                   token: str = Security(api_token), 
                   email: str = api_email):
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
-    operation = request.method.lower()
+    operation = request.scope["fastapi"]["effective_route_context"].operation_id
     logger.debug(f"Operation: {operation}")
     path_furl = furl(request.url)
     logger.debug(f"path_furl: {path_furl}")

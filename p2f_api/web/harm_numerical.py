@@ -23,7 +23,7 @@ Harm_numerical_union = Union[
 
 
 # List
-@router.get("/", operation_id="numerical-list")
+@router.get("/", operation_id="numeric-list")
 def list_harm_numerical(
     auth: api_token_annotation,
     record_hash: Optional[str] = None,

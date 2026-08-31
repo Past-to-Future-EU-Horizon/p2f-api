@@ -300,6 +300,7 @@ def insert_permitted_address(
     with Session(engine) as session:
         del_stmt = delete(permitted_addresses).where(permitted_addresses == email)
         execute_del_stmt = session.execute(del_stmt)
+        commit_del_stmt = session.commit()
         stmt = insert(permitted_addresses)
         stmt = stmt.values(
             email_address=email,
@@ -323,13 +324,10 @@ def is_permitted_address(email: EmailStr) -> bool:
 
 
 def is_action_authorized(
-    endpoint: str,
-    operation: Literal["get", "post", "put", "delete"],
+    operation: str,
     email: Optional[EmailStr]=None,
 ) -> bool:
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
-    endpoint = endpoint.replace("-", "_")
-    logger.debug(f"New endpoint value: {endpoint}")
     if email is not None:
         with Session(engine) as session:
             stmt = select(permitted_addresses.permissions)
@@ -347,11 +345,11 @@ def is_action_authorized(
             # Dump as dictionary
             permissions = permissions.model_dump(exclude_unset=True)
             # logger.debug(permissions)
-            return permissions[endpoint][operation]
+            return permissions[operation]
         else:
             return False
     else: 
-        return public_view.model_dump(exclude_unset=True)[endpoint][operation]
+        return public_view.model_dump(exclude_unset=True)[operation]
 
 def api_init():
     insert_permitted_address(email=P2F_ADMIN_EMAIL_ADDRESS,
