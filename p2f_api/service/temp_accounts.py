@@ -297,21 +297,22 @@ def insert_permitted_address(
     timezone: str = "Europe/Amsterdam",
     ):
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
+    # logger.debug(f"Email: {email}\nPermissions: {permissions}\nTimezone: {timezone}")
     with Session(engine) as session:
         logger.debug("• Deleting prior email address records")
-        del_stmt = delete(permitted_addresses).where(permitted_addresses == email)
-        logger.debug(f"•• Delete statement: {del_stmt}")
+        del_stmt = delete(permitted_addresses).where(permitted_addresses.email_address == email)
+        # logger.debug(f"•• Delete statement: {del_stmt}")
         execute_del_stmt = session.execute(del_stmt)
-        logger.debug("•• Delete statement executed")
+        # logger.debug("•• Delete statement executed")
         commit_del_stmt = session.commit()
-        logger.debug("•• Delete statement committed")
+        # logger.debug("•• Delete statement committed")
         stmt = insert(permitted_addresses)
         stmt = stmt.values(
             email_address=email,
             permissions=permissions.model_dump_json(),
             timezone=timezone,
         )
-        logger.debug(f"• Insert new statement: {stmt}")
+        logger.debug("• Insert new statement running")
         execute = session.execute(stmt)
         commit = session.commit()
         logger.debug("•• statement executed and committed")
