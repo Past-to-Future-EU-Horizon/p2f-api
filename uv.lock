@@ -1400,7 +1400,7 @@ wheels = [
 
 [[package]]
 name = "p2f-api"
-version = "0.0.116"
+version = "0.0.117"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
@@ -1443,15 +1443,15 @@ requires-dist = [
 
 [[package]]
 name = "p2f-pydantic"
-version = "0.0.25"
+version = "0.0.26"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic", extra = ["email"] },
     { name = "python-dotenv" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7b/7e/37a1f1b2c0a0d80ec365f0ab67a61d230c05005742a5042f89b9dc511bd7/p2f_pydantic-0.0.25.tar.gz", hash = "sha256:591b49c32140be6d99a0483cc3bb78e5fac876b06648183802432c9098ebca01", size = 5629, upload-time = "2026-09-07T09:44:59.425Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/14/7d/2e9628d29d67d409a9c15d92a65aed0c2dfd0e880b8f2122e8353af37db7/p2f_pydantic-0.0.26.tar.gz", hash = "sha256:4f5a53812a626826bdf0e5d57dfdcf5302b6a9848f81dd3dc6e2de26c568b185", size = 5636, upload-time = "2026-09-07T11:02:51.011Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/df/5f/91532973372b45ae774ea4e1a063e235b69c776de5bf6e88e5dc3bb9d2b1/p2f_pydantic-0.0.25-py3-none-any.whl", hash = "sha256:8312fc9265a15126350e07f1327a5db849e4f90c0d234dbbda5c4fe204c93c5c", size = 10261, upload-time = "2026-09-07T09:44:58.339Z" },
+    { url = "https://files.pythonhosted.org/packages/85/0e/d89aaa4bccab6b40aa00140f9a7398c564532dd701bab1b8b7cdc8994b35/p2f_pydantic-0.0.26-py3-none-any.whl", hash = "sha256:55b3df8101e2b4907afd16c175bcd5279aa1a0d7180f8fec782805955e45479f", size = 10257, upload-time = "2026-09-07T11:02:49.857Z" },
 ]
 
 [[package]]
