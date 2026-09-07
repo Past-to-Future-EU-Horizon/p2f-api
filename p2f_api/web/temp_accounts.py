@@ -17,6 +17,8 @@ from furl import furl
 # Batteries included libraries
 from typing import Literal, Optional, Annotated
 from inspect import stack
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 router = APIRouter(prefix="/token", tags=["Basic Account"])
 
@@ -47,7 +49,8 @@ def data_upload_check(request: Request,
     result = combined_auth(request=request,
                            token=auth.token,
                            email=auth.email)
-    return Authorization_Check(authorized=result)
+    return Authorization_Check(authorized=result,
+                               authorization_time=datetime.now(tz=ZoneInfo("UTC")))
 
 def authentication(email: str, token: str) -> bool:
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
