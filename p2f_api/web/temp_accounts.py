@@ -29,6 +29,18 @@ api_email = Header(alias="x-p2f-email")
 @router.post("/request")
 def request_token(request_token: Temp_Account,
                   background_task: BackgroundTasks) -> JSONResponse:
+    """Endpoint to request a token for use with the Past 2 Future API.
+
+    This is a temporary endpoint that will be replaced with OIDC connections. 
+
+
+    Args:
+        request_token (Temp_Account): Your email address on file with the 
+                Past to Future project. 
+
+    Returns:
+        JSONResponse: Message
+    """
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     background_task.add_task(temp_accounts.token_request, request_token.email)
     # temp_accounts.token_request(request_token.email)

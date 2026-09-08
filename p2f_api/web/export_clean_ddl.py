@@ -14,6 +14,8 @@ router = APIRouter(prefix="/ddl", include_in_schema=False)
 
 @router.get("/", include_in_schema=False)
 def web_get_clean_ddl(request: Request) -> str:
+    """Generate a DDL export of the database for visualization
+    """
     logger.debug(f"{fa.background}{fa.get} {__name__} {stack()[0][3]}()")
     logger.debug(f"RECEIVED DDL REQUEST FROM {request.client.host}")
     # logger.debug(f"{request.headers.keys()}")

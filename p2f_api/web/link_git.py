@@ -22,6 +22,15 @@ def list_git_repositories(
     auth: api_token_annotation,
     dataset_id: Optional[uuid.UUID] = None,
 ) -> List[Git_Repository]:
+    """List the Git repositories, optionally associated with a dataset
+
+    Args:
+        auth (api_token_annotation): _description_
+        dataset_id (Optional[uuid.UUID], optional): Unique identifier of a dataset. Defaults to None.
+
+    Returns:
+        List[Git_Repository]: List of the p2f-pydantic Git_Repository objects
+    """
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     return link_git.list_git(dataset_id=dataset_id)
 
@@ -30,6 +39,15 @@ def list_git_repositories(
 @router.get("/{git_repo_id}", operation_id="git-get")
 def get_git_repo(auth: api_token_annotation,
                  git_repo_id: Optional[uuid.UUID] = None) -> Git_Repository:
+    """Get a single Git repository from the API
+
+    Args:
+        auth (api_token_annotation): _description_
+        git_repo_id (Optional[uuid.UUID], optional): p2f-pydantic Git_Repository object. Defaults to None.
+
+    Returns:
+        Git_Repository: p2f-pydantic Git_Repository object
+    """
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return link_git.get_git(git_repo_id=git_repo_id)
 
@@ -40,6 +58,17 @@ def create_git_repo(
     auth: api_token_annotation,
     new_git_repo: Git_Repository, dataset_id: Optional[uuid.UUID] = None
 ) -> Git_Repository:
+    """Create a new Git repository object, optionally directly associate with a 
+        dataset by including dataset_id.
+
+    Args:
+        auth (api_token_annotation): _description_
+        new_git_repo (Git_Repository): New p2f-pydantic Git Repository object
+        dataset_id (Optional[uuid.UUID], optional): Unique identifier of a. Defaults to None.
+
+    Returns:
+        Git_Repository: Processed p2f-pydantic Git_Repository object processed by API
+    """
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return link_git.create_git_repo(new_git_repo, dataset_id)
 
@@ -48,6 +77,12 @@ def create_git_repo(
 @router.delete("/{git_repo_id}", include_in_schema=False, operation_id="git-delete")
 def delete_git_repo(auth: api_token_annotation,
                     git_repo_id: Optional[uuid.UUID] = None) -> None:
+    """Remove a git repository from the API
+
+    Args:
+        auth (api_token_annotation): _description_
+        git_repo_id (Optional[uuid.UUID], optional): Unique identifier of the git repository. Defaults to None.
+    """
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return link_git.delete_git_repo(git_repo_id)
 
@@ -56,6 +91,13 @@ def delete_git_repo(auth: api_token_annotation,
 @router.post("/assign", operation_id="git_dataset-assign")
 def assign_git_repo(auth: api_token_annotation,
                     git_repo_id: uuid.UUID, dataset_id: uuid.UUID):
+    """Associate a git repository with a dataset
+
+    Args:
+        auth (api_token_annotation): _description_
+        git_repo_id (uuid.UUID): Unique git repository id (from this API server)
+        dataset_id (uuid.UUID): Unique dataset id
+    """
     logger.debug(f"{fa.web}{fa.assign} {__name__} {stack()[0][3]}()")
     return link_git.assign_git_repo(git_repo_id, dataset_id)
 
@@ -64,5 +106,12 @@ def assign_git_repo(auth: api_token_annotation,
 @router.delete("/remove", operation_id="git_dataset-remove")
 def unlink_git_repo(auth: api_token_annotation,
                     git_repo_id: uuid.UUID, dataset_id: uuid.UUID):
+    """Remove the association of a git repository from a dataset
+
+    Args:
+        auth (api_token_annotation): _description_
+        git_repo_id (uuid.UUID): Unique git repository identifier (from this API server)
+        dataset_id (uuid.UUID): Unique dataset id
+    """
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return link_git.unlink_git_repo(git_repo_id, dataset_id)
