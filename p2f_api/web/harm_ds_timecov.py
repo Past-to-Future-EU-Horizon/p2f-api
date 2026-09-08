@@ -13,7 +13,27 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/time-coverage", tags=["Time Coverage"])
+tag_name = "Time Coverage"
+
+router = APIRouter(prefix="/time-coverage", tags=[tag_name])
+
+tag_metadata = {"name": tag_name,
+                "description": 
+                """HARM Dataset Coverage (HARM_DS_Timecov) is a year based time coverage for a dataset, it has an older and more recent year, with a reference zero. 
+                
+The naming in this metadata node is subject to change. 
+
+The time coverage has the following attributes:
+
+* dataset_id : Unique identifier of the dataset
+* oldest : The older integer year before the reference zero representing the oldest date in the dataset
+* youngest : the more recent integer year before the reference zero representing the youngest date in the dataset
+* oldest_older_conf : The older value of the older confidence interval [Optional]
+* oldest_younger_conf : The most recent value of the older confidence interval [Optional]
+* youngest_older_conf : The older value of the younger confidence interval [Optional]
+* youngest_younger_conf : The most recent value of the younger confidence interval [Optional]
+* older_conf_interval : The float confidence interval of the older date [Optional]
+* younger_conf_interval : The float confidence interval of the younger/recent date [Optional]"""}
 
 # Get
 @router.get("/{dataset_id}", operation_id="timecoverage-get")

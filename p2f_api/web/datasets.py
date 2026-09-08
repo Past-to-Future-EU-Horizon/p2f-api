@@ -14,8 +14,42 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/datasets", tags=["Datasets"])
+tag_name = "Datasets"
 
+router = APIRouter(prefix="/datasets", tags=[tag_name])
+
+tag_metadata = {"name": tag_name,
+                "description": 
+                """Datasets are one of the core data types within the Past 2 Future API and Portal. 
+
+Datasets are any individual data collections or groups of data collections that are published.
+Datasets can also be nested, consider a dataset published on Pangaea that has multiple sub-files. 
+The parent dataset object would be the collection of the data files held within. 
+Sub datasets are the individual files within that collection. 
+In addition to individual files, worksheets within an Excel spreadsheet can be a subdataset. 
+
+Datasets have the following attributes:
+
+* dataset_id : A unqiue identifier of the dataset using the UUID standard. This is set by the API server, do not set this yourself. 
+* doi : The url or doi.org link for the dataset. This must be identical across all sub datasets
+* title : The title of the dataset or collection of datasets
+* sub_dataset_name : A unique name for a sub dataset, such as the filename or worksheet name. 
+* publication_date : The date the publication was made available
+* is_new_p2f : A boolean for if a dataset is newly created by the Past 2 Future project (True) or a dataset that is being re-used from previous science (False)
+* is_sub_dataset : A boolean for if the dataset is part of a larger dataset collection
+
+The dataset_id is one of the most re-used identifiers across the whole API. 
+The dataset_id field is used to relate the following objects back to a dataset:
+
+* HARM Data Records
+* Keywords
+* Git Repositories
+* HARM Time Slices
+* HARM Age Models
+* HARM Data Types
+* HARM References
+* HARM Locations
+* HARM Species"""}
 
 # List
 @router.get("/", operation_id="dataset-list")
@@ -25,17 +59,6 @@ def list_datasets(
     is_sub_dataset: Optional[bool] = None,
     doi: Optional[str] = None,
 ) -> List[Datasets]:
-    """List the datasets available on the API
-
-    Args:
-        auth (api_token_annotation): _description_
-        is_new_p2f (Optional[bool], optional): Is the dataset a product of the P2F project (True) or created prior (False). Defaults to None.
-        is_sub_dataset (Optional[bool], optional): Is the dataset a part of a larger dataset?. Defaults to None.
-        doi (Optional[str], optional): The digital object identifier of a dataset. Defaults to None.
-
-    Returns:
-        List[Datasets]: A list of the datasets that meet the search criteria
-    """
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     # logger.debug(f"Parameters: {is_new_p2f}, {is_sub_dataset}, {doi}")
     return datasets.list_datasets(
@@ -47,15 +70,6 @@ def list_datasets(
 @router.get("/{dataset_id}", operation_id="dataset-get")
 def get_dataset(auth: api_token_annotation,
                 dataset_id: uuid.UUID) -> Datasets:
-    """Get an individual dataset by its dataset_id
-
-    Args:
-        auth (api_token_annotation): _description_
-        dataset_id (uuid.UUID): _description_
-
-    Returns:
-        Datasets: A single p2f-pydantic dataset object
-    """
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return datasets.get_dataset(dataset_id=dataset_id)
 
@@ -64,15 +78,6 @@ def get_dataset(auth: api_token_annotation,
 @router.post("/", operation_id="dataset-create")
 def create_dataset(auth: api_token_annotation,
                    dataset: Datasets) -> Datasets:
-    """Create a new dataset record on the API with a p2f-pydantic Datasets object
-
-    Args:
-        auth (api_token_annotation): _description_
-        dataset (Datasets): The new p2f-pydantic Datasets object
-
-    Returns:
-        Datasets: The resulting ingestion of the new dataset in the API
-    """     
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return datasets.create_dataset(dataset)
 
@@ -81,15 +86,6 @@ def create_dataset(auth: api_token_annotation,
 @router.put("/", include_in_schema=False, operation_id="dataset-update")
 def update_dataset(auth: api_token_annotation,
                    dataset_updates: Datasets) -> Datasets:
-    """Update a dataset on the API using a p2f-pydantic Datasets object
-
-    Args:
-        auth (api_token_annotation): _description_
-        dataset_updates (Datasets): The updated p2f-pydantic Datasets object, the dataset_id must be set. 
-
-    Returns:
-        Datasets: The resulting updated p2f-pydantic Datasets object from the API. 
-    """
     logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
     return datasets.update_dataset(dataset_updates)
 
@@ -98,12 +94,6 @@ def update_dataset(auth: api_token_annotation,
 @router.delete("/{dataset_id}", include_in_schema=False, operation_id="dataset-delete")
 def delete_dataset(auth: api_token_annotation,
                    dataset_id: uuid.UUID) -> None:
-    """Delete a dataset from the portal. 
-
-    Args:
-        auth (api_token_annotation): _description_
-        dataset_id (uuid.UUID): The unique identifier of the dataset
-    """
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     if type(dataset_id) == str:
         return datasets.delete_dataset(dataset_id)

@@ -29,10 +29,30 @@ from fastapi.responses import RedirectResponse
 # Batteries included libraries
 import os
 
+tags_metadata_list = [
+    datasets.tag_metadata,
+    harm_data_record.tag_metadata,
+    harm_age.tag_metadata, 
+    harm_data_type.tag_metadata,
+    age_model.tag_metadata,
+    harm_ds_timecov.tag_metadata,
+    harm_location.tag_metadata,
+    harm_numerical.tag_metadata,
+    harm_reference.tag_metadata,
+    harm_species.tag_metadata,
+    harm_timeslice.tag_metadata,
+    keywords.tag_metadata,
+    link_git.tag_metadata,
+    seasonality.tag_metadata_ds,
+    seasonality.tag_metadata_rec,
+    temp_accounts.tag_metadata
+]
+
 app = FastAPI(
     title="Past to Future Dataset API",
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
-    version="0.0.118"
+    version="0.0.119",
+    openapi_tags=tags_metadata_list
 )
 
 logger.debug(f"{fa.background} {__name__}")
@@ -45,10 +65,10 @@ app.include_router(health.router)
 
 # Main data Types
 app.include_router(datasets.router)
-app.include_router(harm_numerical.router)
 app.include_router(harm_data_record.router)
-app.include_router(harm_location.router)
+app.include_router(harm_numerical.router)
 app.include_router(harm_data_type.router)
+app.include_router(harm_location.router)
 app.include_router(harm_timeslice.router)
 app.include_router(harm_species.router)
 app.include_router(harm_age.router)
@@ -71,7 +91,7 @@ def get_api_metadata() -> p2fsystem.API_Metadata:
                                                        patch=34)
     api_version = p2fsystem.Semantic_Version(major=0, 
                                              minor=0, 
-                                             patch=118)
+                                             patch=119)
     return_class = p2fsystem.API_Metadata(pyclient_minimum_version=minimum_p2f_client_py, 
                                           api_system_version=api_version)
     return return_class

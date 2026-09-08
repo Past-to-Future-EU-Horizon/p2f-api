@@ -13,8 +13,19 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router_ds = APIRouter(prefix="/seasonality", tags=["Seasonality"])
-router_rec = APIRouter(prefix="/season", tags=["Season"])
+tag_name_ds = "Seasonality"
+tag_name_rec = "Season"
+
+router_ds = APIRouter(prefix="/seasonality", tags=[tag_name_ds])
+router_rec = APIRouter(prefix="/season", tags=[tag_name_rec])
+
+tag_metadata_ds = {"name": tag_name_ds,
+                   "description": 
+"""Seasonality is a metadata node to indicate what seasonality information is associated with a dataset. 
+Does the dataset indicate Hot/Cold seasons, Spring/Summer/Fall/Winter seasons, Wet/Dry seasons?"""}
+tag_metadata_rec = {"name": tag_name_rec,
+                    "description": 
+"""Season is a metadata node to indicate what season a HARM data record is in reference to."""}
 
 # Get
 @router_ds.get("/{dataset_id}", operation_id="seasonality-get")

@@ -15,11 +15,32 @@ import uuid
 from typing import Optional, Annotated, Union, Literal
 from inspect import stack
 
-router = APIRouter(prefix="/harm-numerical", tags=["HARM Numerical"])
+tag_name = "HARM Numerical"
+
+router = APIRouter(prefix="/harm-numerical", tags=[tag_name])
 
 Harm_numerical_union = Union[
     HARM_Float_Confidence, HARM_Float, HARM_Int, HARM_Int_Confidence
 ]
+
+tag_metadata = {"name": tag_name,
+                "description": 
+                """HARM Numerical is one of the core features of the Past 2 Future API. 
+A HARM Numerical object can hold individual integer or floating point data, or 
+integers and floating point data with variable upper and lower confidence intervals.
+Each HARM Numerical needs to have a HARM Data Type associated with it. 
+
+To create a HARM Numerical object, you need to create an upload object, with the following attributes:
+
+* fk_data_record : The record hash of the numerical will be associated with
+* fk_data_type : The datatype_id from the HARM Data Type
+* value : An integer or float of the main value for a reading
+* upper_conf_interval : Integer or float of the upper confidence interval (eg 97.5 for a 2.5 & 97.5 interval)
+* lower_conf_interval : Integer or float of the lower confidence interval (eg 2.5 for a 2.5 & 97.5 interval)
+* upper_conf_value : Integer or float of the upper confidence value
+* lower_conf_value : Integer or float of the lower confidence value
+
+The API will return unique objects with Integers or Floats, and with or without confidence intervals and their values. """}
 
 
 # List

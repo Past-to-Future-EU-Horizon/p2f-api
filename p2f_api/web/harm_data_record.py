@@ -13,7 +13,25 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/harm-data-records", tags=["HARM Data Records"])
+tag_name = "HARM Data Records"
+
+router = APIRouter(prefix="/harm-data-records", tags=[tag_name])
+
+tag_metadata = {"name": tag_name,
+                "description": 
+                """HARM Data Records are the second most core attributes of the Past to Future API.
+A data record is an individual row within a dataset, a data record can be associated with multiple data points. 
+For example, you have a table (the dataset that has a dataset_id), each row regardless of the number of columns is a an individual data record.
+
+Data records use a unique hash that can be calculated on multiple machines to identify itself within the database. 
+This also means data can be uploaded across multiple sessions and the hash can be calculated in a repeatable manner. 
+The hash is an MD5 digest of UTF8 string representations of the dataset_id and the row number within the dataset. 
+Check the p2f-client-py library and the harm_data_record.py file for the reference hasher. 
+
+HARM Data Records have the following attributes:
+
+* fk_dataset_id : The unique identifier dataset_id of the dataset [Required]
+* record_hash : The resulting hexadecimal digest of the hashing function described above [Required]"""}
 
 # List
 @router.get("/", operation_id="record-list")
@@ -22,15 +40,6 @@ def list_harm_data_records(
     dataset: Optional[str] = None,
     # data_type: Optional[int]=None, ### Disabled for now, see note in service
 ) -> List[HARM_Data_Record]:
-    """List the records within a dataset
-
-    Args:
-        auth (api_token_annotation): _description_
-        dataset (Optional[str], optional): Unique identifier of the dataset. Defaults to None.
-
-    Returns:
-        List[HARM_Data_Record]: List of p2f-pydantic HARM_Data_Records from search. 
-    """
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     return harm_data_record.list_harm_data_record(dataset=dataset)
 
@@ -39,15 +48,6 @@ def list_harm_data_records(
 @router.get("/{record_hash}", operation_id="record-get")
 def get_harm_data_record(auth: api_token_annotation,
                          record_hash: str) -> HARM_Data_Record:
-    """Get a single record hash object from the API
-
-    Args:
-        auth (api_token_annotation): _description_
-        record_hash (str): The record hash of the desired record
-
-    Returns:
-        HARM_Data_Record: The p2f-pydantic HARM_Data_Record
-    """
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_data_record.get_harm_data_record(record_hash=record_hash)
 
@@ -56,23 +56,6 @@ def get_harm_data_record(auth: api_token_annotation,
 @router.post("/", operation_id="record-create")
 def create_record(auth: api_token_annotation,
                    new_data_record: HARM_Data_Record) -> HARM_Data_Record:
-    """Create a new record for a row within a dataset. Records are an individual row
-        or set of data within a dataset. The P2F project uses a relational model for 
-        records within a dataset so numerical and metadata can be brought together 
-        in a way with a unique identifier. 
-
-        The record hash can be created with the p2f-client-py library. The method
-            for creating the hash is to create a hashing object (sha256 at time of writing), 
-            add the dataset identifier to the hash, digest, add the row identifier, digest.
-            The record hash is the resulting hex digestion of the hash object. 
-
-    Args:
-        auth (api_token_annotation): _description_
-        new_data_record (HARM_Data_Record): New p2f-pydantic HARM_Data_Record object with dataset_id and record_hash
-
-    Returns:
-        HARM_Data_Record: New p2f-pydantic HARM_Data_Record as processed by the API
-    """
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
     return harm_data_record.create_harm_data_record(new_data_record)
 
@@ -92,12 +75,6 @@ def create_record(auth: api_token_annotation,
 @router.delete("/{record_hash}", include_in_schema=False, operation_id="record-delete")
 def delete_dataset(auth: api_token_annotation,
                    record_hash: str) -> None:
-    """Delete a record from the API by record hash
-
-    Args:
-        auth (api_token_annotation): _description_
-        record_hash (str): The records hash
-    """
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     if type(record_hash) == str:
         return harm_data_record.delete_harm_data_record(record_hash)

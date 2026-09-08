@@ -20,7 +20,16 @@ from inspect import stack
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-router = APIRouter(prefix="/token", tags=["Basic Account"])
+tag_name = "Basic Account"
+
+router = APIRouter(prefix="/token", tags=[tag_name])
+
+tag_metadata = {"name": tag_name,
+                "description": 
+                """This is the initial data account system of the Past 2 Future API and Portal. 
+If you are associated with the project you email address has been provided to the API and given basic authorization to read and create data. 
+You can request a token that is valid for 24 hours using your official email address with the project. 
+You can use the token with the API and the portal. """}
 
 api_token = APIKeyHeader(name="x-p2f-token")
 

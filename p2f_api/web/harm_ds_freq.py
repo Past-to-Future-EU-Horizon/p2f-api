@@ -13,7 +13,19 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/data-frequency", tags=["Dataset Frequency"])
+tag_name = "Dataset Frequency"
+
+router = APIRouter(prefix="/data-frequency", tags=[tag_name])
+
+tag_metadata = {"name": tag_name,
+                "description": 
+                """Dataset frequency is a metadata node about how frequent data is within a dataset.
+
+Dataset frequency has the following attributes:
+* dataset_id : The unique dataset identifier
+* mean_frequency : The mean frequency between data points in a dataset in integer years
+* shortest_frequency : The shortest gap between data points in a dataset in integer years [Optional]
+* longest_frequency : The longest gap between data points in a dataset in integer years [Optional]"""}
 
 # Get
 @router.get("/{dataset_id}", operation_id="datafrequency-get")

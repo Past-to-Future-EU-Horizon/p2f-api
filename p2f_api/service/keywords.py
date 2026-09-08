@@ -102,7 +102,7 @@ def assign_taxon_to_dataset(taxdict_id: str, dataset_id: uuid):
         session.execute(stmt)
         session.commit()
 
-def remove_taxon_from_datase(taxdict_id: str, dataset_id: uuid):
+def remove_taxon_from_dataset(taxdict_id: str, dataset_id: uuid):
     with Session(engine) as session:
         stmt = delete(taxonomic_keyword)
         stmt = stmt.where(taxonomic_keyword.fk_dataset_id == dataset_id)

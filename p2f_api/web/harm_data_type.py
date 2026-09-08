@@ -12,8 +12,29 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/harm-data-types", tags=["HARM Data Types"])
+tag_name = "HARM Data Types"
 
+router = APIRouter(prefix="/harm-data-types", tags=[tag_name])
+
+tag_metadata = {"name": tag_name,
+                "description": 
+                """HARM Data Types are essential for the HARM Numerical data points to be associated with a given type of data.
+HARM Data Types are individual metadata points that are unique across what they measure, the units they use for that measurement, method of measurement, and the calibration applied to them.
+
+HARM Data Types have the following attributes:
+
+* datatype_id : A unique identifier for the data type using the UUID standard. This is created by the API server, do not create yourself.
+* measure : What is the data type measuring
+* unit_of_measurement : What units are associated with the measure
+* method : How are these measurements collected, this is a descriptive field
+* calibration : How are the measurements calibrated
+* is_proxy : A boolean flag for if the measurement is indirectly made (True) or directly (False)
+
+Using an example of Sea Surface Temperatures, the measure would be Sea surface temperatures, but there would be many HARM Data Type objects.
+For example, you might have variability in the unit_of_measurement such as Celcius, Farenheit, or Kelvin. 
+The method could be direct measurement with a thermometer in which case the dataset is not a proxy, or the method could be calculated from forminifera and their rations of Mg/Ca in which case it is a proxy.
+You can also have different ways of calibrating data, for the forminifera measurements you can have an example such as BAYMAG.  
+"""}
 
 @router.get("/", operation_id="datatype-list")
 def list_harm_data_types(

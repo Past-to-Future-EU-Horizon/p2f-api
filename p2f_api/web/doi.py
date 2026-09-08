@@ -13,6 +13,10 @@ from inspect import stack
 
 router = APIRouter(prefix="/doi", tags=["Digital Object Identifier"])
 
+tag_metadata = {"name": "Digital Object Identifier",
+                "description": 
+                """This Digital Object Identifier endpoint is used to pull and cache DOI metadata from 
+DataCite, Zenodo, and CrossRef. Not currently implemented"""}
 
 @router.get("/")
 def get(

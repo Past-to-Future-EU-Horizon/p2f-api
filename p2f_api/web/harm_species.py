@@ -13,8 +13,13 @@ from uuid import UUID
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/harm-data-species", tags=["HARM Species"])
+tag_name = "HARM Species"
 
+router = APIRouter(prefix="/harm-data-species", tags=[tag_name])
+
+tag_metadata = {"name": tag_name,
+                "description": 
+                """The HARM Species will change to better handle the complexities of how to refer to any given species and taxonomic heirarchies."""}
 
 # List
 @router.get("/", operation_id="species-list")

@@ -12,8 +12,21 @@ import uuid
 from typing import Optional, List, Annotated
 from inspect import stack
 
-router = APIRouter(prefix="/harm-timeslice", tags=["HARM Timeslice"])
+tag_name = "HARM Timeslice"
 
+router = APIRouter(prefix="/harm-timeslice", tags=[tag_name])
+
+tag_metadata = {"name": tag_name,
+                "description": 
+                """The Past 2 Future project has created named timeslices to refer to specific time periods, this metadata node will associate timeslices with datasets and data records. 
+
+HARM Timeslices have the following attributes:
+
+* timeslice_id : A unique identifier for the timeslice in the UUID format, this is created by the server, do not create this yourself. 
+* timeslice_name : The name created by the Past 2 Future Project
+* timeslice_age_mean : The central year used to describe a timeslice or time event
+* timeslice_age_recent : The most recent year to describe a timeslice as a range
+* timeslice_age_oldest : The older year to describe a timeslice as a range"""}
 
 @router.get("/", operation_id="timeslice-list")
 def list_harm_timeslices(
