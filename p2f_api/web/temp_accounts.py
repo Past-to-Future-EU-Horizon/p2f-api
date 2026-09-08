@@ -59,20 +59,6 @@ def request_token(request_token: Temp_Account,
     # msg = Message(message=msg)
     return JSONResponse(content={"status": msg})
 
-@router.post("/data-upload-check", 
-             operation_id="data-upload-check",
-             include_in_schema=False)
-def data_upload_check(request: Request, 
-                      auth: Temp_Account) -> Authorization_Check:
-    """This method is intended to act as a check on the token and email address. 
-        TODO: Add a check for the location of the incoming request. This check 
-            needs to look if the request is coming from the portal. """
-    result = combined_auth(request=request,
-                           token=auth.token,
-                           email=auth.email)
-    return Authorization_Check(authorized=result,
-                               authorization_time=datetime.now(tz=ZoneInfo("UTC")))
-
 def authentication(email: str, token: str) -> bool:
     logger.debug(f"{fa.web}{fa.auth} {__name__} {stack()[0][3]}()")
     token_match = temp_accounts.evaluate_token(email=email, token=token)
@@ -126,3 +112,19 @@ def combined_auth(request: Request,
         return a1 and a2
     
 api_token_annotation = Annotated[api_token, Security(combined_auth)]
+
+@router.post("/data-upload-check", 
+             operation_id="data-upload-check",
+             include_in_schema=False)
+def data_upload_check(request: Request, 
+                      auth: api_token_annotation) -> Authorization_Check:
+    """This method is intended to act as a check on the token and email address. 
+        TODO: Add a check for the location of the incoming request. This check 
+            needs to look if the request is coming from the portal. """
+    # result = combined_auth(request=request,
+    #                        token=auth.token,
+    #                        email=auth.email)
+    # Do not run result as above, the security annotation handles if a user is allowed or not.
+    # We can return an authorization with True
+    return Authorization_Check(authorized=True,
+                               authorization_time=datetime.now(tz=ZoneInfo("UTC")))
