@@ -1,15 +1,15 @@
-# Local libraries
-from p2f_api.apilogs import logger, fa
-from ..service.doi import get_doi
+# Batteries included libraries
+import uuid
+from typing import Optional, List
+from inspect import stack
 
 # Third Party Libraries
 from fastapi import Body, APIRouter, Request
 from fastapi import HTTPException
 
-# Batteries included libraries
-import uuid
-from typing import Optional, List
-from inspect import stack
+# Local libraries
+from p2f_api.apilogs import logger, fa
+from ..service.doi import get_doi
 
 router = APIRouter(prefix="/doi", tags=["Digital Object Identifier"])
 

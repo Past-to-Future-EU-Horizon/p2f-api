@@ -1,8 +1,8 @@
-from p2f_api.service import keywords
-from p2f_pydantic.keywords import KeywordDictionary, Keywords
-from requests import get
 from gzip import GzipFile
 from xml.dom import minidom as xdmd
+from requests import get
+from p2f_api.service import keywords
+from p2f_pydantic.keywords import KeywordDictionary, Keywords
 
 # URLS
 ## GEMET

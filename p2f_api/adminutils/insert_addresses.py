@@ -1,11 +1,12 @@
-from p2f_api.service.temp_accounts  import insert_permitted_address
-from p2f_api.service.account_permissions_json import Account_Permissions
-from p2f_api.service.account_permissions_json import default_consortium_permissions, super_user, public_view
+from argparse import ArgumentParser
+import pathlib
 # import pandas as pd
 from email_validator import validate_email
 from furl import furl
-from argparse import ArgumentParser
-import pathlib
+from p2f_api.service.temp_accounts  import insert_permitted_address
+from p2f_api.service.account_permissions_json import Account_Permissions
+from p2f_api.service.account_permissions_json import default_consortium_permissions, super_user, public_view
+
 
 TLD_TIMEZONE_MAP = {
     ".nl": "Europe/Amsterdam",

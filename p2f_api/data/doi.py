@@ -1,7 +1,7 @@
-# Local libraries
-from p2f_api.apilogs import logger, fa
-from .p2f_decbase import baseSQL
-from .db_connection import engine
+# Batteries included libraries
+from datetime import datetime
+from uuid import UUID
+from zoneinfo import ZoneInfo
 
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -13,11 +13,10 @@ from sqlalchemy import Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func
 
-# Batteries included libraries
-from datetime import datetime
-from uuid import UUID
-from zoneinfo import ZoneInfo
-
+# Local libraries
+from p2f_api.apilogs import logger, fa
+from .p2f_decbase import baseSQL
+from .db_connection import engine
 
 class doi_metadata(baseSQL):
     __tablename__ = "doi_metadata"

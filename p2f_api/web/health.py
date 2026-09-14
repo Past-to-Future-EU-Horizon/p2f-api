@@ -1,12 +1,12 @@
-# Local libraries
-from p2f_api.apilogs import logger, fa
+# Batteries included libraries
+from inspect import stack
 
 # Third Party Libraries
 from fastapi import Body, APIRouter, Request
 from fastapi.responses import JSONResponse
 
-# Batteries included libraries
-from inspect import stack
+# Local libraries
+from p2f_api.apilogs import logger, fa
 
 router = APIRouter(prefix="/health-check", include_in_schema=False)
 

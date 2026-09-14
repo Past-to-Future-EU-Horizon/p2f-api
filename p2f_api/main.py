@@ -1,3 +1,9 @@
+# Batteries included libraries
+import os
+# Third Party Libraries
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+# from fastapi.security import APIKeyHeader
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from p2f_api.web import datasets
@@ -22,12 +28,6 @@ from p2f_api.web import harm_ds_freq
 from p2f_api.web import harm_ds_timecov
 from p2f_api.service.temp_accounts import api_init
 from p2f_pydantic import system as p2fsystem
-# Third Party Libraries
-from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
-# from fastapi.security import APIKeyHeader
-# Batteries included libraries
-import os
 
 tags_metadata_list = [
     datasets.tag_metadata,

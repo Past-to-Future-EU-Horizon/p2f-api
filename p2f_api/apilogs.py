@@ -1,6 +1,3 @@
-# Local libraries
-# Third Party Libraries
-# Batteries included libraries
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -25,6 +22,5 @@ class FA:  # function annotations
         # Other
         self.auth = "🔐"
         self.migration = "🌀"
-
 
 fa = FA()

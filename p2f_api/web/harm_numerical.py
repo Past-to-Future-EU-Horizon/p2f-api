@@ -1,3 +1,11 @@
+# Batteries included libraries
+import uuid
+from typing import Optional, Annotated, Union, Literal
+from inspect import stack
+
+# Third Party Libraries
+from fastapi import Body, APIRouter, Depends
+
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from ..service import harm_numerical
@@ -6,14 +14,6 @@ from p2f_pydantic.harm_data_numerical import HARM_Int, HARM_Int_Confidence
 from p2f_pydantic.harm_data_numerical import HARM_Float, HARM_Float_Confidence
 from p2f_pydantic.harm_data_numerical import Insert_HARM_Numerical, Return_HARM_Numerical
 from p2f_pydantic.temp_accounts import Temp_Account
-
-# Third Party Libraries
-from fastapi import Body, APIRouter, Depends
-
-# Batteries included libraries
-import uuid
-from typing import Optional, Annotated, Union, Literal
-from inspect import stack
 
 tag_name = "HARM Numerical"
 

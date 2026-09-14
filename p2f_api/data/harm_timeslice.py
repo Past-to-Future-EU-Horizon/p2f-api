@@ -1,8 +1,7 @@
-from p2f_api.apilogs import logger, fa
-from .p2f_decbase import baseSQL
-from .db_connection import engine
-from .harm_data_record import harm_data_record
-from .migration_utilities import migration
+# Batteries included libraries
+from uuid import UUID
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -13,11 +12,11 @@ from sqlalchemy import DateTime
 from sqlalchemy import func
 from sqlalchemy import ForeignKey
 
-# Batteries included libraries
-from uuid import UUID
-from datetime import datetime
-from zoneinfo import ZoneInfo
-
+from p2f_api.apilogs import logger, fa
+from .p2f_decbase import baseSQL
+from .db_connection import engine
+from .harm_data_record import harm_data_record
+from .migration_utilities import migration
 
 logger.debug(f"{fa.data} {__name__}")
 

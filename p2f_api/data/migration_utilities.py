@@ -1,6 +1,7 @@
-from p2f_api.apilogs import logger, fa
-from .db_connection import engine
-from .p2f_decbase import baseSQL
+# Batteries included libraries
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from inspect import stack
 
 # Third Party Libraries
 from sqlalchemy import text
@@ -13,10 +14,10 @@ from sqlalchemy import select, insert, update
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import Session
 
-# Batteries included libraries
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from inspect import stack
+from p2f_api.apilogs import logger, fa
+from .db_connection import engine
+from .p2f_decbase import baseSQL
+
 
 logger.debug(f"{fa.data} {__name__}")
 

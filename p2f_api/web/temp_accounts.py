@@ -1,7 +1,8 @@
-from p2f_api.apilogs import logger, fa
-from ..service import temp_accounts
-from p2f_pydantic.temp_accounts import Temp_Account, Authorization_Check
-from p2f_pydantic.generic import Message
+# Batteries included libraries
+from typing import Literal, Optional, Annotated
+from inspect import stack
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # Third Party Libraries
 from fastapi import APIRouter
@@ -14,11 +15,11 @@ from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyHeader
 from furl import furl
 
-# Batteries included libraries
-from typing import Literal, Optional, Annotated
-from inspect import stack
-from datetime import datetime
-from zoneinfo import ZoneInfo
+# Local libraries
+from p2f_api.apilogs import logger, fa
+from ..service import temp_accounts
+from p2f_pydantic.temp_accounts import Temp_Account, Authorization_Check
+from p2f_pydantic.generic import Message
 
 tag_name = "Basic Account"
 

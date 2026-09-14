@@ -1,15 +1,3 @@
-# Local libraries
-from p2f_api.apilogs import logger, fa
-from p2f_api.doi import doi as DOI
-from ..data.db_connection import engine
-from ..data.doi import doi_metadata, doi_lastrequests
-from ..service.datasets import get_dataset
-# Third Party Libraries
-from sqlalchemy import insert, select
-from sqlalchemy.orm import Session
-import furl
-import requests
-
 # Batteries included libraries
 from uuid import UUID
 from typing import Optional, Literal
@@ -18,6 +6,19 @@ from zoneinfo import ZoneInfo
 from base64 import b64decode
 from xml.dom import minidom as xdmd
 from inspect import stack
+
+# Third Party Libraries
+from sqlalchemy import insert, select
+from sqlalchemy.orm import Session
+import furl
+import requests
+
+# Local libraries
+from p2f_api.apilogs import logger, fa
+from p2f_api.doi import doi as DOI
+from ..data.db_connection import engine
+from ..data.doi import doi_metadata, doi_lastrequests
+from ..service.datasets import get_dataset
 
 datacite_api_url = "https://api.datacite.org/"
 crossref_api_url = "https://api.crossref.org/"

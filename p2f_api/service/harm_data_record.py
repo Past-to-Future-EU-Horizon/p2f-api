@@ -1,19 +1,18 @@
-# Local libraries
-from p2f_api.apilogs import logger, fa
-
-# from ..service.harm_numerical import list_numerics
-from ..data.db_connection import engine
-from ..data.harm_data_record import harm_data_record
-from p2f_pydantic.harm_data_record import HARM_Data_Record
+# Batteries included libraries
+from typing import List, Optional
+from uuid import UUID
+from inspect import stack
 
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
 
-# Batteries included libraries
-from typing import List, Optional
-from uuid import UUID
-from inspect import stack
+# Local libraries
+from p2f_api.apilogs import logger, fa
+# from ..service.harm_numerical import list_numerics
+from ..data.db_connection import engine
+from ..data.harm_data_record import harm_data_record
+from p2f_pydantic.harm_data_record import HARM_Data_Record
 
 
 def list_harm_data_record(

@@ -1,3 +1,12 @@
+# Batteries included libraries
+from uuid import UUID
+from typing import List
+from inspect import stack
+
+# Third Party Libraries
+from sqlalchemy import select, join
+from sqlalchemy.orm import Session
+
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from data.harm_data_types import harm_data_type
@@ -8,16 +17,6 @@ from data.harm_data_record import harm_data_record
 from data.db_connection import engine
 from service import datasets as service_datasets
 from p2f_pydantic.datasets import Datasets
-
-# Third Party Libraries
-from sqlalchemy import select, join
-from sqlalchemy.orm import Session
-
-# Batteries included libraries
-from uuid import UUID
-from typing import List
-from inspect import stack
-
 
 def get_datasets_by_data_type_APISIDE(datatype_id: UUID) -> List[UUID]:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")

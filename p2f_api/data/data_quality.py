@@ -1,7 +1,8 @@
-# Local libraries
-from p2f_api.apilogs import logger, fa
-from .datasets import datasets
-from .p2f_decbase import baseSQL
+# Batteries included libraries
+from datetime import date
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from uuid import UUID
 
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -13,11 +14,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 
-# Batteries included libraries
-from datetime import date
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from uuid import UUID
+# Local libraries
+from p2f_api.apilogs import logger, fa
+from .datasets import datasets
+from .p2f_decbase import baseSQL
 
 logger.debug(f"{fa.data} {__name__}")
 

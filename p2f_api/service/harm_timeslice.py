@@ -1,18 +1,17 @@
-# Local libraries
-from p2f_api.apilogs import logger, fa
-from ..data.db_connection import engine
-from ..data.harm_timeslice import harm_timeslice, harm_timeslice_to_record
-from p2f_pydantic.harm_timeslices import HARM_Timeslice
-
-# Third Party Libraries
-from sqlalchemy.orm import Session
-from sqlalchemy import select, insert, delete, update
-
 # Batteries included libraries
 from typing import List, Optional
 from uuid import UUID, uuid4
 from inspect import stack
 
+# Third Party Libraries
+from sqlalchemy.orm import Session
+from sqlalchemy import select, insert, delete, update
+
+# Local libraries
+from p2f_api.apilogs import logger, fa
+from ..data.db_connection import engine
+from ..data.harm_timeslice import harm_timeslice, harm_timeslice_to_record
+from p2f_pydantic.harm_timeslices import HARM_Timeslice
 
 def list_harm_timeslices(
     named_time_period: Optional[str] = None,

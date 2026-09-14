@@ -1,3 +1,12 @@
+# Batteries included libraries
+from typing import List, Union, Literal, Optional
+from uuid import UUID
+from inspect import stack
+
+# Third Party Libraries
+from sqlalchemy.orm import Session
+from sqlalchemy import select, insert, delete, update
+
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from .harm_data_record import list_harm_data_record
@@ -8,14 +17,7 @@ from ..data.harm_data_numerical import harmonized_numeric_id_map
 from p2f_pydantic.harm_data_numerical import HARM_Int, HARM_Int_Confidence
 from p2f_pydantic.harm_data_numerical import HARM_Float, HARM_Float_Confidence
 from p2f_pydantic.harm_data_numerical import Insert_HARM_Numerical, Return_HARM_Numerical
-# Third Party Libraries
-from sqlalchemy.orm import Session
-from sqlalchemy import select, insert, delete, update
 
-# Batteries included libraries
-from typing import List, Union, Literal, Optional
-from uuid import UUID
-from inspect import stack
 
 Harm_numerical_union = Union[HARM_Int, HARM_Int_Confidence, HARM_Float, HARM_Float_Confidence]
 

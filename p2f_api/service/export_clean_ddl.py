@@ -1,8 +1,7 @@
-# Local libraries
+from sqlalchemy.schema import CreateTable
 from p2f_api.apilogs import logger, fa
 from data.db_connection import engine
 from data.db_connection import baseSQL
-from sqlalchemy.schema import CreateTable
 
 
 def get_clean_ddl() -> str:

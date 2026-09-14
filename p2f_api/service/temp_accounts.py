@@ -1,18 +1,3 @@
-# Local libraries
-from p2f_api.apilogs import logger, fa
-from .account_permissions_json import Account_Permissions
-from .account_permissions_json import default_consortium_permissions
-from .account_permissions_json import super_user
-from .account_permissions_json import public_view
-from ..data.db_connection import engine
-from ..data.temp_accounts import temp_tokens, permitted_addresses, email_history
-
-# Third Party Libraries
-from sqlalchemy.orm import Session
-from sqlalchemy import select, insert, delete, update
-from pydantic import EmailStr
-import dotenv
-
 # Batteries included libraries
 from typing import List, Optional, Literal, Union
 from datetime import datetime, timedelta
@@ -30,6 +15,21 @@ import hashlib
 import os
 from inspect import stack
 import traceback
+
+# Third Party Libraries
+from sqlalchemy.orm import Session
+from sqlalchemy import select, insert, delete, update
+from pydantic import EmailStr
+import dotenv
+
+# Local libraries
+from p2f_api.apilogs import logger, fa
+from .account_permissions_json import Account_Permissions
+from .account_permissions_json import default_consortium_permissions
+from .account_permissions_json import super_user
+from .account_permissions_json import public_view
+from ..data.db_connection import engine
+from ..data.temp_accounts import temp_tokens, permitted_addresses, email_history
 
 dotenv.load_dotenv()
 

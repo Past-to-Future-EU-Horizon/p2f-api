@@ -1,15 +1,15 @@
-from p2f_api.apilogs import logger, fa
-from ..service import dq_comment
-from .temp_accounts import combined_auth, api_token_annotation, api_token_annotation
-from p2f_pydantic.data_quality import DQ_Comment
-
-# Third Party Libraries
-from fastapi import Body, APIRouter, Request
-
 # Batteries included libraries
 import uuid
 from typing import Optional, List
 from inspect import stack
+
+# Third Party Libraries
+from fastapi import Body, APIRouter, Request
+
+from p2f_api.apilogs import logger, fa
+from ..service import dq_comment
+from .temp_accounts import combined_auth, api_token_annotation, api_token_annotation
+from p2f_pydantic.data_quality import DQ_Comment
 
 tag_name = "Data Quality Comment"
 

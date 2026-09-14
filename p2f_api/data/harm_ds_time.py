@@ -1,7 +1,6 @@
-from p2f_api.apilogs import logger, fa
-from .p2f_decbase import baseSQL
-from .db_connection import engine
-from .datasets import datasets
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from uuid import UUID
 
 from sqlalchemy import BigInteger
 from sqlalchemy import Integer
@@ -13,9 +12,10 @@ from sqlalchemy import DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func
 
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from uuid import UUID
+from p2f_api.apilogs import logger, fa
+from .p2f_decbase import baseSQL
+from .db_connection import engine
+from .datasets import datasets
 
 logger.debug(f"{fa.data} {__name__}")
 

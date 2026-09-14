@@ -1,13 +1,13 @@
 ###### THIS IS A DEBUG FEATURE, DO NOT INCLUDE IN REAL USE
-from p2f_api.apilogs import logger, fa
-from service.export_clean_ddl import get_clean_ddl
+# Batteries included libraries
+from inspect import stack
 
 # Third Party Libraries
 from fastapi import Body, APIRouter, Request
 from fastapi.responses import PlainTextResponse
 
-# Batteries included libraries
-from inspect import stack
+from p2f_api.apilogs import logger, fa
+from service.export_clean_ddl import get_clean_ddl
 
 router = APIRouter(prefix="/ddl", include_in_schema=False)
 

@@ -1,16 +1,16 @@
-from p2f_api.apilogs import logger, fa
-from ..data.db_connection import engine
-from ..data.keywords import keywords, taxonomic_keyword, taxonomic_dict
-from p2f_pydantic.keywords import Keywords, TaxonomicDict
+# Batteries included libraries
+import uuid
+from typing import List, Optional
+from inspect import stack
 
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
 
-# Batteries included libraries
-import uuid
-from typing import List, Optional
-from inspect import stack
+from p2f_api.apilogs import logger, fa
+from ..data.db_connection import engine
+from ..data.keywords import keywords, taxonomic_keyword, taxonomic_dict
+from p2f_pydantic.keywords import Keywords, TaxonomicDict
 
 # List
 def list_keywords(dataset_id: Optional[str]=None,

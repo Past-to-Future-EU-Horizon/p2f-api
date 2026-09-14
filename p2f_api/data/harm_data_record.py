@@ -1,7 +1,6 @@
-from p2f_api.apilogs import logger, fa
-from .p2f_decbase import baseSQL
-from .db_connection import engine
-from .datasets import datasets
+# Batteries included libraries
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # Third Party Libraries
 from sqlalchemy import BigInteger
@@ -11,9 +10,11 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import DateTime
 from sqlalchemy import func
 
-# Batteries included libraries
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from p2f_api.apilogs import logger, fa
+from .p2f_decbase import baseSQL
+from .db_connection import engine
+from .datasets import datasets
+
 
 # record hash sizes ----------------------------------------
 ## sha1      40
