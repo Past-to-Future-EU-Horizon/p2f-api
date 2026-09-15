@@ -20,6 +20,7 @@ from .p2f_decbase import baseSQL
 from .db_connection import engine
 from .harm_data_record import harm_data_record
 from .datasets import datasets
+from .migration_utilities import migration
 
 logger.debug(f"{fa.data} {__name__}")
 
@@ -79,3 +80,15 @@ class harm_location_to_ds(baseSQL):
     )
 
 baseSQL.metadata.create_all(engine)
+
+########################################################
+##
+## Migrations
+##
+########################################################
+
+stmt_replace_harm_location_to_ds = f"""DROP TABLE {harm_location_to_ds.__tablename__};"""
+
+migration(name=f"2026-09-15_DROP_TABLE_{harm_location_to_ds.__tablename__}",
+          table=harm_location_to_ds.__tablename__, 
+          action=stmt_replace_harm_location_to_ds)
