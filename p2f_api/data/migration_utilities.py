@@ -44,6 +44,7 @@ def add_migration(name, table):
         )
         execute = session.execute(stmt)
         commit = session.commit()
+        logger.debug(f"Added migration {name}")
 
 def get_migration(name, table):
     logger.debug(f"{fa.data}{fa.migration} {stack()[0][3]}()")
@@ -52,7 +53,7 @@ def get_migration(name, table):
         stmt = stmt.where(migration_history.mig_name == name)
         stmt = stmt.where(migration_history.mig_table == table)
         result = session.execute(stmt).all()
-    logger.debug(result)
+    logger.debug(f"Migration {name} result {result}")
     return result
 
 def update_migration_status(name, table, status=True):
@@ -64,6 +65,7 @@ def update_migration_status(name, table, status=True):
         stmt = stmt.values(mig_status=status)
         session.execute(stmt)
         session.commit()
+        logger.debug(f"Set migration {name} status to {status}")
 
 def migration(name, table, action):
     logger.debug(f"{fa.data}{fa.migration} {stack()[0][3]}()")
