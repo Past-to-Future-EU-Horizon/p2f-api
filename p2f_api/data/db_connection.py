@@ -13,7 +13,7 @@ from p2f_api.apilogs import logger, fa
 # from .create_metadata import create_metadata
 from .p2f_decbase import baseSQL
 
-logger.debug(f"{fa.data} {__name__} P2F-API v0.0.120")
+logger.debug(f"{fa.data} {__name__} P2F-API v0.0.121")
 
 p = pathlib.Path(os.getcwd())
 print(p)
