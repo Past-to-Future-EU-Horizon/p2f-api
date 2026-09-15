@@ -25,12 +25,12 @@ def list_harm_metadata_location(
     dataset_id: Optional[float] = None,
 ) -> List[HARM_Location]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
-    if dataset_id is not None:
-        logger.debug(f"•  Dataset_id is not None: {dataset_id}")
-        data_record_list = list_harm_data_record(dataset=dataset_id)
-        logger.debug(f"•• Data records found for dataset_id: {data_record_list}")
-        data_record_list = [x.record_hash for x in data_record_list]
-        logger.debug(f"•• Reformatted records list: {data_record_list}")
+    # if dataset_id is not None:
+    #     logger.debug(f"•  Dataset_id is not None: {dataset_id}")
+    #     data_record_list = list_harm_data_record(dataset=dataset_id)
+    #     logger.debug(f"•• Data records found for dataset_id: {data_record_list}")
+    #     data_record_list = [x.record_hash for x in data_record_list]
+    #     logger.debug(f"•• Reformatted records list: {data_record_list}")
     with Session(engine) as session:
         logger.debug("•  Created session")
         stmt = select(harm_locations)
@@ -60,9 +60,11 @@ def list_harm_metadata_location(
             stmt = stmt.where(harm_locations.location_age <= max_location_age)
         if dataset_id is not None:
             logger.debug("•• Dataset id is not none")
-            subqry = select(harm_location_to_rec.fk_harm_location).where(
-                harm_location_to_rec.fk_data_record.in_(data_record_list)
-            )
+            # subqry = select(harm_location_to_rec.fk_harm_location).where(
+            #     harm_location_to_rec.fk_data_record.in_(data_record_list)
+            # )
+            subqry = select(harm_location_to_ds.fk_harm_location)
+            subqry = subqry.where(harm_location_to_ds.fk_dataset_id == dataset_id)
             stmt = stmt.where(harm_locations.location_id.in_(subqry))
             logger.debug(f"•• Dataset id statement alteration: {stmt}")
         results = session.execute(stmt).all()
@@ -72,6 +74,7 @@ def list_harm_metadata_location(
 
 def get_location(
     location_id: Optional[UUID] = None, 
+    record_hash: Optional[str] = None,
     pk_harm_location: Optional[int] = None
 ) -> HARM_Location:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
@@ -79,6 +82,10 @@ def get_location(
         stmt = select(harm_locations)
         if location_id is not None:
             stmt = stmt.where(harm_locations.location_id == location_id)
+        if record_hash is not None:
+            subquery = select(harm_location_to_rec.fk_harm_location)
+            subquery = subquery.where(harm_location_to_rec.fk_data_record == record_hash)
+            stmt = stmt.where(harm_locations.location_id.in_(subquery))
         if pk_harm_location is not None:
             stmt = stmt.where(harm_locations.pk_harm_location == pk_harm_location)
         result = session.execute(stmt).first()
