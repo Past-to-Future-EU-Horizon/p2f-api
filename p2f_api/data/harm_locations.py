@@ -62,13 +62,13 @@ class harm_location_to_rec(baseSQL):
 
 class harm_location_to_ds(baseSQL):
     __tablename__ = "p2f_harm_location_to_ds"
-    pk_harm_location_to_record: Mapped[int] = mapped_column(
+    pk_harm_location_to_dataset: Mapped[int] = mapped_column(
         BigInteger, primary_key=True
     )
     fk_harm_location: Mapped[UUID] = mapped_column(
         ForeignKey(f"{harm_locations.__tablename__}.location_id")
     )
-    fk_dataset_id: Mapped[str] = mapped_column(
+    fk_dataset_id: Mapped[UUID] = mapped_column(
         ForeignKey(f"{datasets.__tablename__}.dataset_id")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(

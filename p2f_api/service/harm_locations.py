@@ -146,3 +146,30 @@ def remove_location_from_record(location_id: UUID, record_hash: str):
         execute = session.execute(stmt)
         commit = session.commit()
     return None
+
+def assign_location_to_dataset(location_id: UUID, dataset_id: UUID):
+    logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
+    with Session(engine) as session:
+        logger.debug("Session created")
+        stmt = insert(harm_location_to_ds)
+        stmt = stmt.values(
+            {"fk_harm_location": location_id,
+              "fk_dataset_id": dataset_id}
+        )
+        logger.debug(stmt)
+        execute = session.execute(stmt)
+        commit = session.commit()
+    return None
+
+
+def remove_location_from_dataset(location_id: UUID, dataset_id: UUID):
+    logger.debug(f"{fa.service}{fa.remove} {__name__} {stack()[0][3]}()")
+    with Session(engine) as session:
+        stmt = delete(harm_location_to_ds)
+        stmt = stmt.where(harm_location_to_ds.fk_dataset_id == dataset_id)
+        stmt = stmt.where(
+            harm_location_to_ds.fk_harm_location == location_id
+        )
+        execute = session.execute(stmt)
+        commit = session.commit()
+    return None

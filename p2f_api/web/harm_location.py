@@ -96,7 +96,7 @@ def delete_dataset(auth: api_token_annotation,
     )
 
 
-@router.post("/assign", operation_id="location_recordhash-assign")
+@router.post("/assign-record", operation_id="location_recordhash-assign")
 def assign_location_to_record(auth: api_token_annotation,
                               location_id: uuid.UUID, record_hash: str):
     logger.debug(
@@ -107,10 +107,28 @@ def assign_location_to_record(auth: api_token_annotation,
     )
 
 
-@router.delete("/remove", operation_id="location_recordhash-remove")
+@router.delete("/remove-record", operation_id="location_recordhash-remove")
 def remove_location_from_record(auth: api_token_annotation,
                                 location_id: uuid.UUID, record_hash: str):
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_locations.remove_location_from_record(
         location_id=location_id, record_hash=record_hash
     )
+
+@router.post("/assign-dataset", operation_id="location_dataset-assign")
+def assign_location_to_dataset(auth: api_token_annotation, 
+                               location_id: uuid.UUID, dataset_id: uuid.UUID):
+    logger.debug(
+            f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}({location_id}, {dataset_id})"
+        )
+    return harm_locations.assign_location_to_dataset(location_id=location_id, 
+                                                     dataset_id=dataset_id)
+
+@router.delete("/remove-dataset", operation_id="location_dataset-remove")
+def remove_location_from_dataset(auth: api_token_annotation, 
+                                 location_id: uuid.UUID, dataset_id: uuid.UUID):
+    logger.debug(
+            f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}({location_id}, {dataset_id})"
+        )
+    return harm_locations.remove_location_from_dataset(location_id=location_id,
+                                                       dataset_id=dataset_id)
