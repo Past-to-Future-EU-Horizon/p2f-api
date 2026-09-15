@@ -63,6 +63,8 @@ class Account_Permissions(BaseModel):
     location_delete: bool = False
     location_recordhash_assign: bool = False
     location_recordhash_remove: bool = False
+    location_dataset_assign: bool = False
+    location_dataset_remove: bool = False
     # web/harm_numerical
     numeric_list: bool = False
     numeric_get: bool = False
@@ -177,6 +179,8 @@ default_consortium_permissions = Account_Permissions(
     # location_delete=True,
     location_recordhash_assign=True,
     location_recordhash_remove=True,
+    location_dataset_assign=True,
+    location_dataset_remove=True,
     ## web/harm_numerical
     numeric_list=True,
     numeric_get=True,
@@ -341,6 +345,8 @@ super_user = Account_Permissions(
     location_delete=True,
     location_recordhash_assign=True,
     location_recordhash_remove=True,
+    location_dataset_assign=True, 
+    location_dataset_remove=True,
     # web/harm_numerical
     numeric_list=True,
     numeric_get=True,
