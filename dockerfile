@@ -1,6 +1,10 @@
 FROM ghcr.io/astral-sh/uv:python3.13-alpine
 
-# WORKDIR /p2f/api
+LABEL org.opencontainers.image.description="Past 2 Future API Container built on the UV package manager alpine image"
+LABEL org.opencontainers.image.licenses="GPL3"
+LABEL org.opencontainers.image.source="https://ghcr.io/past-to-future-eu-horizon/p2f_api"
+LABEL org.opencontainers.image.title="P2F-API"
+LABEL org.opencontainers.image.url="https://github.com/Past-to-Future-EU-Horizon/p2f-api"
 
 RUN apk update
 RUN apk upgrade
@@ -9,25 +13,6 @@ RUN apk add git
 ADD . /p2f/api/
 
 EXPOSE 8084
-
-# ENV PG_USER=value
-# ENV PG_PASS=value
-# ENV PG_HOST=value
-# ENV PG_PORT=value
-# ENV PG_DB=value
-
-# ENV P2F_EMAIL_SA_USERNAME=value
-# ENV P2F_EMAIL_SA_PASSWORD=value
-# ENV P2F_EMAIL_SA_PORT=587
-# ENV P2F_EMAIL_SA_SERVER=value
-# ENV P2F_EMAIL_ADDRESS=value
-# ENV P2F_EMAIL_IP_CIDR=value
-# ENV P2F_ADMIN_EMAIL_ADDRESS=value
-# ENV P2F_TOKEN_TTL=value
-# ENV P2F_SALT=value
-# ENV P2F_HASH_COUNT=2000
-# ENV P2F_TOKEN_DEBUG=False
-# ENV P2F_TOKEN_LENGTH=64
 
 ENV UV_LINK_MODE=copy
 

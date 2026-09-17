@@ -1,3 +1,4 @@
 kubernetes/*
 *.ipynb
 uv.lock
+docker_build.py
