@@ -1,6 +1,9 @@
 from uuid import uuid4
+from time import sleep
+from subprocess import run
 from secrets import token_urlsafe
 from typing import List, Dict
+# from datetime import datetime, timedelta
 import docker
 
 test_run_id = uuid4()
@@ -19,14 +22,14 @@ test_network = client.networks.create(
 )
 
 # Setup container
-p2f_environments = {"POSTGRES_PASSWORD": "1234567890ABCDEF",
+p2f_environments = {"POSTGRES_PASSWORD": token_urlsafe(64)[:20],
                     "POSTGRES_USER": "p2f_fastapi",
                     "POSTGRES_DB": "p2f",
                     "P2F_ADMIN_EMAIL_ADDRESS": "admin@example.com",
                     "P2F_EMAIL_ADDRESS": "p2f@example.com",
                     "P2F_EMAIL_CIDR": "",
                     "P2F_EMAIL_IP_ACTIVE": "False",
-                    "P2F_EMAIL_SA_PASSWORD": "fedcba0987654321",
+                    "P2F_EMAIL_SA_PASSWORD": token_urlsafe(64)[:20],
                     "P2F_EMAIL_SA_PORT": "587",
                     "P2F_EMAIL_SA_SERVER": "smtp.example.com",
                     "P2F_EMAIL_SA_USERNAME": "sa_P2F_EMAIL",
@@ -44,17 +47,19 @@ p2f_environments["PG_HOST"] = postgres_container_name
 p2f_environments["PG_PORT"] = "5432"
 p2f_environments["PG_DB"] = p2f_environments["POSTGRES_DB"]
 
+print(p2f_environments)
+
 postgres_images = client.images.list("postgres:18-trix*")
 postgres_image = postgres_images[0]
 
 # TODO Remove ports and connect tests directly into docker network
 p2f_postgres = client.containers.run(image=postgres_image, 
                                      name=postgres_container_name,
-                                     ports={5432:5432},
+                                    #  ports={5432:5432},
                                      remove=True,
                                      detach=True,
                                      environment=p2f_environments,
-                                     network=test_network)
+                                     network=test_network.name)
 
 def highest_epoch_seconds(history: List[Dict]) -> int:
     rv = 0
@@ -71,8 +76,63 @@ p2f_api = client.containers.run(image=p2f_api_image,
                                 name=p2f_container_name,
                                 remove=True,
                                 detach=True,
-                                network=test_network, 
+                                network=test_network.name, 
                                 ports={8082:8082},
                                 # hostname="p2f-api", 
                                 environment=p2f_environments)
 
+# print("Starting a 5 second sleep to let the API get started")
+# sleep(5) # Let the API get started
+
+def get_logs_cmd(container=p2f_api):
+    print(["docker", "logs", container.short_id])
+    logs = run(["docker", "logs", container.short_id], capture_output=True)
+    logs = logs.stdout.decode("utf8")
+    return logs
+
+def get_logs_docker(container=p2f_api):
+    logs = container.logs()
+    logs = logs.decode("utf8")
+    return logs
+
+logs_http_started = False
+
+while logs_http_started is False:
+    logs = get_logs_docker(p2f_api)
+    for line in logs.split("\n"):
+        if """INFO:     Uvicorn running on""" in line:
+            print("Uvicorn started and accepting connections")
+            logs_http_started = True
+
+# Request Token
+
+# Datasets Tests
+# Records Tests
+# Numeric Tests
+
+##   Data Loading Tests
+## # Locations
+## # Species
+## # Data Types
+## # Time Slices
+
+##   Metadata Tests
+## # Datasets Location Tests
+## # Datasets Seasonality Tests
+## # Datasets Git Repository Tests
+## # Datasets Time Coverage Tests
+## # Datasets Species Tests
+## # Datasets Data Types Tests
+## # Datasets Time Slices Tests
+## # Datasets Tags & Keywords Tests
+## # Records Location Tests
+## # Records Species Tests
+## # Records Season Tests
+## # Records Data Types Tests
+## # Records References Tests
+## # Records Age Tests
+
+print("Logging startup finished -- sleeping 5 second then shutting down")
+sleep(5)
+p2f_api.stop()
+p2f_postgres.stop()
