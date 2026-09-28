@@ -2,14 +2,37 @@ from uuid import uuid4
 from time import sleep
 from subprocess import run
 from secrets import token_urlsafe
+from random import randint
+import socket
+import errno
 from typing import List, Dict
-# from datetime import datetime, timedelta
 import docker
+
+from test_request_token import test_token_requesttoken, extract_token
 
 test_run_id = uuid4()
 postgres_container_name = f"p2f_postgres_{str(hex(test_run_id.fields[-1]))[2:]}"
 p2f_container_name = f"p2f_api_{str(hex(test_run_id.fields[-1]))[2:]}"
 network_name = f"p2f_network_test_{str(hex(test_run_id.fields[-1]))[2:]}"
+
+def random_port_wcheck():
+    port_available = False
+    while port_available is False:
+        port = randint(8000, 9999)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            s.bind(("127.0.0.1", port))
+            port_available = True
+        except socket.error as e:
+            errrrrrrrr = e
+        finally:
+            s.close()
+    return port
+p2f_container_port = random_port_wcheck()
+
+p2f_admin_email = "admin@example.com"
+consortium_user_email = "user@example.com"
+unauthorized_user_email = "unauthorized@example.com"
 
 client = docker.from_env()
 
@@ -25,7 +48,7 @@ test_network = client.networks.create(
 p2f_environments = {"POSTGRES_PASSWORD": token_urlsafe(64)[:20],
                     "POSTGRES_USER": "p2f_fastapi",
                     "POSTGRES_DB": "p2f",
-                    "P2F_ADMIN_EMAIL_ADDRESS": "admin@example.com",
+                    "P2F_ADMIN_EMAIL_ADDRESS": p2f_admin_email,
                     "P2F_EMAIL_ADDRESS": "p2f@example.com",
                     "P2F_EMAIL_CIDR": "",
                     "P2F_EMAIL_IP_ACTIVE": "False",
@@ -77,7 +100,7 @@ p2f_api = client.containers.run(image=p2f_api_image,
                                 remove=True,
                                 detach=True,
                                 network=test_network.name, 
-                                ports={8082:8082},
+                                ports={8084:p2f_container_port},
                                 # hostname="p2f-api", 
                                 environment=p2f_environments)
 
@@ -104,7 +127,29 @@ while logs_http_started is False:
             print("Uvicorn started and accepting connections")
             logs_http_started = True
 
+# Add Consortium Member 
+add_user = p2f_api.exec_run(["python", "adminutils/insert_addresses.py", "-i", consortium_user_email])
+print(add_user.output.decode("utf8"))
+
 # Request Token
+## Admin
+test_token_requesttoken(port=p2f_container_port, email=p2f_admin_email)
+sleep(2)
+token_logs = get_logs_docker(p2f_api)
+p2f_admin_token = extract_token(logs=token_logs, email=p2f_admin_email)
+print(p2f_admin_token)
+## Consortium User
+test_token_requesttoken(port=p2f_container_port, email=consortium_user_email)
+sleep(2)
+token_logs = get_logs_docker(p2f_api)
+consortium_user_token = extract_token(logs=token_logs, email=consortium_user_email)
+print(consortium_user_token)
+## Random Person
+test_token_requesttoken(port=p2f_container_port, email=unauthorized_user_email)
+sleep(2)
+token_logs = get_logs_docker(p2f_api)
+unauthorized_user_token = extract_token(logs=token_logs, email=unauthorized_user_email)
+print(unauthorized_user_token)
 
 # Datasets Tests
 # Records Tests
@@ -132,7 +177,6 @@ while logs_http_started is False:
 ## # Records References Tests
 ## # Records Age Tests
 
-print("Logging startup finished -- sleeping 5 second then shutting down")
-sleep(5)
 p2f_api.stop()
 p2f_postgres.stop()
+test_network.remove()

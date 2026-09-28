@@ -76,7 +76,7 @@ if __name__ == "__main__":
     args = args_collect()
     if args.individual_email is not None:
         address = clean_address(args.individual_email)
-        valid_email = validate_email(address)
+        # valid_email = validate_email(address)
         tz = "UTC"
         insert_permitted_address(email=address,
                                  permissions=default_consortium_permissions, 
