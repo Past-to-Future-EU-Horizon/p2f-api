@@ -370,4 +370,4 @@ def api_init():
     logger.debug("Startup insert P2F PORTAL TOKEN to token store")
     insert_token_record(email=P2F_PORTAL_EMAIL_ADDRESS, 
                         generated_token=P2F_PORTAL_TOKEN, 
-                        expiration=datetime(2026, 9, 30, 23, 59, 59))
+                        expiration=datetime(2026, 11, 30, 23, 59, 59))
