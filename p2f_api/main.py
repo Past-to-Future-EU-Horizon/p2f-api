@@ -26,6 +26,7 @@ from p2f_api.web import keywords
 from p2f_api.web import seasonality
 from p2f_api.web import harm_ds_freq
 from p2f_api.web import harm_ds_timecov
+from p2f_api.web import harm_core
 from p2f_api.service.temp_accounts import api_init
 from p2f_pydantic import system as p2fsystem
 
@@ -45,13 +46,14 @@ tags_metadata_list = [
     link_git.tag_metadata,
     seasonality.tag_metadata_ds,
     seasonality.tag_metadata_rec,
-    temp_accounts.tag_metadata
+    temp_accounts.tag_metadata,
+    harm_core.tag_metadata
 ]
 
 app = FastAPI(
     title="Past to Future Dataset API",
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
-    version="0.0.123",
+    version="0.0.124",
     openapi_tags=tags_metadata_list
 )
 
@@ -83,6 +85,7 @@ app.include_router(harm_ds_timecov.router)
 app.include_router(harm_ds_freq.router)
 # app.include_router(dq_comment.router)
 app.include_router(temp_accounts.router)
+app.include_router(harm_core.router)
 
 @app.get("/version")
 def get_api_metadata() -> p2fsystem.API_Metadata:
@@ -91,7 +94,7 @@ def get_api_metadata() -> p2fsystem.API_Metadata:
                                                        patch=34)
     api_version = p2fsystem.Semantic_Version(major=0, 
                                              minor=0, 
-                                             patch=123)
+                                             patch=124)
     return_class = p2fsystem.API_Metadata(pyclient_minimum_version=minimum_p2f_client_py, 
                                           api_system_version=api_version)
     return return_class
