@@ -66,14 +66,14 @@ def create_core_segment(auth: api_token_annotation,
                                          core_id=core_id)
 
 # Delete Core
-@router.delete("/{core_id}", operation_id="core-delete")
+@router.delete("/{core_id}", operation_id="core-delete", include_in_schema=False)
 def delete_core(auth: api_token_annotation,
                 core_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_core.delete_core(core_id=core_id)
 
 # Delete Segment
-@router.delete("/{core_id}/segment/{core_segment_id}", operation_id="core-segment-delete")
+@router.delete("/{core_id}/segment/{core_segment_id}", operation_id="core-segment-delete", include_in_schema=False)
 def delete_core_segment(auth: api_token_annotation,
                         core_id: uuid.UUID, 
                         core_segment_id: uuid.UUID) -> None:
