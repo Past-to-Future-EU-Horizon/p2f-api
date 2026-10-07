@@ -10,7 +10,7 @@ from sqlalchemy import select, insert, delete, update
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
-from ..data.harm_core import core, coreSegment
+from ..data.harm_core import core, coreSegment, coreSegment_to_record
 from p2f_pydantic.harm_core import Core, CoreSegment
 
 
@@ -95,5 +95,27 @@ def delete_core_segment(core_id: UUID,
         # because if they don't match nothing will happen
         stmt = stmt.where(coreSegment.fk_core_id == core_id)
         stmt = stmt.where(coreSegment.core_segment_id == core_segment_id)
+        execute = session.execute(stmt)
+        commit = session.commit()
+
+def assign_core_segment_to_record(core_segment_id: UUID,
+                                  record_hash: str) -> None:
+    logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
+    with Session(engine) as session:
+        stmt = insert(coreSegment_to_record)
+        stmt = stmt.values(
+            fk_record_hash=record_hash,
+            fk_core_segment_id=core_segment_id
+        )
+        execute = session.execute(stmt)
+        commit = session.commit()
+
+def remove_core_segment_from_record(core_segment_id: UUID,
+                                    record_hash: str) -> None:
+    logger.debug(f"{fa.service}{fa.remove} {__name__} {stack()[0][3]}()")
+    with Session(engine) as session:
+        stmt = delete(coreSegment_to_record)
+        stmt = stmt.where(coreSegment_to_record.fk_record_hash == record_hash)
+        stmt = stmt.where(coreSegment_to_record.fk_core_segment_id == core_segment_id)
         execute = session.execute(stmt)
         commit = session.commit()

@@ -79,3 +79,19 @@ def delete_core_segment(auth: api_token_annotation,
                         core_segment_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
     return harm_core.delete_core_segment(core_id=core_id, core_segment_id=core_segment_id)
+
+@router.post("/segment/{core_segment_id}/assign/{record_hash}", operation_id="core-segment_record-assign")
+def assign_core_segment_to_record(auth: api_token_annotation,
+                                  core_segment_id: uuid.UUID,
+                                  record_hash: str) -> None:
+    logger.debug(f"{fa.web}{fa.assign} {__name__} {stack()[0][3]}()")
+    return harm_core.assign_core_segment_to_record(core_segment_id=core_segment_id, 
+                                                   record_hash=record_hash)
+
+@router.delete("/segment/{core_segment_id}/remove/{record_hash}", operation_id="core-segment_record-remove")
+def remove_core_segment_from_record(auth: api_token_annotation,
+                                    core_segment_id: uuid.UUID,
+                                    record_hash: str) -> None:
+    logger.debug(f"{fa.web}{fa.remove} {__name__} {stack()[0][3]}()")
+    return harm_core.remove_core_segment_from_record(core_segment_id=core_segment_id,
+                                                     record_hash=record_hash)

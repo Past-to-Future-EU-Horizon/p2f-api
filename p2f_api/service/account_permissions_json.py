@@ -122,6 +122,17 @@ class Account_Permissions(BaseModel):
     season_delete: bool = False
     # web/temp_accounts.py
     data_upload_check: bool = False
+    # web/harm_core.py
+    core_list: bool = False
+    core_segment_list: bool = False
+    core_get: bool = False
+    core_segment_get: bool = False
+    core_create: bool = False
+    core_segment_create: bool = False
+    core_delete: bool = False
+    core_segment_delete: bool = False
+    core_segment_record_assign: bool = False
+    core_segment_record_remove: bool = False
 
 # List only permissions that need to be set to true
 default_consortium_permissions = Account_Permissions(
@@ -238,6 +249,13 @@ default_consortium_permissions = Account_Permissions(
     season_delete=True,
     ## web/temp_accounts.py
     data_upload_check=True,
+    ## web/harm_core.py
+    core_list=True,
+    core_segment_list=True,
+    core_get=True,
+    core_segment_get=True,
+    core_create=True,
+    core_segment_create=True,
 )
 
 public_view = Account_Permissions(
@@ -288,6 +306,11 @@ public_view = Account_Permissions(
     # web/seasonality.py
     seasonality_get=True,
     season_get=True,
+    # web/harm_core.py
+    core_get=True,
+    core_list=True,
+    core_segment_list=True,
+    core_segment_get=True,
 )
 
 super_user = Account_Permissions(
@@ -404,4 +427,15 @@ super_user = Account_Permissions(
     season_delete=True,
     # web/temp_accounts.py
     data_upload_check=True,
+    # web/harm_core.py
+    core_create=True,
+    core_delete=True,
+    core_get=True,
+    core_list=True,
+    core_segment_create=True,
+    core_segment_delete=True,
+    core_segment_get=True,
+    core_segment_list=True,
+    core_segment_record_assign=True, 
+    core_segment_record_remove=True,
 )

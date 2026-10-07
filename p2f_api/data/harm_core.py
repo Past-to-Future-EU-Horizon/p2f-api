@@ -17,6 +17,7 @@ from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
 from .db_connection import engine
 from .harm_locations import harm_locations
+from .harm_data_record import harm_data_record
 
 class core(baseSQL):
     __tablename__ = "p2f_harm_core"
@@ -50,3 +51,15 @@ class coreSegment(baseSQL):
     update_timestamp: Mapped[datetime] = mapped_column(
                 DateTime(timezone=True), default=func.now(), onupdate=func.now()
             )
+
+class coreSegment_to_record(baseSQL):
+    __tablename__ = "p2f_coreSegment_to_record"
+    pk_coreseg_to_rec: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    fk_record_hash: Mapped[str] = mapped_column(ForeignKey(f"{harm_data_record.__tablename__}.record_hash"))
+    fk_core_segment_id: Mapped[UUID] = mapped_column(ForeignKey(f"{coreSegment.__tablename__}.core_segment_id"))
+    creation_timestamp: Mapped[datetime] = mapped_column(
+                    DateTime(timezone=True), default=func.now()
+                )
+    update_timestamp: Mapped[datetime] = mapped_column(
+                    DateTime(timezone=True), default=func.now(), onupdate=func.now()
+                )
