@@ -7,8 +7,13 @@ import socket
 import errno
 from typing import List, Dict
 import docker
-
+from shared import consortium_user_email, p2f_admin_email, unauthorized_user_email
+from shared import result_print
+from shared import is_token_valid
 from test_request_token import test_token_requesttoken, extract_token
+from test_datasets_token import insert_dataset_user, list_datasets_utility
+from generate_data import generate_dataset, generate_locations
+from generate_data import generate_data_types
 
 test_run_id = uuid4()
 postgres_container_name = f"p2f_postgres_{str(hex(test_run_id.fields[-1]))[2:]}"
@@ -29,10 +34,6 @@ def random_port_wcheck():
             s.close()
     return port
 p2f_container_port = random_port_wcheck()
-
-p2f_admin_email = "admin@example.com"
-consortium_user_email = "user@example.com"
-unauthorized_user_email = "unauthorized@example.com"
 
 client = docker.from_env()
 
@@ -124,12 +125,12 @@ while logs_http_started is False:
     logs = get_logs_docker(p2f_api)
     for line in logs.split("\n"):
         if """INFO:     Uvicorn running on""" in line:
-            print("Uvicorn started and accepting connections")
+            result_print(email="Server", test="API STARTUP", success=True)
             logs_http_started = True
 
 # Add Consortium Member 
 add_user = p2f_api.exec_run(["python", "adminutils/insert_addresses.py", "-i", consortium_user_email])
-print(add_user.output.decode("utf8"))
+# print(add_user.output.decode("utf8"))
 
 # Request Token
 ## Admin
@@ -137,29 +138,46 @@ test_token_requesttoken(port=p2f_container_port, email=p2f_admin_email)
 sleep(2)
 token_logs = get_logs_docker(p2f_api)
 p2f_admin_token = extract_token(logs=token_logs, email=p2f_admin_email)
-print(p2f_admin_token)
+result_print(email=p2f_admin_email, 
+             test="VALID USER TOKEN", 
+             success=is_token_valid(token=p2f_admin_token, email=p2f_admin_email))
 ## Consortium User
 test_token_requesttoken(port=p2f_container_port, email=consortium_user_email)
 sleep(2)
 token_logs = get_logs_docker(p2f_api)
 consortium_user_token = extract_token(logs=token_logs, email=consortium_user_email)
-print(consortium_user_token)
+result_print(email=consortium_user_email, 
+             test="VALID USER TOKEN", 
+             success=is_token_valid(token=consortium_user_token, email=consortium_user_email))
 ## Random Person
 test_token_requesttoken(port=p2f_container_port, email=unauthorized_user_email)
 sleep(2)
 token_logs = get_logs_docker(p2f_api)
 unauthorized_user_token = extract_token(logs=token_logs, email=unauthorized_user_email)
-print(unauthorized_user_token)
+result_print(email=unauthorized_user_email, 
+             test="INVALID USER TOKEN", 
+             success=is_token_valid(token=unauthorized_user_token, email=unauthorized_user_email))
 
 # Datasets Tests
+insert_dataset_user(email=p2f_admin_email, token=p2f_admin_token, port=p2f_container_port)
+insert_dataset_user(email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
+insert_dataset_user(email=unauthorized_user_email, token=unauthorized_user_token, port=p2f_container_port)
+datasets = list_datasets_utility(email=p2f_admin_email, 
+                                 token=p2f_admin_token,
+                                 port=p2f_container_port)
+datasets = {x.dataset_id: generate_dataset(x.dataset_id) for x in datasets}
+# print(datasets)
 # Records Tests
-# Numeric Tests
 
 ##   Data Loading Tests
 ## # Locations
+locations = generate_locations(n=10)
 ## # Species
 ## # Data Types
+data_types = generate_data_types(n=10)
 ## # Time Slices
+
+# Numeric Tests
 
 ##   Metadata Tests
 ## # Datasets Location Tests
@@ -176,6 +194,9 @@ print(unauthorized_user_token)
 ## # Records Data Types Tests
 ## # Records References Tests
 ## # Records Age Tests
+
+with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
+    f.write(p2f_api.logs().decode("utf8"))
 
 p2f_api.stop()
 p2f_postgres.stop()
