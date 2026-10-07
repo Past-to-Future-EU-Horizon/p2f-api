@@ -19,7 +19,7 @@ def list_cores() -> List[Core]:
     with Session(engine) as session:
         stmt = select(core)
         result = session.execute(stmt).all()
-    return [Core(**x) for x in result]
+    return [Core(**x.__dict__) for x in result]
 
 def list_core_segments(core_id: UUID) -> List[CoreSegment]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
@@ -27,7 +27,7 @@ def list_core_segments(core_id: UUID) -> List[CoreSegment]:
         stmt = select(coreSegment)
         stmt = stmt.where(coreSegment.fk_core_id == core_id)
         result = session.execute(stmt).all()
-    return [CoreSegment(**x) for x in result]
+    return [CoreSegment(**x.__dict__) for x in result]
 
 def get_core(core_id: UUID | None=None,
              pk_core: int | None=None) -> Core:
