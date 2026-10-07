@@ -63,3 +63,6 @@ class coreSegment_to_record(baseSQL):
     update_timestamp: Mapped[datetime] = mapped_column(
                     DateTime(timezone=True), default=func.now(), onupdate=func.now()
                 )
+
+
+baseSQL.metadata.create_all(engine)
