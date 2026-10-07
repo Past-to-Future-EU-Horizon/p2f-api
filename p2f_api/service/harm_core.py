@@ -39,7 +39,7 @@ def get_core(core_id: UUID | None=None,
         if pk_core:
             stmt = stmt.where(core.pk_harm_core == pk_core)
         result = session.execute(stmt).first()
-    return Core(**result)
+    return Core(**result.tuple()[0].__dict__)
 
 def get_core_segment(core_id: UUID | None = None,
                      core_segment_id: UUID | None=None,
@@ -54,7 +54,7 @@ def get_core_segment(core_id: UUID | None = None,
         if pk_core_segment:
             stmt = stmt.where(coreSegment.pk_harm_core_segment == pk_core_segment)
         result = session.execute(stmt).first()
-    return CoreSegment(**result)
+    return CoreSegment(**result.tuple()[0].__dict__)
 
 def create_core(new_core: Core) -> Core:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
