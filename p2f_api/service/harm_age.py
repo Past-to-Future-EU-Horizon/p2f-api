@@ -48,7 +48,7 @@ def create_new_harm_data_age(new_harm_age: HARM_Rec_Age) -> HARM_Rec_Age:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_rec_age)
-        stmt = stmt.values(**new_harm_age)
+        stmt = stmt.values(**new_harm_age.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
     return get_harm_age(pk_age=commit.inserted_primary_key[0])
