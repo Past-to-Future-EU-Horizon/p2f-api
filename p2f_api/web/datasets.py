@@ -96,5 +96,4 @@ def update_dataset(auth: api_token_annotation,
 def delete_dataset(auth: api_token_annotation,
                    dataset_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
-    if type(dataset_id) == str:
-        return datasets.delete_dataset(dataset_id)
+    return datasets.delete_dataset(dataset_id=dataset_id)
