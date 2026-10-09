@@ -51,7 +51,7 @@ def create_new_harm_data_age(new_harm_age: HARM_Rec_Age) -> HARM_Rec_Age:
         stmt = stmt.values(**new_harm_age.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
-    return get_harm_age(pk_age=commit.inserted_primary_key[0])
+    return get_harm_age(pk_age=execute.inserted_primary_key[0])
 
 
 def update_age(update_harm_age: HARM_Rec_Age) -> HARM_Rec_Age:
