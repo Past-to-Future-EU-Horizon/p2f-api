@@ -23,7 +23,7 @@ def list_harm_metadata_location(
     maximum_elevation: Optional[float] = None,
     min_location_age: Optional[float] = None,
     max_location_age: Optional[float] = None,
-    dataset_id: Optional[float] = None,
+    dataset_id: Optional[UUID] = None,
     active_locations: Optional[bool] = None,
 ) -> List[HARM_Location]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
