@@ -10,7 +10,7 @@ from sqlalchemy import select, insert, delete, update
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
-from ..data.harm_timeslice import harm_timeslice, harm_timeslice_to_record
+from ..data.harm_timeslice import harm_timeslice, harm_timeslice_to_record, harm_timeslice_to_dataset
 from p2f_pydantic.harm_timeslices import HARM_Timeslice
 
 def list_harm_timeslices(
@@ -83,8 +83,8 @@ def delete_timeslice(timeslice_id: UUID) -> None:
         commit = session.commit()
 
 
-def assign_timeslice(timeslice_id: UUID, record_hash: str):
-    logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
+def assign_timeslice_record(timeslice_id: UUID, record_hash: str):
+    logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_timeslice_to_record)
         stmt = stmt.values(fk_timeslice_id=timeslice_id, fk_record_hash=record_hash)
@@ -92,11 +92,28 @@ def assign_timeslice(timeslice_id: UUID, record_hash: str):
         commit = session.commit()
 
 
-def remove_timeslice(timeslice_id: UUID, record_hash: str):
-    logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
+def remove_timeslice_record(timeslice_id: UUID, record_hash: str):
+    logger.debug(f"{fa.service}{fa.remove} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_timeslice_to_record)
         stmt = stmt.where(harm_timeslice_to_record.fk_timeslice_id == timeslice_id)
         stmt = stmt.where(harm_timeslice_to_record.fk_record_hash == record_hash)
+        execute = session.execute(stmt)
+        commit = session.commit()
+
+def assign_timeslice_dataset(timeslice_id: UUID, dataset_id: UUID): 
+    logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
+    with Session(engine) as session:
+        stmt = insert(harm_timeslice_to_dataset)
+        stmt = stmt.values(fk_timeslice_id=timeslice_id, fk_dataset_id=dataset_id)
+        execute = session.execute(stmt)
+        commit = session.commit()
+
+def remove_timeslice_dataset(timeslice_id: UUID, dataset_id: UUID):
+    logger.debug(f"{fa.service}{fa.assign} {__name__} {stack()[0][3]}()")
+    with Session(engine) as session:
+        stmt = delete(harm_timeslice_to_dataset)
+        stmt = stmt.where(harm_timeslice_to_dataset.fk_timeslice_id == timeslice_id)
+        stmt = stmt.where(harm_timeslice_to_dataset.fk_dataset_id == dataset_id)
         execute = session.execute(stmt)
         commit = session.commit()

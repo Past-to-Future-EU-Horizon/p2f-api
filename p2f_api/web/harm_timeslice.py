@@ -75,18 +75,35 @@ def delete_timeslice(auth: api_token_annotation,
 
 
 @router.post("/assign", operation_id="timeslice_recordhash-assign")
-def assign_timeslice(auth: api_token_annotation,
+def assign_timeslice_record(auth: api_token_annotation,
                      timeslice_id: uuid.UUID, record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
-    return harm_timeslice.assign_timeslice(
+    return harm_timeslice.assign_timeslice_record(
         timeslice_id=timeslice_id, record_hash=record_hash
     )
 
 
 @router.delete("/remove", operation_id="timeslice_recordhash-remove")
-def remove_timeslice(auth: api_token_annotation,
+def remove_timeslice_record(auth: api_token_annotation,
                      timeslice_id: uuid.UUID, record_hash: str) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
-    return harm_timeslice.remove_timeslice(
+    return harm_timeslice.remove_timeslice_record(
         timeslice_id=timeslice_id, record_hash=record_hash
+    )
+
+@router.post("/assign", operation_id="timeslice_dataset-assign")
+def assign_timeslice_dataset(auth: api_token_annotation,
+                     timeslice_id: uuid.UUID, dataset_id: uuid.UUID) -> None:
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
+    return harm_timeslice.assign_timeslice_dataset(
+        timeslice_id=timeslice_id, dataset_id=dataset_id
+    )
+
+
+@router.delete("/remove", operation_id="timeslice_dataset-remove")
+def remove_timeslice_dataset(auth: api_token_annotation,
+                     timeslice_id: uuid.UUID, dataset_id: uuid.UUID) -> None:
+    logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
+    return harm_timeslice.remove_timeslice_dataset(
+        timeslice_id=timeslice_id, dataset_id=dataset_id
     )

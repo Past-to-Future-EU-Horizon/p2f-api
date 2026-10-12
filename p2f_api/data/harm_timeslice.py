@@ -16,6 +16,7 @@ from p2f_api.apilogs import logger, fa
 from .p2f_decbase import baseSQL
 from .db_connection import engine
 from .harm_data_record import harm_data_record
+from .datasets import datasets
 from .migration_utilities import migration
 
 logger.debug(f"{fa.data} {__name__}")
@@ -46,6 +47,22 @@ class harm_timeslice_to_record(baseSQL):
     )
     fk_record_hash: Mapped[str] = mapped_column(
         ForeignKey(f"{harm_data_record.__tablename__}.record_hash")
+    )
+    creation_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )
+    update_timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now(), onupdate=func.now()
+    )
+
+class harm_timeslice_to_dataset(baseSQL):
+    __tablename__ = "p2f_harm_timeslice_to_dataset"
+    pk_timeslice_to_dataset: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    fk_timeslice_id: Mapped[UUID] = mapped_column(
+            ForeignKey(f"{harm_timeslice.__tablename__}.pk_harm_timeslice")
+        )
+    fk_dataset_id: Mapped[UUID] = mapped_column(
+        ForeignKey(f"{datasets.__tablename__}.dataset_id")
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now()
