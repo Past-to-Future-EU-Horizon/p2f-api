@@ -1639,7 +1639,7 @@ wheels = [
 
 [[package]]
 name = "p2f-api"
-version = "0.0.134"
+version = "0.0.135"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
