@@ -6,6 +6,7 @@ from inspect import stack
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
+from sqlalchemy import union
 
 from p2f_api.apilogs import logger, fa
 from .harm_data_record import list_harm_data_record
@@ -23,6 +24,7 @@ def list_harm_metadata_location(
     min_location_age: Optional[float] = None,
     max_location_age: Optional[float] = None,
     dataset_id: Optional[float] = None,
+    active_locations: Optional[bool] = None,
 ) -> List[HARM_Location]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     # if dataset_id is not None:
@@ -67,6 +69,12 @@ def list_harm_metadata_location(
             subqry = subqry.where(harm_location_to_ds.fk_dataset_id == dataset_id)
             stmt = stmt.where(harm_locations.location_id.in_(subqry))
             logger.debug(f"•• Dataset id statement alteration: {stmt}")
+        if active_locations:
+            logger.debug("•• active_locations id is not none or False")
+            active_ds_subqry = select(harm_location_to_ds.fk_harm_location.distinct())
+            active_rec_subqry = select(harm_location_to_rec.fk_harm_location.distinct())
+            active_union = union(active_ds_subqry, active_rec_subqry)
+            stmt = stmt.where(harm_locations.location_id.in_(active_union))
         results = session.execute(stmt).all()
         logger.debug(f"• Found {len(results)} results. ")
     return [HARM_Location(**x[0].__dict__) for x in results]
