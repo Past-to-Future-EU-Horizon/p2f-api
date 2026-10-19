@@ -13,7 +13,7 @@ from fastapi.responses import Response
 from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
 from ..data.datasets import datasets
-import .shared_execution
+from service import shared_execution
 from p2f_pydantic.datasets import Datasets
 
 def list_datasets(
