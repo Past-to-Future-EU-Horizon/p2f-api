@@ -5,12 +5,13 @@ from inspect import stack
 
 # Third Party Libraries
 from fastapi import APIRouter, Security, Depends
-from fastapi import Header, Body
+from fastapi import Request
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from ..service import datasets
-from .temp_accounts import combined_auth, api_token_annotation, api_token_annotation
+from .temp_accounts import api_token_annotation
+import response_models
 from p2f_pydantic.datasets import Datasets
 # from p2f_pydantic.temp_accounts import Temp_Account
 
@@ -53,47 +54,62 @@ The dataset_id field is used to relate the following objects back to a dataset:
 * HARM Species"""}
 
 # List
-@router.get("/", operation_id="dataset-list")
+@router.get("/", operation_id="dataset-list", responses=response_models.json_and_table)
 def list_datasets(
     auth: api_token_annotation,
+    req: Request,
     is_new_p2f: Optional[bool] = None,
     is_sub_dataset: Optional[bool] = None,
     doi: Optional[str] = None,
 ) -> List[Datasets]:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
+    output_format = req.headers.get("Accept", "application/json")
     # logger.debug(f"Parameters: {is_new_p2f}, {is_sub_dataset}, {doi}")
     return datasets.list_datasets(
-        is_new_p2f=is_new_p2f, is_sub_dataset=is_sub_dataset, doi=doi
+        is_new_p2f=is_new_p2f, 
+        is_sub_dataset=is_sub_dataset, 
+        doi=doi, 
+        output_format=output_format,
     )
 
 
 # Get Single
-@router.get("/{dataset_id}", operation_id="dataset-get")
+@router.get("/{dataset_id}", operation_id="dataset-get", responses=response_models.json_and_table)
 def get_dataset(auth: api_token_annotation,
+                req: Request,
                 dataset_id: uuid.UUID) -> Datasets:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
-    return datasets.get_dataset(dataset_id=dataset_id)
+    output_format = req.headers.get("Accept", "application/json")
+    return datasets.get_dataset(dataset_id=dataset_id, 
+                                output_format=output_format)
 
 
 # Create
-@router.post("/", operation_id="dataset-create")
+@router.post("/", operation_id="dataset-create", responses=response_models.json_and_table)
 def create_dataset(auth: api_token_annotation,
+                   req: Request,
                    dataset: Datasets) -> Datasets:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
-    return datasets.create_dataset(dataset)
+    output_format = req.headers.get("Accept", "application/json")
+    return datasets.create_dataset(dataset, 
+                                   output_format=output_format)
 
 
 # Update
-@router.put("/", include_in_schema=False, operation_id="dataset-update")
+@router.put("/", include_in_schema=False, operation_id="dataset-update", responses=response_models.json_and_table)
 def update_dataset(auth: api_token_annotation,
+                   req: Request,
                    dataset_updates: Datasets) -> Datasets:
     logger.debug(f"{fa.web}{fa.update} {__name__} {stack()[0][3]}()")
+    output_format = req.headers.get("Accept", "application/json")
     return datasets.update_dataset(dataset_updates)
 
 
 # Delete
 @router.delete("/{dataset_id}", include_in_schema=False, operation_id="dataset-delete")
 def delete_dataset(auth: api_token_annotation,
+                #    req: Request,
                    dataset_id: uuid.UUID) -> None:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
+    # output_format = req.headers.get("Accept", "application/json")
     return datasets.delete_dataset(dataset_id=dataset_id)

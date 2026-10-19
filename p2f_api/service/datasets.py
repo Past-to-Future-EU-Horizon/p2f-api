@@ -1,23 +1,27 @@
 # Batteries included libraries
 from typing import List, Optional
 from inspect import stack
+from io import BytesIO
 import uuid
 
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
+from fastapi.responses import Response
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from ..data.db_connection import engine
 from ..data.datasets import datasets
+import shared_execution
 from p2f_pydantic.datasets import Datasets
 
 def list_datasets(
     is_new_p2f: Optional[bool] = None,
     is_sub_dataset: Optional[bool] = None,
     doi: Optional[str] = None,
-) -> List[Datasets]:
+    output_format: shared_execution.mimes = "application/json",
+    ) -> List[Datasets] | Response:
     logger.debug(f"{fa.service}{fa.list} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
@@ -29,14 +33,22 @@ def list_datasets(
             stmt = stmt.where(datasets.is_sub_dataset == is_sub_dataset)
         if doi is not None:
             stmt = stmt.where(datasets.doi == doi)
-        results = session.execute(stmt).all()
+        results = shared_execution.list(stmt=stmt,
+                                        pydantic_object=Datasets,
+                                        session_object=session,
+                                        output_format=output_format)
         logger.debug(f"•  Found {len(results)} results")
-    results = [x[0] for x in results]
-    datasets_list = [Datasets(**x.__dict__) for x in results]
-    return datasets_list
+    if output_format in ["application/vnd.apache.parquet", 
+                         "text/csv"]:
+        return Response(content=results,
+                        media_type=output_format)
+    else:
+        return results
 
 
-def get_dataset(dataset_id=None, pk_datasets=None) -> Datasets:
+def get_dataset(dataset_id=None,
+                output_format: shared_execution.mimes = "application/json", 
+                pk_datasets=None) -> Datasets | Response:
     logger.debug(f"{fa.service}{fa.get} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
@@ -45,13 +57,20 @@ def get_dataset(dataset_id=None, pk_datasets=None) -> Datasets:
             stmt = stmt.where(datasets.dataset_id == dataset_id)
         if pk_datasets is not None:
             stmt = stmt.where(datasets.pk_datasets == pk_datasets)
-        result = session.execute(stmt).first()
-    result = result.tuple()[0]
-    ## I hate the current below implementation, but its all I have for now
-    return Datasets(**result.__dict__)
+        result = shared_execution.get(stmt=stmt,
+                                      pydantic_object=Datasets,
+                                      session_object=session,
+                                      output_format=output_format)
+    if output_format in ["application/vnd.apache.parquet", 
+                         "text/csv"]:
+        return Response(content=result,
+                        media_type=output_format)
+    else:
+        return result
 
 
-def create_dataset(new_dataset: Datasets) -> Datasets:
+def create_dataset(new_dataset: Datasets,
+                   output_format: shared_execution.mimes = "application/json",) -> Datasets:
     logger.debug(f"{fa.service}{fa.create} {stack()[0][3]}()")
     # logger.debug(f"•  received: {new_dataset}")
     if new_dataset.dataset_id is None:
@@ -64,14 +83,14 @@ def create_dataset(new_dataset: Datasets) -> Datasets:
         stmt = insert(datasets)
         stmt = stmt.values(**new_dataset.model_dump(exclude_unset=True))
         logger.debug(f"•  statement: {stmt}")
-        execute = session.execute(stmt)
-        commit = session.commit()
+        inserted_pk = shared_execution.create(stmt=stmt,
+                                              session_object=session)
         logger.debug("•  Executed and Commited")
-    return_dataset = get_dataset(pk_datasets=execute.inserted_primary_key[0])
-    return return_dataset
+    return get_dataset(pk_datasets=inserted_pk)
 
 
-def update_dataset(dataset_update: Datasets) -> Datasets:
+def update_dataset(dataset_update: Datasets,
+                   output_format: shared_execution.mimes = "application/json",) -> Datasets:
     logger.debug(f"{fa.service}{fa.update} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
@@ -85,11 +104,11 @@ def update_dataset(dataset_update: Datasets) -> Datasets:
     return get_dataset(dataset_id=dataset_update.dataset_id)
 
 
-def delete_dataset(dataset_id) -> None:
+def delete_dataset(dataset_id,
+                   output_format: shared_execution.mimes = "application/json",) -> None:
     logger.debug(f"{fa.service}{fa.delete} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
         stmt = delete(datasets).where(datasets.dataset_id == dataset_id)
-        execute = session.execute(stmt)
-        commit = session.commit()
-    return None
+        return shared_execution.delete(stmt=stmt,
+                                       session_object=session)

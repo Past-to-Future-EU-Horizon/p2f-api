@@ -68,13 +68,13 @@ def list_harm_metadata_location(
             subqry = select(harm_location_to_ds.fk_harm_location)
             subqry = subqry.where(harm_location_to_ds.fk_dataset_id == dataset_id)
             stmt = stmt.where(harm_locations.location_id.in_(subqry))
-            logger.debug(f"•• Dataset id statement alteration: {stmt}")
         if active_locations:
             logger.debug("•• active_locations id is not none or False")
             active_ds_subqry = select(harm_location_to_ds.fk_harm_location.distinct())
             active_rec_subqry = select(harm_location_to_rec.fk_harm_location.distinct())
             active_union = union(active_ds_subqry, active_rec_subqry)
             stmt = stmt.where(harm_locations.location_id.in_(active_union))
+        logger.debug(f"• Final statement: {stmt}")
         results = session.execute(stmt).all()
         logger.debug(f"• Found {len(results)} results. ")
     return [HARM_Location(**x[0].__dict__) for x in results]
