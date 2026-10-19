@@ -98,7 +98,7 @@ p2f_api_image = p2f_api_image_ages[max(p2f_api_image_ages.keys())]
 
 p2f_api = client.containers.run(image=p2f_api_image,
                                 name=p2f_container_name,
-                                remove=True,
+                                # remove=True,
                                 detach=True,
                                 network=test_network.name, 
                                 ports={8084:p2f_container_port},
@@ -107,6 +107,11 @@ p2f_api = client.containers.run(image=p2f_api_image,
 
 # print("Starting a 5 second sleep to let the API get started")
 # sleep(5) # Let the API get started
+
+# DUMP startup logging issues
+# sleep(1)
+# with open(f"tests/test_apilogs_{test_run_id}_STARTUPDUMP.txt", "w") as f:
+#     f.write(p2f_api.logs().decode("utf8"))
 
 def get_logs_cmd(container=p2f_api):
     print(["docker", "logs", container.short_id])
@@ -199,5 +204,6 @@ with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
     f.write(p2f_api.logs().decode("utf8"))
 
 p2f_api.stop()
+p2f_api.remove()
 p2f_postgres.stop()
 test_network.remove()
