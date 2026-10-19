@@ -98,7 +98,7 @@ p2f_api_image = p2f_api_image_ages[max(p2f_api_image_ages.keys())]
 
 p2f_api = client.containers.run(image=p2f_api_image,
                                 name=p2f_container_name,
-                                # remove=True,
+                                remove=True,
                                 detach=True,
                                 network=test_network.name, 
                                 ports={8084:p2f_container_port},

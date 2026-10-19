@@ -4,7 +4,6 @@ import pandas as pd
 from sqlalchemy.sql import Executable
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from ..data.p2f_decbase import baseSQL
 
 mimes = Literal["text/csv", "application/json", "application/vnd.apache.parquet"]
 
