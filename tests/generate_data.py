@@ -10,13 +10,17 @@ def record_hash(dataset_id: UUID, row: int):
     return h.hexdigest()
 
 def generate_dataset(dataset_id: UUID, 
-                     n: int=100):
+                     location_list: list,
+                    #  datatypes_list: list,
+                     n: int=100,
+                     ):
     df = pd.DataFrame(columns=["dataset_id", "Record ID", "RecordHash", 
                                "test_int", 
                                "test_int_v", "test_int_l", "test_int_u", "test_int_lc", "test_int_uc",
                                "test_float",
                                "test_float_v", "test_float_l", "test_float_u", "test_float_lc", "test_float_uc",
-                               "season", "age", "length_along_core",])
+                               "season", "age", "length_along_core",
+                               "location_id"])
     seasonality_dict = {"hot/cold": ["Hot", "Cold"],
                         "summer/winter": ["Summer", "Winter"],
                         "spring/summer/fall/winter": ["Spring", "Summer", "Fall", "Winter"]}
@@ -44,7 +48,8 @@ def generate_dataset(dataset_id: UUID,
                      test_int_v, test_int_l, test_int_u, test_int_lc, test_int_uc,
                      randint(-2000, 2000) + random(), 
                      test_float_v, test_float_l, test_float_u, test_float_lc, test_float_uc,
-                     season, age, length_along_core)
+                     season, age, length_along_core,
+                     choice(location_list))
     return df
 
 def generate_location():
