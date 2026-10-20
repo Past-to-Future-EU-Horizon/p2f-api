@@ -86,7 +86,8 @@ def create_dataset(new_dataset: Datasets,
         inserted_pk = shared_execution.create(stmt=stmt,
                                               session_object=session)
         logger.debug("•  Executed and Commited")
-    return get_dataset(pk_datasets=inserted_pk)
+    return get_dataset(pk_datasets=inserted_pk, 
+                       output_format=output_format)
 
 
 def update_dataset(dataset_update: Datasets,
@@ -101,7 +102,8 @@ def update_dataset(dataset_update: Datasets,
         stmt = stmt.values(**dataset_update.model_dump(exclude_unset=True))
         execute = session.execute(stmt)
         commit = session.commit()
-    return get_dataset(dataset_id=dataset_update.dataset_id)
+    return get_dataset(dataset_id=dataset_update.dataset_id,
+                       output_format=output_format)
 
 
 def delete_dataset(dataset_id,

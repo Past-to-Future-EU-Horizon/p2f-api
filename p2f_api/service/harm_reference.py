@@ -9,17 +9,21 @@ from sqlalchemy import select, insert, delete, update
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
+from service import shared_execution
 from ..data.db_connection import engine
 from ..data.harm_reference import harm_reference, harm_reference_to_record
 from p2f_pydantic.harm_reference import HARM_Reference
 
 # List
-def list_references() -> List[HARM_Reference]:
+def list_references(output_format: shared_execution.mimes = "application/json",) -> List[HARM_Reference]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_reference)
-        results = session.execute(stmt).all()
-    return [HARM_Reference(**x[0].__dict__) for x in results]
+        results = shared_execution.list(stmt=stmt,
+                                        pydantic_object=HARM_Reference,
+                                        session_object=session,
+                                        output_format=output_format)
+    return results
 
 
 # Get
@@ -27,6 +31,7 @@ def get_reference(
     doi: Optional[str] = None,
     reference_id: Optional[str] = None,
     pk_harm_reference: Optional[int] = None,
+    output_format: shared_execution.mimes = "application/json",
 ) -> HARM_Reference:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
@@ -37,21 +42,25 @@ def get_reference(
             stmt = stmt.where(harm_reference.reference_id == reference_id)
         if pk_harm_reference is not None:
             stmt = stmt.where(harm_reference.pk_harm_reference == pk_harm_reference)
-        result = session.execute(stmt).first()
-    return HARM_Reference(**result.tuple()[0].__dict__)
+        result = shared_execution.get(stmt=stmt, 
+                                      pydantic_object=HARM_Reference,
+                                      session_object=session,
+                                      output_format=output_format)
+    return result
 
 
 # Create
-def create_reference(new_reference: HARM_Reference) -> HARM_Reference:
+def create_reference(new_reference: HARM_Reference,
+                     output_format: shared_execution.mimes = "application/json",) -> HARM_Reference:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     if new_reference.reference_id is None:
         new_reference.reference_id = uuid4()
     with Session(engine) as session:
         stmt = insert(harm_reference)
         stmt = stmt.values(**new_reference.model_dump(exclude_unset=True))
-        execute = session.execute(stmt)
-        commit = session.commit()
-    return get_reference(pk_harm_reference=execute.inserted_primary_key[0])
+        pk = shared_execution.create(stmt=stmt, session_object=session)
+    return get_reference(pk_harm_reference=pk, 
+                         output_format=output_format)
 
 
 # Update
@@ -63,8 +72,7 @@ def delete_reference(reference_id: UUID) -> None:
     with Session(engine) as session:
         stmt = delete(harm_reference)
         stmt = stmt.where(reference_id == reference_id)
-        execute = session.execute(stmt)
-        commit = session.commit()
+        shared_execution.delete(stmt=stmt, session_object=session)
     return None
 
 

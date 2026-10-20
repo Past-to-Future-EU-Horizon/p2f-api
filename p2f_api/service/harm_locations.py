@@ -10,6 +10,7 @@ from sqlalchemy import union
 
 from p2f_api.apilogs import logger, fa
 from .harm_data_record import list_harm_data_record
+from service import shared_execution
 from ..data.db_connection import engine
 from ..data.harm_locations import harm_location_to_rec, harm_location_to_ds, harm_locations
 from p2f_pydantic.harm_location import HARM_Location
@@ -25,6 +26,7 @@ def list_harm_metadata_location(
     max_location_age: Optional[float] = None,
     dataset_id: Optional[UUID] = None,
     active_locations: Optional[bool] = None,
+    output_format: shared_execution.mimes = "application/json",
 ) -> List[HARM_Location]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     # if dataset_id is not None:
@@ -74,16 +76,18 @@ def list_harm_metadata_location(
             active_rec_subqry = select(harm_location_to_rec.fk_harm_location.distinct())
             active_union = union(active_ds_subqry, active_rec_subqry)
             stmt = stmt.where(harm_locations.location_id.in_(active_union))
-        logger.debug(f"• Final statement: {stmt}")
-        results = session.execute(stmt).all()
-        logger.debug(f"• Found {len(results)} results. ")
-    return [HARM_Location(**x[0].__dict__) for x in results]
+        results = shared_execution.list(stmt=stmt,
+                                        pydantic_object=HARM_Location,
+                                        session_object=session,
+                                        output_format=output_format)
+    return results
 
 
 def get_location(
     location_id: Optional[UUID] = None, 
     record_hash: Optional[str] = None,
-    pk_harm_location: Optional[int] = None
+    pk_harm_location: Optional[int] = None,
+    output_format: shared_execution.mimes = "application/json",
 ) -> HARM_Location:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
@@ -96,12 +100,15 @@ def get_location(
             stmt = stmt.where(harm_locations.location_id.in_(subquery))
         if pk_harm_location is not None:
             stmt = stmt.where(harm_locations.pk_harm_location == pk_harm_location)
-        result = session.execute(stmt).first()
-    result = result.tuple()[0]
-    return HARM_Location(**result.__dict__)
+        result = shared_execution.get(stmt=stmt,
+                                      pydantic_object=HARM_Location,
+                                      session_object=session,
+                                      output_format=output_format)
+    return result
 
 
-def create_location(new_location: HARM_Location) -> HARM_Location:
+def create_location(new_location: HARM_Location,
+                    output_format: shared_execution.mimes = "application/json",) -> HARM_Location:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     if new_location.location_id is None:
         logger.debug("• Inserting UUID to location_id")
@@ -109,29 +116,31 @@ def create_location(new_location: HARM_Location) -> HARM_Location:
     with Session(engine) as session:
         stmt = insert(harm_locations)
         stmt = stmt.values(**new_location.model_dump(exclude_unset=True))
-        execute = session.execute(stmt)
-        commit = session.commit()
-    return get_location(pk_harm_location=execute.inserted_primary_key[0])
+        pk = shared_execution.create(stmt=stmt,
+                                     session_object=session)
+    return get_location(pk_harm_location=pk,
+                        output_format=output_format)
 
 
-def update_location(update_location: HARM_Location) -> HARM_Location:
-    logger.debug(f"{fa.service}{fa.update} {__name__} {stack()[0][3]}()")
-    with Session(engine) as session:
-        stmt = update(harm_locations)
-        stmt = stmt.where(update_location.location_id)
-        stmt = stmt.values(update_location)
-        execute = session.execute(stmt)
-        commit = session.commit()
-    return get_location(update_location.pk_harm_location)
+# def update_location(update_location: HARM_Location,
+#                     output_format: shared_execution.mimes = "application/json",) -> HARM_Location:
+#     logger.debug(f"{fa.service}{fa.update} {__name__} {stack()[0][3]}()")
+#     with Session(engine) as session:
+#         stmt = update(harm_locations)
+#         stmt = stmt.where(update_location.location_id)
+#         stmt = stmt.values(update_location)
+#         execute = session.execute(stmt)
+#         commit = session.commit()
+#     return get_location(update_location.pk_harm_location)
 
 
-def delete_location(location_id: UUID) -> None:
+def delete_location(location_id: UUID,
+                    output_format: shared_execution.mimes = "application/json",) -> None:
     logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_locations)
         stmt = stmt.where(harm_locations.location_id == location_id)
-        execute = session.execute(stmt)
-        commit = session.commit()
+        shared_execution.delete(stmt=stmt, session_object=session)
     return None
 
 

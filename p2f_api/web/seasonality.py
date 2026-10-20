@@ -4,7 +4,7 @@ from typing import Optional, List, Annotated
 from inspect import stack
 
 # Third Party Libraries
-from fastapi import Body, APIRouter, Depends
+from fastapi import APIRouter, Body
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
@@ -44,18 +44,16 @@ def get_season_rec(auth: api_token_annotation,
 @router_ds.post("/{dataset_id}", operation_id="seasonality-create")
 def add_seasonality_ds(auth: api_token_annotation,
                        dataset_id: uuid.UUID,
-                       seasonality: str) -> Seasonality_DS:
+                       seasonality: Seasonality_DS) -> Seasonality_DS:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
-    return season_svc.add_seasonality_ds(dataset_id=dataset_id,
-                                          seasonality=seasonality)
+    return season_svc.add_seasonality_ds(new_seasonality=seasonality)
     
 @router_rec.post("/{record_hash}", operation_id="season-create")
 def add_season_rec(auth: api_token_annotation,
-                   record_hash: str, 
-                   season: str) -> Season:
+                   record_hash: str,
+                   season: Season) -> Season:
     logger.debug(f"{fa.web}{fa.create} {__name__} {stack()[0][3]}()")
-    return season_svc.add_season_rec(record_hash=record_hash,
-                                     season=season)
+    return season_svc.add_season_rec(new_season=season)
 # Delete
 @router_ds.delete("/{dataset_id}", operation_id="seasonality-delete")
 def delete_seasonality_ds(auth: api_token_annotation,

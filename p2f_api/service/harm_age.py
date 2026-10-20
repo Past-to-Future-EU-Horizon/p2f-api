@@ -9,6 +9,7 @@ from sqlalchemy import select, insert, delete, update
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
+from service import shared_execution
 from ..data.db_connection import engine
 from ..data.harm_age import harm_rec_age
 from p2f_pydantic.harm_age import HARM_Rec_Age
@@ -16,7 +17,8 @@ from p2f_pydantic.harm_age import HARM_Rec_Age
 
 def list_harm_ages(
     recent_year_search: Optional[int] = None, 
-    older_year_search: Optional[int] = None
+    older_year_search: Optional[int] = None,
+    output_format: shared_execution.mimes = "application/json",
 ) -> List[HARM_Rec_Age]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
@@ -25,13 +27,17 @@ def list_harm_ages(
             stmt = stmt.where(harm_rec_age.age_mean >= recent_year_search)
         if older_year_search is not None:
             stmt = stmt.where(harm_rec_age.age_mean <= older_year_search)
-        results = session.execute(harm_rec_age).all()
-    return [HARM_Rec_Age(**x[0].__dict__) for x in results]
+        results = shared_execution.list(stmt=stmt,
+                                        pydantic_object=HARM_Rec_Age,
+                                        session_object=session,
+                                        output_format=output_format)
+    return results
 
 
 def get_harm_age(
     record_hash: Optional[str] = None, 
-    pk_age: Optional[int] = None
+    pk_age: Optional[int] = None,
+    output_format: shared_execution.mimes = "application/json",
 ) -> HARM_Rec_Age:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
@@ -40,21 +46,26 @@ def get_harm_age(
             stmt = stmt.where(harm_rec_age.fk_record_hash == record_hash)
         if pk_age is not None:
             stmt = stmt.where(harm_rec_age.pk_harm_age == pk_age)
-        result = session.execute(stmt)
-    return HARM_Rec_Age(**result.tuple()[0].__dict__)
+        result = shared_execution.get(stmt=stmt,
+                                      pydantic_object=HARM_Rec_Age,
+                                      session_object=session,
+                                      output_format=output_format)
+    return result
 
 
-def create_new_harm_data_age(new_harm_age: HARM_Rec_Age) -> HARM_Rec_Age:
+def create_new_harm_data_age(new_harm_age: HARM_Rec_Age,
+                             output_format: shared_execution.mimes = "application/json",) -> HARM_Rec_Age:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(harm_rec_age)
         stmt = stmt.values(**new_harm_age.model_dump(exclude_unset=True))
-        execute = session.execute(stmt)
-        commit = session.commit()
-    return get_harm_age(pk_age=execute.inserted_primary_key[0])
+        pk = shared_execution.create(stmt=stmt, session_object=session)
+    return get_harm_age(pk_age=pk,
+                        output_format=output_format)
 
 
-def update_age(update_harm_age: HARM_Rec_Age) -> HARM_Rec_Age:
+def update_age(update_harm_age: HARM_Rec_Age,
+               output_format: shared_execution.mimes = "application/json",) -> HARM_Rec_Age:
     logger.debug(f"{fa.service}{fa.update} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = update(harm_rec_age)
@@ -67,10 +78,11 @@ def update_age(update_harm_age: HARM_Rec_Age) -> HARM_Rec_Age:
     return get_harm_age(record_hash=update_harm_age.fk_record_hash)
 
 
-def delete_age(record_hash: str) -> None:
+def delete_age(record_hash: str,
+               output_format: shared_execution.mimes = "application/json",) -> None:
     logger.debug(f"{fa.service}{fa.delete} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = delete(harm_rec_age)
         stmt = stmt.where(harm_rec_age.fk_record_hash == record_hash)
-        execute = session.execute(stmt)
-        commit = session.commit()
+        shared_execution.delete(stmt=stmt,
+                                session_object=session)

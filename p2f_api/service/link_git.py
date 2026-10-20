@@ -9,6 +9,7 @@ from sqlalchemy import select, insert, delete, update
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
+from service import shared_execution
 from ..data.db_connection import engine
 from ..data.link_git import git_repository, git_repository_to_dataset
 from p2f_pydantic.link_git import Git_Repository
@@ -16,6 +17,7 @@ from p2f_pydantic.link_git import Git_Repository
 
 def list_git_repositories(
     dataset_id: Optional[uuid.UUID] = None,
+    output_format: shared_execution.mimes = "application/json",
 ) -> List[Git_Repository]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
@@ -23,12 +25,17 @@ def list_git_repositories(
         if dataset_id is not None:
             stmt_2 = select(git_repository_to_dataset)
             stmt_2 = stmt_2.where(git_repository_to_dataset.fk_dataset == dataset_id)
-        results = session.execute(stmt).all()
-    return [Git_Repository(x) for x in results]
+        results = shared_execution.list(stmt=stmt,
+                                        pydantic_object=Git_Repository,
+                                        session_object=session,
+                                        output_format=output_format)
+    return results
 
 
 def get_git_repo(
-    git_repo_id: Optional[uuid.UUID] = None, pk_git_repo: Optional[int] = None
+    git_repo_id: Optional[uuid.UUID] = None, 
+    pk_git_repo: Optional[int] = None,
+    output_format: shared_execution.mimes = "application/json",
 ) -> Git_Repository:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
@@ -37,12 +44,17 @@ def get_git_repo(
             stmt.where(git_repository.git_repo_id == git_repo_id)
         if pk_git_repo is not None:
             stmt.where(git_repository.pk_git_repo == pk_git_repo)
-        result = session.execute(stmt).first()
-    return Git_Repository(**result[0])
+        result = shared_execution.get(stmt=stmt,
+                                      pydantic_object=Git_Repository,
+                                      session_object=session,
+                                      output_format=output_format)
+    return result
 
 
 def create_git_repo(
-    new_git_repo: Git_Repository, dataset_id: Optional[uuid.UUID] = None
+    new_git_repo: Git_Repository, 
+    dataset_id: Optional[uuid.UUID] = None,
+    output_format: shared_execution.mimes = "application/json",
 ) -> Git_Repository:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     if new_git_repo.git_repo_id is None:
@@ -52,18 +64,17 @@ def create_git_repo(
         stmt = stmt.values(
             git_repo_url=new_git_repo.git_repo_id, is_p2f_repo=new_git_repo.is_p2f_repo
         )
-        execute = session.execute(stmt)
-        commit = session.commit()
-    return get_git_repo(pk_git_repo=execute.inserted_primary_key[0])
+        pk = shared_execution.create(stmt=stmt, session_object=session)
+    return get_git_repo(pk_git_repo=pk,
+                        output_format=output_format)
 
 
-def delete_git_repo(git_repo_id: Optional[uuid.UUID] = None) -> None:
+def delete_git_repo(git_repo_id: Optional[uuid.UUID] = None,) -> None:
     logger.debug(f"{fa.service}{fa.delete} {__name__}")
     with Session(engine) as session:
         stmt = delete(git_repository)
         stmt = stmt.where(git_repository.git_repo_id == git_repo_id)
-        execute = session.execute(stmt)
-        commit = session.commit()
+        shared_execution.delete(stmt=stmt, session_object=session)
 
 
 def assign_git_repo(git_repo_id: uuid.UUID, dataset_id: uuid.UUID):
