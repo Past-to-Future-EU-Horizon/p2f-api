@@ -9,6 +9,7 @@ from sqlalchemy import select, insert, delete, update
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
+from service import shared_execution
 # from ..service.harm_numerical import list_numerics
 from ..data.db_connection import engine
 from ..data.harm_data_record import harm_data_record
@@ -20,6 +21,7 @@ def list_harm_data_record(
     # data_type: Optional[int]=None,  ## Disabling this for now
     ## I would need to duplicate the code in the numerical service
     ## as this is currently causing circular import issues.
+    output_format: shared_execution.mimes = "application/json",
 ) -> List[HARM_Data_Record]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
@@ -29,14 +31,17 @@ def list_harm_data_record(
             stmt = stmt.where(harm_data_record.fk_dataset == dataset)
         # if data_type is not None: ### Disabled
         #     subqry = (select().subquery())
-        results = session.execute(stmt).all()
-        logger.debug(f"\tFound {len(results)} results")
-    return [HARM_Data_Record(**x[0].__dict__) for x in results]
+        results = shared_execution.list(stmt=stmt,
+                                        session_object=session, 
+                                        pydantic_object=HARM_Data_Record,
+                                        output_format=output_format)
+    return results
 
 
 def get_harm_data_record(
     record_hash: Optional[str] = None,
-    pk_harm_data_record: Optional[int] = None
+    pk_harm_data_record: Optional[int] = None,
+    output_format: shared_execution.mimes = "application/json",
 ) -> HARM_Data_Record:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
@@ -48,24 +53,29 @@ def get_harm_data_record(
             stmt = stmt.where(
                 harm_data_record.pk_harm_data_record == pk_harm_data_record
             )
-        result = session.execute(stmt).first()
-    return HARM_Data_Record(**result.tuple()[0].__dict__)
+        result = shared_execution.get(stmt=stmt,
+                                      pydantic_object=HARM_Data_Record,
+                                      session_object=session,
+                                      output_format=output_format)
+    return result
 
-
-def create_harm_data_record(new_dataset: HARM_Data_Record) -> HARM_Data_Record:
+def create_harm_data_record(new_dataset: HARM_Data_Record,
+                            output_format: shared_execution.mimes = "application/json",) -> HARM_Data_Record:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("\tCreated session")
         stmt = insert(harm_data_record)
         stmt = stmt.values(**new_dataset.model_dump(exclude_unset=True))
-        execute = session.execute(stmt)
-        commit = session.commit()
-    return get_harm_data_record(pk_harm_data_record=execute.inserted_primary_key[0])
+        pk = shared_execution.create(stmt=stmt,
+                                     session_object=session)
+    return get_harm_data_record(pk_harm_data_record=pk,
+                                output_format=output_format)
 
 
 def update_harm_data_record(
     record_hash: str,
-    dataset_update: HARM_Data_Record
+    dataset_update: HARM_Data_Record,
+    output_format: shared_execution.mimes = "application/json",
 ) -> HARM_Data_Record:
     logger.debug(f"{fa.service}{fa.update} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
@@ -87,6 +97,6 @@ def delete_harm_data_record(record_hash: str) -> None:
         stmt = delete(harm_data_record).where(
             harm_data_record.record_hash == record_hash
         )
-        execute = session.execute(stmt)
-        commit = session.commit()
+        shared_execution.delete(stmt=stmt,
+                                session_object=session)
     return None

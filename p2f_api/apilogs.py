@@ -22,5 +22,6 @@ class FA:  # function annotations
         # Other
         self.auth = "🔐"
         self.migration = "🌀"
+        self.other = "⭕"
 
 fa = FA()

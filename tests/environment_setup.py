@@ -12,6 +12,11 @@ from shared import result_print
 from shared import is_token_valid
 from test_request_token import test_token_requesttoken, extract_token
 from test_datasets_token import insert_dataset_user, list_datasets_utility
+from test_upload_locations import insert_locations, get_all_inserted_locations
+from test_upload_datatypes import insert_datatypes, get_all_inserted_datatypes
+from test_insert_numerics import insert_numericals_from_datasets
+from test_insert_records import insert_records
+from test_assign_record_metadata import assign_location_record_bytable, assign_season_record_bytable
 from generate_data import generate_dataset, generate_locations
 from generate_data import generate_data_types
 
@@ -108,6 +113,11 @@ p2f_api = client.containers.run(image=p2f_api_image,
 # print("Starting a 5 second sleep to let the API get started")
 # sleep(5) # Let the API get started
 
+# DUMP startup logging issues
+# sleep(1)
+# with open(f"tests/test_apilogs_{test_run_id}_STARTUPDUMP.txt", "w") as f:
+#     f.write(p2f_api.logs().decode("utf8"))
+
 def get_logs_cmd(container=p2f_api):
     print(["docker", "logs", container.short_id])
     logs = run(["docker", "logs", container.short_id], capture_output=True)
@@ -162,22 +172,65 @@ result_print(email=unauthorized_user_email,
 insert_dataset_user(email=p2f_admin_email, token=p2f_admin_token, port=p2f_container_port)
 insert_dataset_user(email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
 insert_dataset_user(email=unauthorized_user_email, token=unauthorized_user_token, port=p2f_container_port)
+with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
+    f.write(p2f_api.logs().decode("utf8"))
+
 datasets = list_datasets_utility(email=p2f_admin_email, 
                                  token=p2f_admin_token,
                                  port=p2f_container_port)
-datasets = {x.dataset_id: generate_dataset(x.dataset_id) for x in datasets}
-# print(datasets)
+with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
+    f.write(p2f_api.logs().decode("utf8"))
+
 # Records Tests
 
 ##   Data Loading Tests
 ## # Locations
-locations = generate_locations(n=10)
+admin_locations = generate_locations(n=10)
+member_locations = generate_locations(n=10)
+unauth_locations = generate_locations(n=10)
+insert_locations(locations=admin_locations, email=p2f_admin_email, token=p2f_admin_token, port=p2f_container_port)
+insert_locations(locations=member_locations, email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
+insert_locations(locations=unauth_locations, email=unauthorized_user_email, token=unauthorized_user_token, port=p2f_container_port)
+locations_uuids = get_all_inserted_locations(email=p2f_admin_email, token=p2f_admin_token, port=p2f_container_port)
+get_all_inserted_locations(email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
+get_all_inserted_locations(email=unauthorized_user_email, token=unauthorized_user_token, port=p2f_container_port)
+
+
+
 ## # Species
 ## # Data Types
-data_types = generate_data_types(n=10)
+admin_datatypes = generate_data_types(n=10)
+member_datatypes = generate_data_types(n=10)
+unauth_datatypes = generate_data_types(n=10)
+insert_datatypes(email=p2f_admin_email, token=p2f_admin_token, datatypes=admin_datatypes, port=p2f_container_port)
+insert_datatypes(email=consortium_user_email, token=consortium_user_token, datatypes=member_datatypes, port=p2f_container_port)
+insert_datatypes(email=unauthorized_user_email, token=unauthorized_user_token, datatypes=unauth_datatypes, port=p2f_container_port)
+datatype_uuids = get_all_inserted_datatypes(email=p2f_admin_email, token=p2f_admin_token, port=p2f_container_port)
+get_all_inserted_datatypes(email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
+get_all_inserted_datatypes(email=unauthorized_user_email, token=unauthorized_user_token, port=p2f_container_port)
 ## # Time Slices
 
+datasets = {x.dataset_id: generate_dataset(x.dataset_id, location_list=locations_uuids) for x in datasets}
+# print(datasets)
+with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
+    f.write(p2f_api.logs().decode("utf8"))
+
+# Distribute datasets to users
+dataset_len = int(round((len(datasets.keys())/2), 0))
+admin_datasets = list(datasets.keys())[:dataset_len]
+member_datasets = [x for x in datasets.keys() if x not in admin_datasets]
+
+# Records
+for dataset in admin_datasets:
+    insert_records(dataset=datasets[dataset], email=p2f_admin_email, token=p2f_admin_token, port=p2f_container_port)
+for dataset in member_datasets:
+    insert_records(dataset=datasets[dataset], email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
+
 # Numeric Tests
+for dataset in admin_datasets:
+    insert_numericals_from_datasets(dataset=datasets[dataset], datatypes_list=datatype_uuids, email=p2f_admin_email, token=p2f_admin_token, port=p2f_container_port)
+for dataset in member_datasets:
+    insert_numericals_from_datasets(dataset=datasets[dataset], datatypes_list=datatype_uuids, email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
 
 ##   Metadata Tests
 ## # Datasets Location Tests
@@ -189,8 +242,20 @@ data_types = generate_data_types(n=10)
 ## # Datasets Time Slices Tests
 ## # Datasets Tags & Keywords Tests
 ## # Records Location Tests
+for dataset in admin_datasets:
+    assign_location_record_bytable(dataset=datasets[dataset], 
+                                   email=p2f_admin_email, token=p2f_admin_token, port=p2f_container_port)
+for dataset in member_datasets:
+    assign_location_record_bytable(dataset=datasets[dataset], 
+                                   email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
 ## # Records Species Tests
 ## # Records Season Tests
+for dataset in admin_datasets:
+    assign_season_record_bytable(dataset=datasets[dataset],
+                                 email=p2f_admin_email, token=p2f_admin_token, port=p2f_container_port)
+for dataset in member_datasets:
+    assign_season_record_bytable(dataset=datasets[dataset],
+                                 email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
 ## # Records Data Types Tests
 ## # Records References Tests
 ## # Records Age Tests
@@ -198,6 +263,8 @@ data_types = generate_data_types(n=10)
 with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
     f.write(p2f_api.logs().decode("utf8"))
 
+print(f"----- {test_run_id} FINISHED -----------------")
 p2f_api.stop()
+# p2f_api.remove()
 p2f_postgres.stop()
 test_network.remove()

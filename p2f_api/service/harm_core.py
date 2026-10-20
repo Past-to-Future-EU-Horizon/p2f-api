@@ -9,28 +9,37 @@ from sqlalchemy import select, insert, delete, update
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
+from service import shared_execution
 from ..data.db_connection import engine
 from ..data.harm_core import core, coreSegment, coreSegment_to_record
 from p2f_pydantic.harm_core import Core, CoreSegment
 
 
-def list_cores() -> List[Core]:
+def list_cores(output_format: shared_execution.mimes = "application/json",) -> List[Core]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(core)
-        result = session.execute(stmt).all()
-    return [Core(**x[0].__dict__) for x in result]
+        results = shared_execution.list(stmt=stmt,
+                                        pydantic_object=Core,
+                                        session_object=session,
+                                        output_format=output_format)
+    return results
 
-def list_core_segments(core_id: UUID) -> List[CoreSegment]:
+def list_core_segments(core_id: UUID,
+                       output_format: shared_execution.mimes = "application/json",) -> List[CoreSegment]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(coreSegment)
         stmt = stmt.where(coreSegment.fk_core_id == core_id)
-        result = session.execute(stmt).all()
-    return [CoreSegment(**x[0].__dict__) for x in result]
+        results = shared_execution.list(stmt=stmt,
+                                        pydantic_object=CoreSegment,
+                                        session_object=session,
+                                        output_format=output_format)
+    return results
 
 def get_core(core_id: UUID | None=None,
-             pk_core: int | None=None) -> Core:
+             pk_core: int | None=None,
+             output_format: shared_execution.mimes = "application/json",) -> Core:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(core)
@@ -38,12 +47,16 @@ def get_core(core_id: UUID | None=None,
             stmt = stmt.where(core.core_id == core_id)
         if pk_core:
             stmt = stmt.where(core.pk_harm_core == pk_core)
-        result = session.execute(stmt).first()
-    return Core(**result.tuple()[0].__dict__)
+        result = shared_execution.get(stmt=stmt,
+                                      pydantic_object=Core, 
+                                      session_object=session,
+                                      output_format=output_format)
+    return result
 
 def get_core_segment(core_id: UUID | None = None,
                      core_segment_id: UUID | None=None,
-                     pk_core_segment: int | None=None) -> CoreSegment:
+                     pk_core_segment: int | None=None,
+                     output_format: shared_execution.mimes = "application/json",) -> CoreSegment:
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(coreSegment)
@@ -53,28 +66,35 @@ def get_core_segment(core_id: UUID | None = None,
             stmt = stmt.where(coreSegment.core_segment_id == core_segment_id)
         if pk_core_segment:
             stmt = stmt.where(coreSegment.pk_harm_core_segment == pk_core_segment)
-        result = session.execute(stmt).first()
-    return CoreSegment(**result.tuple()[0].__dict__)
+        result = shared_execution.get(stmt=stmt, 
+                                      pydantic_object=CoreSegment,
+                                      session_object=session,
+                                      output_format=output_format)
+    return result
 
-def create_core(new_core: Core) -> Core:
+def create_core(new_core: Core,
+                output_format: shared_execution.mimes = "application/json",) -> Core:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = insert(core)
         stmt = stmt.values(**new_core.model_dump(exclude_unset=True))
-        execute = session.execute(stmt)
-        commit = session.commit()
-    return get_core(pk_core=execute.inserted_primary_key[0])
+        pk = shared_execution.create(stmt=stmt, 
+                                     session_object=session)
+    return get_core(pk_core=pk, 
+                    output_format=output_format)
 
 def create_core_segment(core_id: UUID, 
-                        new_core_segment: CoreSegment) -> CoreSegment:
+                        new_core_segment: CoreSegment,
+                        output_format: shared_execution.mimes = "application/json",) -> CoreSegment:
     logger.debug(f"{fa.service}{fa.create} {__name__} {stack()[0][3]}()")
     if core_id == new_core_segment.fk_core_id:
         with Session(engine) as session:
             stmt = insert(coreSegment)
             stmt = stmt.values(**new_core_segment.model_dump(exclude_unset=True))
-            execute = session.execute(stmt)
-            commit = session.commit()
-        return get_core_segment(pk_core_segment=execute.inserted_primary_key[0])
+            pk = shared_execution.create(stmt=stmt,
+                                         session_object=session)
+        return get_core_segment(pk_core_segment=pk,
+                                output_format=output_format)
     else: 
         raise ValueError("supplied core_id did not match the core_id in the new segment")
 
@@ -83,8 +103,8 @@ def delete_core(core_id: UUID) -> None:
     with Session(engine) as session:
         stmt = delete(core)
         stmt = stmt.where(core.core_id == core_id)
-        execute = session.execute(stmt)
-        commit = session.commit()
+        shared_execution.delete(stmt=stmt, 
+                                session_object=session)
 
 def delete_core_segment(core_id: UUID, 
                         core_segment_id: UUID) -> None:
@@ -95,8 +115,8 @@ def delete_core_segment(core_id: UUID,
         # because if they don't match nothing will happen
         stmt = stmt.where(coreSegment.fk_core_id == core_id)
         stmt = stmt.where(coreSegment.core_segment_id == core_segment_id)
-        execute = session.execute(stmt)
-        commit = session.commit()
+        shared_execution.delete(stmt=stmt,
+                                session_object=session)
 
 def assign_core_segment_to_record(core_segment_id: UUID,
                                   record_hash: str) -> None:
