@@ -37,10 +37,10 @@ class harmonized_int_confidence(baseSQL):
     upper_conf_value: Mapped[int] = mapped_column(BigInteger)
     lower_conf_value: Mapped[int] = mapped_column(BigInteger)
     fk_data_record: Mapped[str] = mapped_column(
-        ForeignKey(f"{harm_data_record.__tablename__}.record_hash")
+        ForeignKey(f"{harm_data_record.__tablename__}.record_hash"), index=True
     )
     fk_data_type: Mapped[UUID] = mapped_column(
-        ForeignKey(f"{harm_data_type.__tablename__}.datatype_id")
+        ForeignKey(f"{harm_data_type.__tablename__}.datatype_id"), index=True
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now()
@@ -59,10 +59,10 @@ class harmonized_int(baseSQL):
     pk_harm_num: Mapped[UUID] = mapped_column(Uuid, default=func.gen_random_uuid())
     value: Mapped[int] = mapped_column(BigInteger)
     fk_data_record: Mapped[str] = mapped_column(
-        ForeignKey(f"{harm_data_record.__tablename__}.record_hash")
+        ForeignKey(f"{harm_data_record.__tablename__}.record_hash"), index=True
     )
     fk_data_type: Mapped[UUID] = mapped_column(
-        ForeignKey(f"{harm_data_type.__tablename__}.datatype_id")
+        ForeignKey(f"{harm_data_type.__tablename__}.datatype_id"), index=True
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now()
@@ -84,10 +84,10 @@ class harmonized_float_confidence(baseSQL):
     upper_conf_value: Mapped[float] = mapped_column(Double)
     lower_conf_value: Mapped[float] = mapped_column(Double)
     fk_data_record: Mapped[str] = mapped_column(
-        ForeignKey(f"{harm_data_record.__tablename__}.record_hash")
+        ForeignKey(f"{harm_data_record.__tablename__}.record_hash"), index=True
     )
     fk_data_type: Mapped[UUID] = mapped_column(
-        ForeignKey(f"{harm_data_type.__tablename__}.datatype_id")
+        ForeignKey(f"{harm_data_type.__tablename__}.datatype_id"), index=True
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now()
@@ -105,16 +105,10 @@ class harmonized_float(baseSQL):
     pk_harm_num: Mapped[UUID] = mapped_column(Uuid, default=func.gen_random_uuid())
     value: Mapped[float] = mapped_column(Double)
     fk_data_record: Mapped[str] = mapped_column(
-        ForeignKey(f"{harm_data_record.__tablename__}.record_hash")
+        ForeignKey(f"{harm_data_record.__tablename__}.record_hash"), index=True
     )
     fk_data_type: Mapped[UUID] = mapped_column(
-        ForeignKey(f"{harm_data_type.__tablename__}.datatype_id")
-    )
-    creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now()
-    )
-    update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now(), onupdate=func.now()
+        ForeignKey(f"{harm_data_type.__tablename__}.datatype_id"), index=True
     )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now()
@@ -130,12 +124,6 @@ class harmonized_numeric_id_map(baseSQL):
         Uuid, index=True, unique=True, nullable=False
     )
     table_class: Mapped[str] = mapped_column(Text)  # TODO Make this a ENUM
-    creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now()
-    )
-    update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now(), onupdate=func.now()
-    )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now()
     )

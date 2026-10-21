@@ -4,6 +4,7 @@ from inspect import stack
 import pandas as pd
 from sqlalchemy.sql import Executable
 from sqlalchemy.orm import Session
+from fastapi import Response
 from pydantic import BaseModel
 from p2f_api.apilogs import logger, fa
 
@@ -39,17 +40,21 @@ def get(
         case "application/json":
             result = session_object.execute(stmt).first()
             result = pydantic_object(**result[0].__dict__)
+            return result
         case "application/vnd.apache.parquet":
             result = pd.read_sql(stmt, session_object)
             result = remove_table_metadata(result)
             file_object = BytesIO()
             result = result.to_parquet(file_object)
+            return Response(content=result,
+                            media_type=output_format)
         case "text/csv":
             result = pd.read_sql(stmt, session_object)
             result = remove_table_metadata(result)
             file_object = BytesIO()
             result = result.to_parquet(file_object)
-    return result
+            return Response(content=result,
+                            media_type=output_format)
 
 def list(
         stmt: Executable,
@@ -62,17 +67,21 @@ def list(
         case "application/json":
             results = session_object.execute(stmt).all()
             results = [pydantic_object(**x[0].__dict__) for x in results]
+            return results
         case "application/vnd.apache.parquet":
             results = pd.read_sql(stmt, session_object)
             results = remove_table_metadata(results)
             file_object = BytesIO()
             results = results.to_parquet(file_object)
+            return Response(content=results,
+                            media_type=output_format)
         case "text/csv":
             results = pd.read_sql(stmt, session_object)
             results = remove_table_metadata(results)
             file_object = BytesIO()
             results = results.to_csv(file_object)
-    return results
+            return Response(content=results,
+                            media_type=output_format)
 
 
 def create(

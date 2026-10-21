@@ -1,5 +1,6 @@
 from random import randint, choice
 from string import ascii_letters, digits
+from typing import Literal
 
 base_headers = {"Accept": "application/json", "Content-Type": "application/json"}
 
@@ -8,6 +9,8 @@ consortium_user_email = "user@example.com"
 unauthorized_user_email = "unauthorized@example.com"
 users_valid = [p2f_admin_email, consortium_user_email]
 users_invalid = [unauthorized_user_email]
+
+mimes = {"parquet": "application/vnd.apache.parquet", "csv": "text/csv", "json": "application/json"}
 
 def random_doi():
     doi = "10."
