@@ -20,6 +20,7 @@ dependencies = [
     "p2f-pydantic>=0.0.2",
     "pandas>=3.0.6",
     "psycopg[binary,pool]>=3.2.8",
+    "pyarrow>=26.0.0",
     "pydantic[email]>=2.12.3",
     "pyjwt>=2.10.1",
     "python-dotenv>=1.1.0",
@@ -40,3 +41,10 @@ readme = {file = "README.md", content-type = "text/markdown"}
 [project.urls]
 Homepage = "https://past2future.org/"
 Repository = "https://github.com/Past-to-Future-EU-Horizon/p2f-api.git"
+
+[dependency-groups]
+dev = [
+    "docker>=7.2.0",
+    "ruff>=0.17.1",
+    "ty>=0.0.90",
+]

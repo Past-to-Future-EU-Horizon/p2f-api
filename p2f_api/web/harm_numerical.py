@@ -1,18 +1,20 @@
 # Batteries included libraries
 import uuid
-from typing import Optional, Annotated, Union, Literal
+from typing import Optional, Annotated, Union, Literal, List
 from inspect import stack
 
 # Third Party Libraries
-from fastapi import Body, APIRouter, Depends
+from fastapi import Body, APIRouter, Request
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from ..service import harm_numerical
 from .temp_accounts import combined_auth, api_token_annotation
+from web.response_models import json_and_table
 from p2f_pydantic.harm_data_numerical import HARM_Int, HARM_Int_Confidence
 from p2f_pydantic.harm_data_numerical import HARM_Float, HARM_Float_Confidence
 from p2f_pydantic.harm_data_numerical import Insert_HARM_Numerical, Return_HARM_Numerical
+from p2f_pydantic.harm_data_numerical import Numerical_Table_Statistics
 from p2f_pydantic.temp_accounts import Temp_Account
 
 tag_name = "HARM Numerical"
@@ -44,25 +46,37 @@ The API will return unique objects with Integers or Floats, and with or without 
 
 
 # List
-@router.get("/", operation_id="numeric-list")
+@router.get("/", operation_id="numeric-list", responses=json_and_table)
 def list_harm_numerical(
     auth: api_token_annotation,
+    req: Request,
     record_hash: Optional[str] = None,
     numeric_type: Optional[
         Literal["float_confidence", "float", "int_confidence", "int"]
     ] = None,
-    data_type: Optional[uuid.UUID] = None,
+    datatype_id: Optional[uuid.UUID] = None,
     dataset_id: Optional[uuid.UUID] = None,
-) -> Return_HARM_Numerical:
+) -> HARM_Float | HARM_Float_Confidence | HARM_Int | HARM_Int_Confidence | List[HARM_Float] | List[HARM_Float_Confidence] | List[HARM_Int] | List[HARM_Int_Confidence] | Return_HARM_Numerical:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     logger.debug(f"Received params: {locals()}")
-    return harm_numerical.list_numerics(
-        record_hash=record_hash,
-        numeric_type=numeric_type,
-        data_type=data_type,
-        dataset_id=dataset_id,
-    )
-
+    output_format = req.headers.get("Accept", "application/json")
+    if numeric_type is not None:
+        return harm_numerical.list_numerics_single_type(numeric_type=numeric_type,
+                                                        record_hash=record_hash,
+                                                        datatype_id=datatype_id,
+                                                        dataset_id=dataset_id,
+                                                        output_format=output_format)
+    else:
+        return harm_numerical.list_numerics_type_iterator(record_hash=record_hash,
+                                                          dataset_id=dataset_id,
+                                                          datatype_id=datatype_id, 
+                                                          output_format=output_format)
+    
+@router.get("/statistics", operation_id="numeric-statistics")
+def get_numeric_statistics(datatype_id: uuid.UUID | None = None,
+                           dataset_id: uuid.UUID | None = None,) -> Numerical_Table_Statistics:
+    return harm_numerical.get_numeric_types_stats(dataset_id=dataset_id,
+                                                  datatype_id=datatype_id)
 
 # Get Single
 @router.get("/{numeric_id}", operation_id="numeric-get")
@@ -70,7 +84,6 @@ def get_harm_numerical(auth: api_token_annotation,
                        numeric_id: uuid.UUID) -> Harm_numerical_union:
     logger.debug(f"{fa.web}{fa.get} {__name__} {stack()[0][3]}()")
     return harm_numerical.get_numeric(numeric_id=numeric_id)
-
 
 # Create
 @router.post("/", operation_id="numeric-create")

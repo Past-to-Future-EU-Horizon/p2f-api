@@ -38,12 +38,7 @@ def list_datasets(
                                         session_object=session,
                                         output_format=output_format)
         logger.debug(f"•  Found {len(results)} results")
-    if output_format in ["application/vnd.apache.parquet", 
-                         "text/csv"]:
-        return Response(content=results,
-                        media_type=output_format)
-    else:
-        return results
+    return results
 
 
 def get_dataset(dataset_id=None,
@@ -61,12 +56,7 @@ def get_dataset(dataset_id=None,
                                       pydantic_object=Datasets,
                                       session_object=session,
                                       output_format=output_format)
-    if output_format in ["application/vnd.apache.parquet", 
-                         "text/csv"]:
-        return Response(content=result,
-                        media_type=output_format)
-    else:
-        return result
+    return result
 
 
 def create_dataset(new_dataset: Datasets,

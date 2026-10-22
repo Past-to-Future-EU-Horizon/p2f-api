@@ -116,12 +116,6 @@ class harmonized_float(baseSQL):
     update_timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
-    creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now()
-    )
-    update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now(), onupdate=func.now()
-    )
 
 class harmonized_numeric_id_map(baseSQL):
     __tablename__ = "p2f_harm_id_map"
@@ -130,12 +124,6 @@ class harmonized_numeric_id_map(baseSQL):
         Uuid, index=True, unique=True, nullable=False
     )
     table_class: Mapped[str] = mapped_column(Text)  # TODO Make this a ENUM
-    creation_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now()
-    )
-    update_timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now(), onupdate=func.now()
-    )
     creation_timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now()
     )

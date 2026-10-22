@@ -3,7 +3,7 @@ json_and_table = {
         "content": {
             "text/csv": {},
             "application/vnd.apache.parquet": {}, 
-            "application/json": {}
+            # "application/json": {}
         }
     }
 }
