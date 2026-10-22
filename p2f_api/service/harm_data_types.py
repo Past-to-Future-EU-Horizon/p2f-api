@@ -78,7 +78,7 @@ def list_harm_data_types(
             stmt = stmt.where(harm_data_type.is_proxy == is_proxy)
         if dataset_id is not None:
             logger.debug("•• dataset_id is not none")
-            subqry_d = select(harm_data_record.record_hash.distinct()).where(harm_data_record.fk_dataset)
+            subqry_d = select(harm_data_record.record_hash.distinct()).where(harm_data_record.fk_dataset == dataset_id)
             subqry_i = select(harmonized_int.fk_data_type.distinct()).where(harmonized_int.fk_data_record.in_(subqry_d))
             subqry_ic = select(harmonized_int_confidence.fk_data_type.distinct()).where(harmonized_int_confidence.fk_data_record.in_(subqry_d))
             subqry_f = select(harmonized_float.fk_data_type.distinct()).where(harmonized_float.fk_data_record.in_(subqry_d))

@@ -216,6 +216,7 @@ insert_datatypes(email=unauthorized_user_email, token=unauthorized_user_token, d
 datatype_uuids = get_all_inserted_datatypes(email=p2f_admin_email, token=p2f_admin_token, port=p2f_container_port)
 get_all_inserted_datatypes(email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
 get_all_inserted_datatypes(email=unauthorized_user_email, token=unauthorized_user_token, port=p2f_container_port)
+####TODO Add get datatypes with filters
 ## # Time Slices
 
 datasets = {x.dataset_id: generate_dataset(x.dataset_id, location_list=locations_uuids) for x in datasets}
