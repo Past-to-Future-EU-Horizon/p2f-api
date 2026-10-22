@@ -1,11 +1,22 @@
 from random import choice
+from io import BytesIO, StringIO
 from time import sleep
 import requests
+import pandas as pd
 from p2f_pydantic.harm_data_numerical import Numerical_Table_Statistics
 from p2f_pydantic.harm_data_types import HARM_Data_Type
+from p2f_pydantic.harm_data_numerical import HARM_Int, HARM_Int_Confidence
+from p2f_pydantic.harm_data_numerical import HARM_Float, HARM_Float_Confidence
 from shared import result_print
 from shared import base_headers
 from shared import mimes
+
+harm_table_matching = {
+    "float_confidence": HARM_Float_Confidence,
+    "float": HARM_Float,
+    "int_confidence":  HARM_Int_Confidence,
+    "int": HARM_Int
+    }
 
 def get_datatype_by_dataset_id(dataset_id, email: str, token: str, hostname: str="127.0.0.1", port:int=8000,):
     headers = base_headers
@@ -30,22 +41,26 @@ def read_numeric_stats(datatypes: list, datasets: list, hostname: str = "127.0.0
         r = requests.get(f"http://{hostname}:{port}/harm-numerical/statistics",
                          headers=base_headers,
                          params={"datatype_id": datatype})
+        # print(r.content)
+        # sleep(3)
         if r.ok:
             success_datatype += 1
             datatypes_collections[datatype] = Numerical_Table_Statistics(**r.json())
-        sleep(5)
+        # sleep(10)
     if success_datatype == len(datatypes):
         result_print(email="Not needed", test=test_datatype_name, success=True)
     else: 
         result_print(email="Not needed", test=test_datatype_name, success=False)
+    # sleep(30)
     for dataset in datasets:
         r = requests.get(f"http://{hostname}:{port}/harm-numerical/statistics",
                          headers=base_headers,
                          params={"dataset_id": dataset})
+        # print(r.content)
+        # sleep(3)   
         if r.ok:
             success_dataset += 1
-            datasets_collections[dataset] = Numerical_Table_Statistics(**r.json())
-        sleep(5)    
+            datasets_collections[dataset] = Numerical_Table_Statistics(**r.json()) 
     if success_dataset == len(datasets):
         result_print(email="Not needed", test=test_dataset_name, success=True)
     else: 
@@ -96,22 +111,44 @@ def list_numerics_iterated(email: str, token: str, hostname: str="127.0.0.1", po
 
 def list_numerics_specific(email: str, token: str, numeric_type: str, hostname: str="127.0.0.1", port:int=8000,
                            record_hash:str=None, dataset: str=None, datatype: str=None,):
-    headers = base_headers
-    headers["x-p2f-email"] = email
-    headers["x-p2f-token"] = token
-    params = {
-        "numeric_type": numeric_type,
-        "record_hash": record_hash,
-        "dataset_id": dataset,
-        "datatype_id": datatype
-    }
-    params = {x: y for x, y in params.items() if y is not None}
     for test_name, mime_type in mimes.items():
+        headers = base_headers
+        headers["x-p2f-email"] = email
+        headers["x-p2f-token"] = token
+        params = {
+            "numeric_type": numeric_type,
+            "record_hash": record_hash,
+            "dataset_id": dataset,
+            "datatype_id": datatype
+        }
+        params = {x: y for x, y in params.items() if y is not None}
         headers["Accept"] = mime_type
         r = requests.get(f"http://{hostname}:{port}/harm-numerical/",
                         headers=headers,
                         params=params)
-        if r.ok:
+        decode = False
+        match mime_type:
+            case "application/json":
+                try:
+                    data = [harm_table_matching[numeric_type](**x) for x in r.json()]
+                    decode = True
+                except Exception as e:
+                    print(e)
+            case "text/csv":
+                try:
+                    file = StringIO(r.content.decode("utf8"))
+                    pd.read_csv(file)
+                    decode = True
+                except Exception as e:
+                    print(e)
+            case "application/vnd.apache.parquet":
+                try:
+                    file = BytesIO(r.content)
+                    pd.read_parquet(file)
+                    decode = True
+                except Exception as e:
+                    print(e)
+        if r.ok and decode:
             result_print(email=email, test=f"LIST NUMERIC SPECIFIC {test_name}", success=True)
         else:
             result_print(email=email, test=f"LIST NUMERIC SPECIFIC {test_name}", success=False)

@@ -242,9 +242,9 @@ for dataset in admin_datasets:
 sleep(2)
 for dataset in member_datasets:
     insert_numericals_from_datasets(dataset=datasets[dataset], datatypes_list=datatype_uuids, email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
-print("STATUS: SLEEPING 30 SECONDS")
-sleep(30)
-print("STATUS: WAKING UP")
+# print("STATUS: SLEEPING 30 SECONDS")
+# sleep(30)
+# print("STATUS: WAKING UP")
 datatypes_numeric, datasets_numeric = read_numeric_stats(datatypes=datatype_uuids, datasets=list(datasets.keys()), port=p2f_container_port)
 with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
     f.write(p2f_api.logs().decode("utf8"))
@@ -259,24 +259,24 @@ with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
 datasets_numeric = {str(x): y.model_dump(exclude_unset=True) for x, y in datasets_numeric.items()}
 datatypes_numeric = {str(x): y.model_dump(exclude_unset=True) for x, y in datatypes_numeric.items()}
 # output check 
-print(datatypes_numeric, datasets_numeric)
+# print(datatypes_numeric, datasets_numeric)
 # select the specific candidates
-specific_dataset_admin = choice(list[datasets_numeric.keys()])
-numeric_dataset_admin = choice([x for x, y in datasets_numeric[specific_dataset_admin].items() if y > 0])
-specific_dataset_member = choice([x for x in datasets_numeric.keys() if x != specific_dataset_admin])
-numeric_dataset_member = choice([x for x, y in datasets_numeric[specific_dataset_member].items() if y > 0])
-specific_datatype_admin = choice(list(datatypes_numeric.keys()))
-numeric_datatype_admin = choice([x for x, y in datatypes_numeric[specific_datatype_admin].items() if y > 0])
-specific_datatype_member = choice([x for x in datatypes_numeric.keys() if x != specific_datatype_admin])
-numeric_datatype_member = choice([x for x, y in datatypes_numeric[specific_datatype_member].items() if y > 0])
+specific_dataset_admin = choice([x for x, y in datasets_numeric.items() if y["count_total"] > 0])
+numeric_dataset_admin = choice([x for x, y in datasets_numeric[specific_dataset_admin].items() if y > 0 and "total" not in x]).replace("count_", "")
+specific_dataset_member = choice([x for x, y in datasets_numeric.items() if x != specific_dataset_admin and y["count_total"] > 0])
+numeric_dataset_member = choice([x for x, y in datasets_numeric[specific_dataset_member].items() if y > 0 and "total" not in x]).replace("count_", "")
+specific_datatype_admin = choice([x for x, y in datatypes_numeric.items() if y["count_total"] > 0])
+numeric_datatype_admin = choice([x for x, y in datatypes_numeric[specific_datatype_admin].items() if y > 0 and "total" not in x]).replace("count_", "")
+specific_datatype_member = choice([x for x, y in datatypes_numeric.items() if x != specific_datatype_admin and y["count_total"] > 0])
+numeric_datatype_member = choice([x for x, y in datatypes_numeric[specific_datatype_member].items() if y > 0 and "total" not in x]).replace("count_", "")
 # Run the tests
 list_numerics_specific(email=p2f_admin_email, token=p2f_admin_token, 
                        dataset=specific_dataset_admin, numeric_type=numeric_dataset_admin, port=p2f_container_port)
-list_numerics_specific(email=consortium_user_email, token=consortium_user_email, 
+list_numerics_specific(email=consortium_user_email, token=consortium_user_token, 
                        dataset=specific_dataset_member, numeric_type=numeric_dataset_member, port=p2f_container_port)
 list_numerics_specific(email=p2f_admin_email, token=p2f_admin_token, 
                        dataset=specific_datatype_admin, numeric_type=numeric_datatype_admin, port=p2f_container_port)
-list_numerics_specific(email=consortium_user_email, token=consortium_user_email, 
+list_numerics_specific(email=consortium_user_email, token=consortium_user_token, 
                        dataset=specific_datatype_member, numeric_type=numeric_datatype_member, port=p2f_container_port)
 ##   Metadata Tests
 ## # Datasets Location Tests

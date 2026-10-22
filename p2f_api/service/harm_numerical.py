@@ -12,8 +12,6 @@ import pandas as pd
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from service import shared_execution
-from .harm_data_record import list_harm_data_record
-from .datasets import get_dataset, list_datasets
 from ..data.db_connection import engine
 from ..data.harm_data_numerical import harmonized_float_confidence, harmonized_float
 from ..data.harm_data_numerical import harmonized_int_confidence, harmonized_int
@@ -73,36 +71,38 @@ def get_numeric_types_stats(datatype_id: UUID | None = None,
         stmt_intc = select(func.count()).select_from(harmonized_int_confidence)
         stmt_float = select(func.count()).select_from(harmonized_float)
         stmt_floatc = select(func.count()).select_from(harmonized_float_confidence)
-    if datatype_id is not None:
-        stmt_int = stmt_int.where(harmonized_int.fk_data_type == datatype_id)
-        stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_type == datatype_id)
-        stmt_float = stmt_float.where(harmonized_float.fk_data_type == datatype_id)
-        stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_type == datatype_id)
-    if dataset_id is not None:
-        # Was experiencing an error on only float confidence with a shared subquery. Therefore all get their own subquery.
-        sbqr_dataset_int = select(harm_data_record.record_hash.distinct()).where(harm_data_record.fk_dataset == dataset_id)
-        sbqr_dataset_intc = select(harm_data_record.record_hash.distinct()).where(harm_data_record.fk_dataset == dataset_id)
-        sbqr_dataset_float = select(harm_data_record.record_hash.distinct()).where(harm_data_record.fk_dataset == dataset_id)
-        sbqr_dataset_floatc = select(harm_data_record.record_hash.distinct()).where(harm_data_record.fk_dataset == dataset_id)
-        stmt_int = stmt_int.where(harmonized_int.fk_data_record.in_(sbqr_dataset_int))
-        stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_record.in_(sbqr_dataset_intc))
-        stmt_float = stmt_float.where(harmonized_float.fk_data_record.in_(sbqr_dataset_float))
-        stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_record.in_(sbqr_dataset_floatc))
-    if record_hash is not None:
-        stmt_int = stmt_int.where(harmonized_int.fk_data_record == record_hash)
-        stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_record == record_hash)
-        stmt_float = stmt_float.where(harmonized_float.fk_data_record == record_hash)
-        stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_record == record_hash)
-    # logger.debug(f"=============Statments for counts==========\nInt: {stmt_int}\n\nIntConf: {stmt_intc}\n\nFloat: {stmt_float}\n\nFloatConf: {stmt_floatc}\n=============")
-    result_int = session.execute(stmt_int).first()
-    result_intc = session.execute(stmt_intc).first()
-    result_float = session.execute(stmt_float).first()
-    result_floatc = session.execute(stmt_floatc).first()
+        if datatype_id is not None:
+            stmt_int = stmt_int.where(harmonized_int.fk_data_type == datatype_id)
+            stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_type == datatype_id)
+            stmt_float = stmt_float.where(harmonized_float.fk_data_type == datatype_id)
+            stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_type == datatype_id)
+        if dataset_id is not None:
+            # Was experiencing an error on only float confidence with a shared subquery. Therefore all get their own subquery.
+            sbqr_dataset_int = select(harm_data_record.record_hash).where(harm_data_record.fk_dataset == dataset_id).distinct()
+            sbqr_dataset_intc = select(harm_data_record.record_hash).where(harm_data_record.fk_dataset == dataset_id).distinct()
+            sbqr_dataset_float = select(harm_data_record.record_hash).where(harm_data_record.fk_dataset == dataset_id).distinct()
+            sbqr_dataset_floatc = select(harm_data_record.record_hash).where(harm_data_record.fk_dataset == dataset_id).distinct()
+            stmt_int = stmt_int.where(harmonized_int.fk_data_record.in_(sbqr_dataset_int))
+            stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_record.in_(sbqr_dataset_intc))
+            stmt_float = stmt_float.where(harmonized_float.fk_data_record.in_(sbqr_dataset_float))
+            stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_record.in_(sbqr_dataset_floatc))
+        if record_hash is not None:
+            stmt_int = stmt_int.where(harmonized_int.fk_data_record == record_hash)
+            stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_record == record_hash)
+            stmt_float = stmt_float.where(harmonized_float.fk_data_record == record_hash)
+            stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_record == record_hash)
+        # logger.debug(f"=============Statments for counts==========\nInt: {stmt_int}\n\nIntConf: {stmt_intc}\n\nFloat: {stmt_float}\n\nFloatConf: {stmt_floatc}\n=============")
+        result_int = session.execute(stmt_int).first()
+        result_intc = session.execute(stmt_intc).first()
+        result_float = session.execute(stmt_float).first()
+        result_floatc = session.execute(stmt_floatc).first()
+    result_total = result_int[0] + result_intc[0] + result_float[0] + result_floatc[0]
     # logger.debug(f"==========Results===============\nInt: {result_int[0]}\nIntConf: {result_intc[0]}\nFloat: {result_float[0]}\nFloatConf: {result_floatc[0]}")
     return Numerical_Table_Statistics(count_int=result_int[0],
                                       count_int_confidence=result_intc[0],
                                       count_float=result_float[0],
-                                      count_float_confidence=result_floatc[0])
+                                      count_float_confidence=result_floatc[0],
+                                      count_total=result_total)
             
 
 def get_numeric_table_by_uuid(numeric_id: UUID):
@@ -129,6 +129,7 @@ def list_numerics_single_type(
     ): # -> Return only one kind of table 
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}({numeric_type})")
     TABLE, PYDANTIC = harm_table_matching[numeric_type]["db"], harm_table_matching[numeric_type]["pydantic"]
+    logger.debug(f"List numericals selected types: {repr(TABLE)} - {repr(PYDANTIC)}")
     ########### The following code block has many time out errors due to the complexity of the search.
     # if dataset_id is not None:
     #     # Gather information on the dataset. 
@@ -152,7 +153,7 @@ def list_numerics_single_type(
         if dataset_id is not None:
             logger.debug(f"•• dataset_id is not None {dataset_id}")
             # What we want here are all the record hashes under a dataset
-            subqry = select(harm_data_record.record_hash.distinct())
+            subqry = select(harm_data_record.record_hash).distinct()
             subqry = subqry.where(harm_data_record.fk_dataset == dataset_id)
             stmt = stmt.where(TABLE.fk_data_record.in_(subqry))
         results = shared_execution.list(stmt=stmt,
