@@ -77,7 +77,7 @@ def list(
             results = session_object.execute(stmt).all()
             logger.debug(f"Found {len(results)} results")
             results = [pydantic_object(**x[0].__dict__) for x in results]
-            logger.debug(f"SHARED EXECUTION LIST application/json RESULT: {results}")
+            # logger.debug(f"SHARED EXECUTION LIST application/json RESULT: {results}")
             return results
         case "application/vnd.apache.parquet":
             results = pd.read_sql(stmt, engine)
