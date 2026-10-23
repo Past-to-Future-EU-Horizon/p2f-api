@@ -40,10 +40,12 @@ def get(
         output_format: mimes
         ): 
     logger.debug(f"{fa.service}{fa.get} {stack()[0][3]}()")
+    logger.debug(f"SHARED EXECUTION GET STMT: {stmt}")
     logger.debug(f"SHARED EXECUTION OUTPUT FORMAT: {output_format}")
     match output_format:
         case "application/json":
             result = session_object.execute(stmt).first()
+            logger.debug(f"SHARED EXECUTION GET RESULT: {result}")
             result = pydantic_object(**result[0].__dict__)
             return result
         case "application/vnd.apache.parquet":
@@ -70,6 +72,7 @@ def list(
         output_format: mimes
         ):
     logger.debug(f"{fa.service}{fa.list} {stack()[0][3]}()")
+    logger.debug(f"SHARED EXECUTION LIST STMT: {stmt}")
     logger.debug(f"SHARED EXECUTION OUTPUT FORMAT: {output_format}")
     logger.debug(f"SHARED EXECUTION RECEIVED PYDANTIC OBJECT: {repr(pydantic_object)}")
     match output_format:

@@ -11,16 +11,18 @@ import pandas as pd
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
-from service import shared_execution
+from ..service import shared_execution
 from ..data.db_connection import engine
 from ..data.harm_data_numerical import harmonized_float_confidence, harmonized_float
 from ..data.harm_data_numerical import harmonized_int_confidence, harmonized_int
 from ..data.harm_data_numerical import harmonized_numeric_id_map
+from ..data.datasets import datasets as datasets_ddl
 from ..data.harm_data_record import harm_data_record
 from p2f_pydantic.harm_data_numerical import HARM_Int, HARM_Int_Confidence
 from p2f_pydantic.harm_data_numerical import HARM_Float, HARM_Float_Confidence
 from p2f_pydantic.harm_data_numerical import Insert_HARM_Numerical, Return_HARM_Numerical
 from p2f_pydantic.harm_data_numerical import Numerical_Table_Statistics
+from p2f_pydantic.datasets import Datasets
 
 
 Harm_numerical_union = Union[HARM_Int, HARM_Int_Confidence, HARM_Float, HARM_Float_Confidence]
@@ -77,15 +79,12 @@ def get_numeric_types_stats(datatype_id: UUID | None = None,
             stmt_float = stmt_float.where(harmonized_float.fk_data_type == datatype_id)
             stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_type == datatype_id)
         if dataset_id is not None:
-            # Was experiencing an error on only float confidence with a shared subquery. Therefore all get their own subquery.
-            sbqr_dataset_int = select(harm_data_record.record_hash).where(harm_data_record.fk_dataset == dataset_id).distinct()
-            sbqr_dataset_intc = select(harm_data_record.record_hash).where(harm_data_record.fk_dataset == dataset_id).distinct()
-            sbqr_dataset_float = select(harm_data_record.record_hash).where(harm_data_record.fk_dataset == dataset_id).distinct()
-            sbqr_dataset_floatc = select(harm_data_record.record_hash).where(harm_data_record.fk_dataset == dataset_id).distinct()
-            stmt_int = stmt_int.where(harmonized_int.fk_data_record.in_(sbqr_dataset_int))
-            stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_record.in_(sbqr_dataset_intc))
-            stmt_float = stmt_float.where(harmonized_float.fk_data_record.in_(sbqr_dataset_float))
-            stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_record.in_(sbqr_dataset_floatc))
+            # Previous comment for this code block was due to an indentation caused error, not due to performance.
+            sbqry = select(harm_data_record.record_hash).where(harm_data_record.fk_dataset == dataset_id).distinct()
+            stmt_int = stmt_int.where(harmonized_int.fk_data_record.in_(sbqry))
+            stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_record.in_(sbqry))
+            stmt_float = stmt_float.where(harmonized_float.fk_data_record.in_(sbqry))
+            stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_record.in_(sbqry))
         if record_hash is not None:
             stmt_int = stmt_int.where(harmonized_int.fk_data_record == record_hash)
             stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_record == record_hash)
@@ -130,18 +129,6 @@ def list_numerics_single_type(
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}({numeric_type})")
     TABLE, PYDANTIC = harm_table_matching[numeric_type]["db"], harm_table_matching[numeric_type]["pydantic"]
     logger.debug(f"List numericals selected types: {repr(TABLE)} - {repr(PYDANTIC)}")
-    ########### The following code block has many time out errors due to the complexity of the search.
-    # if dataset_id is not None:
-    #     # Gather information on the dataset. 
-    #     ##  If its a parent dataset, get the children, otherwise just collect exactly that dataset 
-    #     logger.debug("•  dataset_id is not none")
-    #     dataset_filter = get_dataset(dataset_id=dataset_id)
-    #     if not dataset_filter.is_sub_dataset:
-    #         related_datasets = list_datasets(doi=dataset_filter.doi)
-    #         related_dataset_ids = [x.dataset_id for x in related_datasets]
-    #     else:
-    #         related_datasets = [dataset_filter]
-    #         related_dataset_ids = [dataset_filter.dataset_id]
     with Session(engine) as session:
         stmt = select(TABLE)
         if record_hash is not None:
@@ -152,9 +139,20 @@ def list_numerics_single_type(
             stmt = stmt.where(TABLE.fk_data_type == datatype_id)
         if dataset_id is not None:
             logger.debug(f"•• dataset_id is not None {dataset_id}")
-            # What we want here are all the record hashes under a dataset
-            subqry = select(harm_data_record.record_hash).distinct()
-            subqry = subqry.where(harm_data_record.fk_dataset == dataset_id)
+            # Find out if the dataset is a parent or subdataset
+            subqry_is_subdataset = select(datasets_ddl.is_sub_dataset, datasets_ddl.doi).where(datasets_ddl.dataset_id == dataset_id)
+            dataset_obj = session.execute(subqry_is_subdataset).all()[0]
+            # logger.debug(dataset_obj)
+            # logger.debug(dir(dataset_obj))
+            if not dataset_obj.is_sub_dataset:
+                logger.debug("is not subdataset")
+                related_dataset_ids = select(datasets_ddl.dataset_id).where(datasets_ddl.doi == dataset_obj.doi)
+                subqry = select(harm_data_record.record_hash).distinct()
+                subqry = subqry.where(harm_data_record.fk_dataset.in_(related_dataset_ids))
+            else:
+                logger.debug("is subdataset")
+                subqry = select(harm_data_record.record_hash).distinct()
+                subqry = subqry.where(harm_data_record.fk_dataset == dataset_id)
             stmt = stmt.where(TABLE.fk_data_record.in_(subqry))
         results = shared_execution.list(stmt=stmt,
                                         pydantic_object=PYDANTIC,

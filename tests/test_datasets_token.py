@@ -96,3 +96,21 @@ def list_datasets_utility(email: str | None = None,
                      headers=headers)
     if r.ok:
         return [Datasets(**x) for x in r.json()]
+
+def get_dataset(dataset_id: str,
+                email: str | None = None, 
+                token: str | None = None,
+                port=8000, 
+                hostname="127.0.0.1"):
+    headers = base_headers
+    if email:
+        headers["x-p2f-email"] = email
+    if token:
+        headers["x-p2f-token"] = token
+    r = requests.get(f"http://{hostname}:{port}/datasets/{dataset_id}",
+                    #  params={"dataset_id": dataset_id},
+                     headers=headers)
+    if r.ok:
+        return True
+    else:
+        return False
