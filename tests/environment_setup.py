@@ -11,7 +11,7 @@ from shared import consortium_user_email, p2f_admin_email, unauthorized_user_ema
 from shared import result_print
 from shared import is_token_valid
 from test_request_token import test_token_requesttoken, extract_token
-from test_datasets_token import insert_dataset_user, list_datasets_utility
+from test_datasets_token import insert_dataset_user, list_datasets_utility, get_dataset
 from test_upload_locations import insert_locations, get_all_inserted_locations
 from test_upload_datatypes import insert_datatypes, get_all_inserted_datatypes
 from test_insert_numerics import insert_numericals_from_datasets
@@ -186,6 +186,14 @@ with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
 datasets = list_datasets_utility(email=p2f_admin_email, 
                                  token=p2f_admin_token,
                                  port=p2f_container_port)
+for dataset in datasets:
+    if get_dataset(dataset_id=dataset.dataset_id,
+                    email=p2f_admin_email,
+                    token=p2f_admin_token,
+                    port=p2f_container_port):
+        result_print(email=p2f_admin_email, test="GET DATASET", success=True)
+    else:
+        result_print(email=p2f_admin_email, test="GET DATASET", success=False)
 with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
     f.write(p2f_api.logs().decode("utf8"))
 

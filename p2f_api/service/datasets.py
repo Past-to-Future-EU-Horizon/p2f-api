@@ -41,7 +41,7 @@ def list_datasets(
     return results
 
 
-def get_dataset(dataset_id=None,
+def get_dataset(dataset_id: Optional[uuid.UUID]=None,
                 output_format: shared_execution.mimes = "application/json", 
                 pk_datasets=None) -> Datasets | Response:
     logger.debug(f"{fa.service}{fa.get} {stack()[0][3]}()")
