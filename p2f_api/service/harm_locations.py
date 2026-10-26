@@ -9,10 +9,11 @@ from sqlalchemy import select, insert, delete, update
 from sqlalchemy import union
 
 from p2f_api.apilogs import logger, fa
-from .harm_data_record import list_harm_data_record
 from service import shared_execution
 from ..data.db_connection import engine
 from ..data.harm_locations import harm_location_to_rec, harm_location_to_ds, harm_locations
+from ..data.datasets import datasets as datasets_ddl
+from ..data.harm_data_record import harm_data_record as harm_data_record_ddl
 from p2f_pydantic.harm_location import HARM_Location
 from p2f_pydantic.harm_location import HARM_Bounding_Box
 
@@ -64,12 +65,23 @@ def list_harm_metadata_location(
             stmt = stmt.where(harm_locations.location_age <= max_location_age)
         if dataset_id is not None:
             logger.debug("•• Dataset id is not none")
-            # subqry = select(harm_location_to_rec.fk_harm_location).where(
-            #     harm_location_to_rec.fk_data_record.in_(data_record_list)
-            # )
-            subqry = select(harm_location_to_ds.fk_harm_location)
-            subqry = subqry.where(harm_location_to_ds.fk_dataset_id == dataset_id)
-            stmt = stmt.where(harm_locations.location_id.in_(subqry))
+            # Get dataset doi
+            subqry_doi = select(datasets_ddl.doi)
+            subqry_doi = subqry_doi.where(datasets_ddl.dataset_id == dataset_id)
+            subqry_doi = subqry_doi.where(datasets_ddl.is_sub_dataset == False)
+            # Get related datasets
+            subqry_datasets = select(datasets_ddl.dataset_id).distinct()
+            subqry_datasets = subqry_datasets.where(datasets_ddl.doi.in_(subqry_doi))
+            # Get related location to dataset records
+            subqry_loc_ds = select(harm_location_to_ds.fk_harm_location)
+            subqry_loc_ds = subqry_loc_ds.where(harm_location_to_ds.fk_dataset_id.in_(subqry_datasets))
+            # Get related datasets to record hashes
+            subqry_recs = select(harm_data_record_ddl.record_hash).distinct()
+            subqry_recs = subqry_recs.where(harm_data_record_ddl.fk_dataset.in_(subqry_datasets))
+            # Get related locations to record hashes
+            subqry_loc_rec = select(harm_location_to_rec.fk_harm_location)
+            subqry_loc_rec.where(harm_location_to_rec.fk_data_record.in_(subqry_recs))
+            stmt = stmt.where(harm_locations.location_id.in_(union(subqry_loc_ds, subqry_loc_rec)))
         if active_locations:
             logger.debug("•• active_locations id is not none or False")
             active_ds_subqry = select(harm_location_to_ds.fk_harm_location.distinct())

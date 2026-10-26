@@ -18,6 +18,7 @@ from test_insert_numerics import insert_numericals_from_datasets
 from test_get_numerics import read_numeric_stats, list_numerics_iterated, list_numerics_specific
 from test_insert_records import insert_records
 from test_assign_record_metadata import assign_location_record_bytable, assign_season_record_bytable
+from test_get_dataset_metadata import get_locations_by_dataset_id
 from generate_data import generate_dataset, generate_locations
 from generate_data import generate_data_types
 
@@ -287,15 +288,7 @@ list_numerics_specific(email=p2f_admin_email, token=p2f_admin_token,
                        dataset=specific_datatype_admin, numeric_type=numeric_datatype_admin, port=p2f_container_port)
 list_numerics_specific(email=consortium_user_email, token=consortium_user_token, 
                        dataset=specific_datatype_member, numeric_type=numeric_datatype_member, port=p2f_container_port)
-##   Metadata Tests
-## # Datasets Location Tests
-## # Datasets Seasonality Tests
-## # Datasets Git Repository Tests
-## # Datasets Time Coverage Tests
-## # Datasets Species Tests
-## # Datasets Data Types Tests
-## # Datasets Time Slices Tests
-## # Datasets Tags & Keywords Tests
+
 ## # Records Location Tests
 for dataset in admin_datasets:
     assign_location_record_bytable(dataset=datasets[dataset], 
@@ -314,6 +307,20 @@ for dataset in member_datasets:
 ## # Records Data Types Tests
 ## # Records References Tests
 ## # Records Age Tests
+
+##   Metadata Tests
+## # Datasets Location Tests
+get_locations_by_dataset_id(dataset_ids=[str(x) for x in datasets.keys()],
+                            email=p2f_admin_email, token=p2f_admin_token, port=p2f_container_port)
+get_locations_by_dataset_id(dataset_ids=[str(x) for x in datasets.keys()],
+                            email=consortium_user_email, token=consortium_user_token, port=p2f_container_port)
+## # Datasets Seasonality Tests
+## # Datasets Git Repository Tests
+## # Datasets Time Coverage Tests
+## # Datasets Species Tests
+## # Datasets Data Types Tests
+## # Datasets Time Slices Tests
+## # Datasets Tags & Keywords Tests
 
 with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
     f.write(p2f_api.logs().decode("utf8"))

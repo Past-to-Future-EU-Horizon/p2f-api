@@ -139,20 +139,37 @@ def list_numerics_single_type(
             stmt = stmt.where(TABLE.fk_data_type == datatype_id)
         if dataset_id is not None:
             logger.debug(f"•• dataset_id is not None {dataset_id}")
+            # subqry_debug = select(datasets_ddl.dataset_id, datasets_ddl.is_sub_dataset).distinct()
+            # results_debug = session.execute(subqry_debug).all()
+            # logger.debug(f"•••• debug found the following unique dataset_id and subdataset statuses: {results_debug}")
             # Find out if the dataset is a parent or subdataset
-            subqry_is_subdataset = select(datasets_ddl.is_sub_dataset, datasets_ddl.doi).where(datasets_ddl.dataset_id == dataset_id)
-            dataset_obj = session.execute(subqry_is_subdataset).all()[0]
+            subqry_is_subdataset = select(datasets_ddl.is_sub_dataset, datasets_ddl.doi)
+            subqry_is_subdataset = subqry_is_subdataset.where(datasets_ddl.dataset_id == dataset_id)
+            subqry_is_subdataset = subqry_is_subdataset.execution_options(populate_existing=True)
+            try:
+                dataset_obj = session.execute(subqry_is_subdataset).one_or_none()
+                logger.debug(repr(dataset_obj))
+            except IndexError:
+                logger.debug("••!•• Index error on dataset subdataset query")
             # logger.debug(dataset_obj)
             # logger.debug(dir(dataset_obj))
-            if not dataset_obj.is_sub_dataset:
-                logger.debug("is not subdataset")
-                related_dataset_ids = select(datasets_ddl.dataset_id).where(datasets_ddl.doi == dataset_obj.doi)
-                subqry = select(harm_data_record.record_hash).distinct()
-                subqry = subqry.where(harm_data_record.fk_dataset.in_(related_dataset_ids))
+            if dataset_obj is not None:
+                if not dataset_obj.is_sub_dataset:
+                    logger.debug("••• is not subdataset")
+                    related_dataset_ids = select(datasets_ddl.dataset_id).where(datasets_ddl.doi == dataset_obj.doi)
+                    subqry = select(harm_data_record.record_hash).distinct()
+                    subqry = subqry.where(harm_data_record.fk_dataset.in_(related_dataset_ids))
+                    logger.debug(f"••• DOI related datasets subquery: {subqry}")
+                else:
+                    logger.debug("••• is subdataset")
+                    subqry = select(harm_data_record.record_hash).distinct()
+                    subqry = subqry.where(harm_data_record.fk_dataset == dataset_id)
+                    logger.debug(f"••• Subdataset subquery: {subqry}")
             else:
-                logger.debug("is subdataset")
+                logger.debug("••• is subdataset")
                 subqry = select(harm_data_record.record_hash).distinct()
                 subqry = subqry.where(harm_data_record.fk_dataset == dataset_id)
+                logger.debug(f"••• Subdataset subquery: {subqry}")
             stmt = stmt.where(TABLE.fk_data_record.in_(subqry))
         results = shared_execution.list(stmt=stmt,
                                         pydantic_object=PYDANTIC,
