@@ -53,7 +53,7 @@ tags_metadata_list = [
 app = FastAPI(
     title="Past to Future Dataset API",
     summary="APIs for the P2F team to share datasets and conform to a harmonized data model",
-    version="0.0.141",
+    version="0.0.142",
     openapi_tags=tags_metadata_list
 )
 
@@ -91,10 +91,10 @@ app.include_router(harm_core.router)
 def get_api_metadata() -> p2fsystem.API_Metadata:
     minimum_p2f_client_py = p2fsystem.Semantic_Version(major=0, 
                                                        minor=0, 
-                                                       patch=34)
+                                                       patch=40)
     api_version = p2fsystem.Semantic_Version(major=0, 
                                              minor=0, 
-                                             patch=141)
+                                             patch=142)
     return_class = p2fsystem.API_Metadata(pyclient_minimum_version=minimum_p2f_client_py, 
                                           api_system_version=api_version)
     return return_class

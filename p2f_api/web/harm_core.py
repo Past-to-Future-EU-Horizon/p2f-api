@@ -1,6 +1,6 @@
 # Batteries included libraries
 import uuid
-from typing import Optional, List, Annotated
+from typing import Optional, List, Annotated, Literal
 from inspect import stack
 
 # Third Party Libraries
@@ -22,16 +22,37 @@ tag_metadata = {"name": tag_name,
 
 # List Cores
 @router.get("/", operation_id="core-list")
-def list_cores(auth: api_token_annotation,) -> List[Core]:
+def list_cores(auth: api_token_annotation,
+               dataset_id: uuid.UUID | None = None,
+               record_hash: str | None = None,
+               active_core: bool | None = None,
+               location_id: uuid.UUID | None = None, 
+               datatype_id: uuid.UUID | None = None,
+               core_type: Literal["ice", "sediment", "other"] | None = None,) -> List[Core]:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
-    return harm_core.list_cores()
+    return harm_core.list_cores(dataset_id=dataset_id,
+                                record_hash=record_hash,
+                                active_core=active_core,
+                                location_id=location_id,
+                                datatype_id=datatype_id,
+                                core_type=core_type)
 
 # List Core Segments
 @router.get("/{core_id}/segment", operation_id="core-segment-list")
 def list_core_segments(auth: api_token_annotation,
-                       core_id: uuid.UUID) -> List[CoreSegment]:
+                       core_id: uuid.UUID | None = None,
+                       dataset_id: uuid.UUID | None = None,
+                       record_hash: str | None = None,
+                       location_id: uuid.UUID | None = None,
+                       datatype_id: uuid.UUID | None = None,
+                       active_segments: bool | None = None, ) -> List[CoreSegment]:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
-    return harm_core.list_core_segments(core_id=core_id)
+    return harm_core.list_core_segments(core_id=core_id,
+                                        dataset_id=dataset_id,
+                                        record_hash=record_hash,
+                                        location_id=location_id,
+                                        datatype_id=datatype_id,
+                                        active_segments=active_segments)
 
 # Get Core
 @router.get("/{core_id}", operation_id="core-get")

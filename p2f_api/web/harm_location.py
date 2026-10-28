@@ -47,6 +47,8 @@ def list_harm_data_records(
     min_location_age: Optional[float] = None,
     max_location_age: Optional[float] = None,
     dataset_id: Optional[uuid.UUID] = None,
+    datatype_id: Optional[uuid.UUID] = None,
+    record_hash: Optional[str] = None,
     active_locations: Optional[bool] = None,
 ) -> List[HARM_Location]:
     logger.debug(f"{fa.web}{fa.delete} {__name__} {stack()[0][3]}()")
@@ -59,6 +61,8 @@ def list_harm_data_records(
         min_location_age=min_location_age,
         max_location_age=max_location_age,
         dataset_id=dataset_id,
+        datatype_id=datatype_id,
+        record_hash=record_hash,
         active_locations=active_locations,
     )
 

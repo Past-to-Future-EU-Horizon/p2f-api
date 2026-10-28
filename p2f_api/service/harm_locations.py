@@ -14,6 +14,8 @@ from ..data.db_connection import engine
 from ..data.harm_locations import harm_location_to_rec, harm_location_to_ds, harm_locations
 from ..data.datasets import datasets as datasets_ddl
 from ..data.harm_data_record import harm_data_record as harm_data_record_ddl
+from ..data.harm_data_numerical import harmonized_int, harmonized_int_confidence
+from ..data.harm_data_numerical import harmonized_float, harmonized_float_confidence
 from p2f_pydantic.harm_location import HARM_Location
 from p2f_pydantic.harm_location import HARM_Bounding_Box
 
@@ -26,6 +28,8 @@ def list_harm_metadata_location(
     min_location_age: Optional[float] = None,
     max_location_age: Optional[float] = None,
     dataset_id: Optional[UUID] = None,
+    datatype_id: UUID | None = None,
+    record_hash: str | None = None,
     active_locations: Optional[bool] = None,
     output_format: shared_execution.mimes = "application/json",
 ) -> List[HARM_Location]:
@@ -82,6 +86,23 @@ def list_harm_metadata_location(
             subqry_loc_rec = select(harm_location_to_rec.fk_harm_location)
             subqry_loc_rec.where(harm_location_to_rec.fk_data_record.in_(subqry_recs))
             stmt = stmt.where(harm_locations.location_id.in_(union(subqry_loc_ds, subqry_loc_rec)))
+        if datatype_id is not None:
+            logger.debug("•• Data Type id is not none")
+            # Gather numeric distinct numeric record hashes
+            subqry_i_rec = select(harmonized_int.fk_data_record).distinct().where(harmonized_int.fk_data_type == datatype_id)
+            subqry_ic_rec = select(harmonized_int_confidence.fk_data_record).distinct().where(harmonized_int_confidence.fk_data_type == datatype_id)
+            subqry_f_rec = select(harmonized_float.fk_data_record).distinct().where(harmonized_float.fk_data_type == datatype_id)
+            subqry_fc_rec = select(harmonized_float_confidence.fk_data_record).distinct().where(harmonized_float_confidence.fk_data_type == datatype_id)
+            # group them up
+            subqry_union_rec = union(subqry_i_rec, subqry_ic_rec, subqry_f_rec, subqry_fc_rec)
+            subqry_location_rec = select(harm_location_to_rec.fk_harm_location).distinct()
+            subqry_location_rec = subqry_location_rec.where(harm_location_to_rec.fk_data_record.in_(subqry_union_rec))
+            stmt = stmt.where(harm_locations.location_id.in_(subqry_location_rec))
+        if record_hash is not None:
+            logger.debug("•• Record Hash is not none")
+            rechash_subqry = select(harm_location_to_rec.fk_harm_location).distinct()
+            rechash_subqry = rechash_subqry.where(harm_location_to_rec.fk_data_record == record_hash)
+            stmt = stmt.where(harm_locations.location_id.in_(rechash_subqry))
         if active_locations:
             logger.debug("•• active_locations id is not none or False")
             active_ds_subqry = select(harm_location_to_ds.fk_harm_location.distinct())

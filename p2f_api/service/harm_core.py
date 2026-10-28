@@ -1,36 +1,139 @@
 # Batteries included libraries
-from typing import List, Optional
+from typing import List, Optional, Literal
 from uuid import UUID
 from inspect import stack
 
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
+from sqlalchemy import union
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from service import shared_execution
 from ..data.db_connection import engine
 from ..data.harm_core import core, coreSegment, coreSegment_to_record
+from ..data.harm_data_record import harm_data_record
+from ..data.harm_data_numerical import harmonized_int, harmonized_int_confidence
+from ..data.harm_data_numerical import harmonized_float, harmonized_float_confidence
 from p2f_pydantic.harm_core import Core, CoreSegment
 
 
-def list_cores(output_format: shared_execution.mimes = "application/json",) -> List[Core]:
+def list_cores(dataset_id: UUID | None = None,
+               record_hash: str | None = None,
+               active_core: bool | None = None,
+               location_id: UUID | None = None, 
+               datatype_id: UUID | None = None,
+               core_type: Literal["ice", "sediment", "other"] | None = None,
+               output_format: shared_execution.mimes = "application/json",) -> List[Core]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(core)
+        if core_type is not None:
+            stmt = stmt.where(core.core_type == core_type)
+        if record_hash is not None: 
+            # Select the coreSegments that are assigned to a record
+            coreseg_assigned_subqry = select(coreSegment_to_record.fk_core_segment_id.distinct())
+            coreseg_assigned_subqry = coreseg_assigned_subqry.where(coreSegment_to_record.fk_record_hash == record_hash)
+            # Select the core segment using the above record query
+            coreseg_subqry = select(coreSegment.fk_core_id.distinct())
+            coreseg_subqry = coreseg_subqry.where(coreSegment.core_segment_id.in_(coreseg_assigned_subqry))
+            # select core
+            stmt = stmt.where(core.core_id.in_(coreseg_subqry))
+        if dataset_id is not None:
+            # Select the record hashes where the record hash are associated with the dataset_id
+            dataset_subqry = select(harm_data_record.record_hash).distinct()
+            dataset_subqry = dataset_subqry.where(harm_data_record.fk_dataset == dataset_id)
+            # select the core segment id that are matched to the above record hashes
+            core_segments_rel_subqry = select(coreSegment_to_record.fk_core_segment_id).distinct()
+            core_segments_rel_subqry = core_segments_rel_subqry.where(coreSegment_to_record.in_(dataset_subqry))
+            # select the core_ids from the core_segments
+            coreseg_dataset_subqry = select(coreSegment.fk_core_id).distinct()
+            coreseg_dataset_subqry = coreseg_dataset_subqry.where(coreSegment.core_segment_id.in_(core_segments_rel_subqry))
+            # finally get the cores
+            stmt = stmt.where(core.core_id.in_(coreseg_dataset_subqry))
+        if active_core is not None:
+            # get all distinct assigned core_segment_id
+            assigned_segments_subqry = select(coreSegment_to_record.fk_core_segment_id).distinct()
+            # get related parent core from core_segment_ids
+            coreseg_assigned_subqry = select(coreSegment.fk_core_id).distinct()
+            coreseg_assigned_subqry = coreseg_assigned_subqry.where(coreSegment.core_segment_id.in_(assigned_segments_subqry))
+            # filter cores by above
+            stmt = stmt.where(core.core_id.in_(coreseg_assigned_subqry))
+        if location_id is not None:
+            stmt = stmt.where(core.fk_location == location_id)
+        if datatype_id is not None:
+            # Request all numerics by data type
+            subqry_i_rec = select(harmonized_int.fk_data_record).distinct().where(harmonized_int.fk_data_type == datatype_id)
+            subqry_ic_rec = select(harmonized_int_confidence.fk_data_record).distinct().where(harmonized_int_confidence.fk_data_type == datatype_id)
+            subqry_f_rec = select(harmonized_float.fk_data_record).distinct().where(harmonized_float.fk_data_type == datatype_id)
+            subqry_fc_rec = select(harmonized_float_confidence.fk_data_record).distinct().where(harmonized_float_confidence.fk_data_type == datatype_id)
+            # group numerics
+            subqry_union_rec = union(subqry_i_rec, subqry_ic_rec, subqry_f_rec, subqry_fc_rec)
+            # match core segment ids with the record hashes
+            coresegs_union_subqry = select(coreSegment_to_record.fk_core_segment_id).distinct()
+            coresegs_union_subqry = coresegs_union_subqry.where(coreSegment_to_record.fk_record_hash.in_(subqry_union_rec))
+            # get the cores from the above matched core segments
+            coreseg_dtype_subqry = select(coreSegment.fk_core_id).distinct()
+            coreseg_dtype_subqry = coreseg_dtype_subqry.where(coreSegment.core_segment_id.in_(coresegs_union_subqry))
+            # filter by core ids
+            stmt = stmt.where(core.core_id.in_(coreseg_dtype_subqry))
         results = shared_execution.list(stmt=stmt,
                                         pydantic_object=Core,
                                         session_object=session,
                                         output_format=output_format)
     return results
 
-def list_core_segments(core_id: UUID,
+def list_core_segments(core_id: UUID | None = None,
+                       dataset_id: UUID | None = None,
+                       record_hash: str | None = None,
+                       location_id: UUID | None = None,
+                       datatype_id: UUID | None = None,
+                       active_segments: bool | None = None,                       
                        output_format: shared_execution.mimes = "application/json",) -> List[CoreSegment]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(coreSegment)
-        stmt = stmt.where(coreSegment.fk_core_id == core_id)
+        if core_id is not None:
+            stmt = stmt.where(coreSegment.fk_core_id == core_id)
+        if dataset_id is not None:
+            # Request record hashes that are associated with dataset
+            rechash_datasetid_subqry = select(harm_data_record.record_hash).distinct()
+            rechash_datasetid_subqry = rechash_datasetid_subqry.where(harm_data_record.fk_dataset == dataset_id)
+            # Match record hashes to coreSegments
+            coreseg_rechash_subqry = select(coreSegment_to_record.fk_core_segment_id).distinct()
+            coreseg_rechash_subqry = coreseg_rechash_subqry.where(coreSegment_to_record.fk_record_hash.in_(rechash_datasetid_subqry))
+            # Filter by these core segments
+            stmt = stmt.where(coreSegment.core_segment_id.in_(coreseg_rechash_subqry))
+        if record_hash is not None:
+            # Match record hash to coreSegments
+            rechash_coreseg_subqry = select(coreSegment_to_record.fk_core_segment_id).distinct()
+            rechash_coreseg_subqry = rechash_coreseg_subqry.where(coreSegment_to_record.fk_record_hash == record_hash)
+            # Filter by coreSegments
+            stmt = stmt.where(coreSegment.core_segment_id.in_(rechash_coreseg_subqry))
+        if location_id is not None:
+            # Get core_id at location
+            location_core_subqry = select(core.core_id).distinct()
+            location_core_subqry = location_core_subqry.where(core.fk_location == location_id)
+            # Get CoreSegments with above core_id
+            stmt = stmt.where(coreSegment.fk_core_id.in_(location_core_subqry))
+        if datatype_id is not None:
+            # Gather numeric distinct numeric record hashes
+            subqry_i_rec = select(harmonized_int.fk_data_record).distinct().where(harmonized_int.fk_data_type == datatype_id)
+            subqry_ic_rec = select(harmonized_int_confidence.fk_data_record).distinct().where(harmonized_int_confidence.fk_data_type == datatype_id)
+            subqry_f_rec = select(harmonized_float.fk_data_record).distinct().where(harmonized_float.fk_data_type == datatype_id)
+            subqry_fc_rec = select(harmonized_float_confidence.fk_data_record).distinct().where(harmonized_float_confidence.fk_data_type == datatype_id)
+            # group them up
+            subqry_union_rec = union(subqry_i_rec, subqry_ic_rec, subqry_f_rec, subqry_fc_rec)
+            # match record hashes to core segment ids
+            dtype_rechash_subqry = select(coreSegment_to_record.fk_core_segment_id).distinct()
+            dtype_rechash_subqry = dtype_rechash_subqry.where(coreSegment_to_record.fk_record_hash.in_(subqry_union_rec))
+            # filter by core segment ids
+            stmt = stmt.where(coreSegment.core_segment_id.in_(dtype_rechash_subqry))
+        if active_segments is not None:
+            # gather assigned core_segments
+            subqry_coresegs_inuse = select(coreSegment_to_record.fk_core_segment_id).distinct()
+            stmt = stmt.where(coreSegment.core_segment_id.in_(subqry_coresegs_inuse))
         results = shared_execution.list(stmt=stmt,
                                         pydantic_object=CoreSegment,
                                         session_object=session,

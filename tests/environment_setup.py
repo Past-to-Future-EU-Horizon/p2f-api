@@ -71,7 +71,7 @@ p2f_environments = {"POSTGRES_PASSWORD": token_urlsafe(64)[:20],
                     "P2F_TOKEN_TTL": "86400",
                     "P2F_PORTAL_EMAIL_ADDRESS": "portal@example.com",
                     "P2F_PORTAL_TOKEN": token_urlsafe(64)[:64],
-                    }
+                    "_P2F_API_PORT": p2f_container_port}
 p2f_environments["PG_USER"] = p2f_environments["POSTGRES_USER"]
 p2f_environments["PG_PASS"] = p2f_environments["POSTGRES_PASSWORD"]
 p2f_environments["PG_HOST"] = postgres_container_name
@@ -326,7 +326,7 @@ with open(f"tests/test_apilogs_{test_run_id}.txt", "w") as f:
     f.write(p2f_api.logs().decode("utf8"))
 
 print(f"----- {test_run_id} FINISHED -----------------")
-p2f_api.stop()
-# p2f_api.remove()
-p2f_postgres.stop()
-test_network.remove()
+# p2f_api.stop()
+# # p2f_api.remove()
+# p2f_postgres.stop()
+# test_network.remove()
