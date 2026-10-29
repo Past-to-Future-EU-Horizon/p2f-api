@@ -19,45 +19,16 @@ from ..data.harm_data_types import harm_data_type, datatype_to_dataset
 from ..data.harm_data_numerical import harmonized_float_confidence, harmonized_float
 from ..data.harm_data_numerical import harmonized_int_confidence, harmonized_int
 from ..data.harm_data_record import harm_data_record
+from ..data.harm_locations import harm_location_to_rec
 from ..data import harm_data_numerical
 from p2f_pydantic.harm_data_types import HARM_Data_Type
-
-# def list_harm_data_types_by_dataset_id(dataset_id: Optional[UUID] = None) -> List[UUID]:
-#     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
-#     data_records = list_harm_data_record(dataset=dataset_id)
-#     logger.debug(f"•  data records {data_records}")
-#     numeric_records = []
-#     for data_record in data_records:
-#         logger.debug("•  Iterating through data records")
-#         listed_numerics = list_numerics_type_iterator(
-#             record_hash=data_record.record_hash,
-#             dataset_id=dataset_id
-#         )
-#         if listed_numerics.data_harmonized_int is not None:
-#             logger.debug("•• listed_numerics.data_harmonized_int")
-#             for record in listed_numerics.data_harmonized_int:
-#                 numeric_records.append(record)
-#         if listed_numerics.data_harmonized_int_confidence is not None:
-#             logger.debug("•• listed_numerics.data_harmonized_int_confidence")
-#             for record in listed_numerics.data_harmonized_int_confidence:
-#                 numeric_records.append(record)
-#         if listed_numerics.data_harmonized_float is not None:
-#             logger.debug("•• listed_numerics.data_harmonized_float")
-#             for record in listed_numerics.data_harmonized_float:
-#                 numeric_records.append(record)
-#         if listed_numerics.data_harmonized_float_confidence is not None:
-#             logger.debug("•• listed_numerics.data_harmonized_float_confidence")
-#             for record in listed_numerics.data_harmonized_float_confidence:
-#                 numeric_records.append(record)
-#     numeric_records = {x.fk_data_type for x in numeric_records}  # yes this is a set
-#     return numeric_records
-
 
 def list_harm_data_types(
     measure: Optional[str] = None,
     unit_of_measure: Optional[str] = None,
     method: Optional[str] = None,
     dataset_id: Optional[UUID] = None,
+    location_id: Optional[UUID] = None, 
     is_proxy: Optional[bool] = None,
     active_datatypes: Optional[bool] = None,
     output_format: shared_execution.mimes = "application/json"
@@ -86,6 +57,17 @@ def list_harm_data_types(
             subqry_f = select(harmonized_float.fk_data_type.distinct()).where(harmonized_float.fk_data_record.in_(subqry_d))
             subqry_fc = select(harmonized_float_confidence.fk_data_type.distinct()).where(harmonized_float_confidence.fk_data_record.in_(subqry_d))
             stmt = stmt.where(harm_data_type.datatype_id.in_(union(subqry_i, subqry_ic, subqry_f, subqry_fc)))
+        if location_id is not None:
+            logger.debug("•• location_id is not none")
+            subqry_rechash_from_locid = select(harm_location_to_rec.fk_data_record).distinct()
+            subqry_rechash_from_locid = subqry_rechash_from_locid.where(harm_location_to_rec.fk_harm_location == location_id)
+            # rtd = record_hash to datatype
+            subqry_rtd_i = select(harmonized_int.fk_data_type).distinct().where(harmonized_int.fk_data_record.in_(subqry_rechash_from_locid))
+            subqry_rtd_ic = select(harmonized_int_confidence.fk_data_type).distinct().where(harmonized_int_confidence.fk_data_record.in_(subqry_rechash_from_locid))
+            subqry_rtd_f = select(harmonized_float.fk_data_type).distinct().where(harmonized_float.fk_data_record.in_(subqry_rechash_from_locid))
+            subqry_rtd_fc = select(harmonized_float_confidence.fk_data_type).distinct().where(harmonized_float_confidence.fk_data_record.in_(subqry_rechash_from_locid))
+            subqry_rtd_u = union(subqry_rtd_i, subqry_rtd_ic, subqry_rtd_f, subqry_rtd_fc)
+            stmt = stmt.where(harm_data_type.datatype_id.in_(subqry_rtd_u))
         if active_datatypes is not None:
             logger.debug("•• active_datatypes is not none")
             subqry_dt_i = select(harmonized_int.fk_data_type).distinct()
@@ -95,17 +77,6 @@ def list_harm_data_types(
             stmt = stmt.where(harm_data_type.datatype_id.in_(union(subqry_dt_f, subqry_dt_fc, subqry_dt_i, subqry_dt_ic)))
         results = shared_execution.list(stmt=stmt, pydantic_object=HARM_Data_Type, session_object=session, output_format="application/json")
     return results
-    #     results = session.execute(stmt).all()
-    # logger.debug(f"• Found {len(results)} results")
-    # results = [HARM_Data_Type(**x[0].__dict__) for x in results]
-    # if dataset_id is not None:
-    #     logger.debug("•  dataset_id is not None")
-    #     dataset_datatypes = list_harm_data_types_by_dataset_id()
-    #     logger.debug(dataset_datatypes)
-    #     results = [x for x in results if x.datatype_id in dataset_datatypes]
-    # logger.debug(results)
-    # return results
-
 
 def get_harm_data_type(
     datatype_id: Optional[UUID] = None,

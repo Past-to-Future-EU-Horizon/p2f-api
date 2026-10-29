@@ -43,6 +43,7 @@ def list_harm_data_types(
     unit_of_measure: Optional[str] = None,
     method: Optional[str] = None,
     dataset_id: Optional[uuid.UUID] = None,
+    location_id: Optional[uuid.UUID] = None,
     is_proxy: Optional[bool] = None,
     active_datatypes: Optional[bool] = None
 ) -> List[HARM_Data_Type]:
@@ -54,6 +55,7 @@ def list_harm_data_types(
         unit_of_measure=unit_of_measure,
         method=method,
         dataset_id=dataset_id,
+        location_id=location_id,
         is_proxy=is_proxy,
         active_datatypes=active_datatypes
     )
