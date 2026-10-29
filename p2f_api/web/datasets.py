@@ -61,6 +61,10 @@ def list_datasets(
     is_new_p2f: Optional[bool] = None,
     is_sub_dataset: Optional[bool] = None,
     doi: Optional[str] = None,
+    location_id: Optional[uuid.UUID] = None, 
+    datatype_id: Optional[uuid.UUID] = None,
+    core_id: Optional[uuid.UUID] = None,
+    core_segment_id: Optional[uuid.UUID] = None
 ) -> List[Datasets]:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     output_format = req.headers.get("Accept", "application/json")
@@ -69,6 +73,10 @@ def list_datasets(
         is_new_p2f=is_new_p2f, 
         is_sub_dataset=is_sub_dataset, 
         doi=doi, 
+        location_id=location_id,
+        datatype_id=datatype_id,
+        core_id=core_id,
+        core_segment_id=core_segment_id,
         output_format=output_format,
     )
 
