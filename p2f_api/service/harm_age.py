@@ -12,12 +12,14 @@ from p2f_api.apilogs import logger, fa
 from service import shared_execution
 from ..data.db_connection import engine
 from ..data.harm_age import harm_rec_age
+from ..data.harm_data_record import harm_data_record
 from p2f_pydantic.harm_age import HARM_Rec_Age
 
 
 def list_harm_ages(
     recent_year_search: Optional[int] = None, 
     older_year_search: Optional[int] = None,
+    dataset_id: Optional[UUID] = None,
     output_format: shared_execution.mimes = "application/json",
 ) -> List[HARM_Rec_Age]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
@@ -27,6 +29,10 @@ def list_harm_ages(
             stmt = stmt.where(harm_rec_age.age_mean >= recent_year_search)
         if older_year_search is not None:
             stmt = stmt.where(harm_rec_age.age_mean <= older_year_search)
+        if dataset_id is not None:
+            dataset_to_rec_subqry = select(harm_data_record.record_hash).distinct()
+            dataset_to_rec_subqry = dataset_to_rec_subqry.where(harm_data_record.fk_dataset == dataset_id)
+            stmt = stmt.where(harm_rec_age.fk_record_hash.in_(dataset_to_rec_subqry))
         results = shared_execution.list(stmt=stmt,
                                         pydantic_object=HARM_Rec_Age,
                                         session_object=session,

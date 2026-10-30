@@ -18,6 +18,8 @@ from ..data.harm_data_numerical import harmonized_int_confidence, harmonized_int
 from ..data.harm_data_numerical import harmonized_numeric_id_map
 from ..data.datasets import datasets as datasets_ddl
 from ..data.harm_data_record import harm_data_record
+from ..data.harm_locations import harm_location_to_rec
+from ..data.harm_core import coreSegment, coreSegment_to_record
 from p2f_pydantic.harm_data_numerical import HARM_Int, HARM_Int_Confidence
 from p2f_pydantic.harm_data_numerical import HARM_Float, HARM_Float_Confidence
 from p2f_pydantic.harm_data_numerical import Insert_HARM_Numerical, Return_HARM_Numerical
@@ -65,7 +67,10 @@ harm_table_matching = {
 
 def get_numeric_types_stats(datatype_id: UUID | None = None,
                             dataset_id: UUID | None = None,
-                            record_hash: str | None = None) -> Numerical_Table_Statistics: 
+                            record_hash: str | None = None,
+                            location_id: UUID | None = None,
+                            core_id: UUID | None = None,
+                            core_segment_id: UUID | None = None) -> Numerical_Table_Statistics: 
     logger.debug(f"{fa.service}{fa.get} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         logger.debug("•  Created session")
@@ -90,6 +95,31 @@ def get_numeric_types_stats(datatype_id: UUID | None = None,
             stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_record == record_hash)
             stmt_float = stmt_float.where(harmonized_float.fk_data_record == record_hash)
             stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_record == record_hash)
+        if location_id is not None:
+            subqry_loc_rec = select(harm_location_to_rec.fk_data_record).distinct()
+            subqry_loc_rec = subqry_loc_rec.where(harm_location_to_rec.fk_harm_location == location_id)
+            stmt_int = stmt_int.where(harmonized_int.fk_data_record.in_(subqry_loc_rec))
+            stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_record.in_(subqry_loc_rec))
+            stmt_float = stmt_float.where(harmonized_float.fk_data_record.in_(subqry_loc_rec))
+            stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_record.in_(subqry_loc_rec))
+        if core_id is not None:
+            # select the core segments with core_id
+            subqry_coreid_coreseg = select(coreSegment.core_segment_id).distinct()
+            subqry_coreid_coreseg = subqry_coreid_coreseg.where(coreSegment.fk_core_id == core_id)
+            # select the core segments from relation table
+            subqry_coreseg_rec = select(coreSegment_to_record.fk_record_hash).distinct()
+            subqry_coreseg_rec = subqry_coreseg_rec.where(coreSegment_to_record.fk_core_segment_id.in_(subqry_coreid_coreseg))
+            stmt_int = stmt_int.where(harmonized_int.fk_data_record.in_(subqry_coreseg_rec))
+            stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_record.in_(subqry_coreseg_rec))
+            stmt_float = stmt_float.where(harmonized_float.fk_data_record.in_(subqry_coreseg_rec))
+            stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_record.in_(subqry_coreseg_rec))
+        if core_segment_id is not None:
+            subqry_coreseg_rechash = select(coreSegment_to_record.fk_record_hash).distinct()
+            subqry_coreseg_rechash = subqry_coreseg_rechash.where(coreSegment_to_record.fk_core_segment_id == core_segment_id)
+            stmt_int = stmt_int.where(harmonized_int.fk_data_record.in_(subqry_coreseg_rechash))
+            stmt_intc = stmt_intc.where(harmonized_int_confidence.fk_data_record.in_(subqry_coreseg_rechash))
+            stmt_float = stmt_float.where(harmonized_float.fk_data_record.in_(subqry_coreseg_rechash))
+            stmt_floatc = stmt_floatc.where(harmonized_float_confidence.fk_data_record.in_(subqry_coreseg_rechash))
         # logger.debug(f"=============Statments for counts==========\nInt: {stmt_int}\n\nIntConf: {stmt_intc}\n\nFloat: {stmt_float}\n\nFloatConf: {stmt_floatc}\n=============")
         result_int = session.execute(stmt_int).first()
         result_intc = session.execute(stmt_intc).first()
@@ -124,6 +154,9 @@ def list_numerics_single_type(
         record_hash: Optional[str] = None,
         datatype_id: Optional[UUID] = None,
         dataset_id: Optional[UUID] = None,
+        location_id: Optional[UUID] = None,
+        core_id: Optional[UUID] = None, 
+        core_segment_id: Optional[UUID] = None,
         output_format: shared_execution.mimes = "application/json",
     ): # -> Return only one kind of table 
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}({numeric_type})")
@@ -137,6 +170,23 @@ def list_numerics_single_type(
         if datatype_id is not None:
             logger.debug(f"•• datatype_id is not None {datatype_id}")
             stmt = stmt.where(TABLE.fk_data_type == datatype_id)
+        if location_id is not None:
+            logger.debug(f"•• datatype_id is not None {location_id}")
+            location_rec_subqry = select(harm_location_to_rec.fk_data_record).distinct()
+            location_rec_subqry = location_rec_subqry.where(harm_location_to_rec.fk_harm_location == location_id)
+            stmt = stmt.where(TABLE.fk_data_record.in_(location_rec_subqry))
+        if core_id is not None:
+            # Select core segments by core_id
+            coreseg_to_coreid_subqry = select(coreSegment.core_segment_id).distinct()
+            coreseg_to_coreid_subqry = coreseg_to_coreid_subqry.where(coreSegment.fk_core_id == core_id)
+            # select record hashes from coreseg to rec by above core segments
+            coreseg_rechash_subqry = select(coreSegment_to_record.fk_record_hash).distinct()
+            coreseg_rechash_subqry = coreseg_rechash_subqry.where(coreSegment_to_record.fk_core_segment_id.in_(coreseg_to_coreid_subqry))
+            stmt = stmt.where(TABLE.fk_data_record.in_(coreseg_rechash_subqry))
+        if core_segment_id is not None:
+            coreseg_2_rechash_subqry = select(coreSegment_to_record.fk_record_hash).distinct()
+            coreseg_2_rechash_subqry = coreseg_2_rechash_subqry.where(coreSegment_to_record.fk_core_segment_id == core_segment_id)
+            stmt = stmt.where(TABLE.fk_data_record.in_(coreseg_2_rechash_subqry))
         if dataset_id is not None:
             logger.debug(f"•• dataset_id is not None {dataset_id}")
             # subqry_debug = select(datasets_ddl.dataset_id, datasets_ddl.is_sub_dataset).distinct()
@@ -181,12 +231,17 @@ def list_numerics_type_iterator(
         record_hash: Optional[str] = None,
         datatype_id: Optional[UUID] = None,
         dataset_id: Optional[UUID] = None,
+        location_id: Optional[UUID] = None, 
+        core_id: Optional[UUID] = None, 
+        core_segment_id: Optional[UUID] = None,
         output_format: shared_execution.mimes = "application/json",
     ) -> Return_HARM_Numerical:
     stats = None
     numeric_type_iteration = ["float_confidence", "float", "int_confidence", "int"]
     if datatype_id is not None or dataset_id is not None or record_hash is not None:
-        stats = get_numeric_types_stats(dataset_id=dataset_id, datatype_id=datatype_id, record_hash=record_hash).model_dump(exclude_unset=True)
+        stats = get_numeric_types_stats(dataset_id=dataset_id, 
+                                        datatype_id=datatype_id, 
+                                        record_hash=record_hash).model_dump(exclude_unset=True)
         # logger.debug(f"stats dictionary before comprehension: {stats}")
         stats = {x.replace("count_", ""): y for x, y in stats.items() if y > 0}
         # logger.debug(f"stats dictionary after comprehension: {stats}")
@@ -199,6 +254,9 @@ def list_numerics_type_iterator(
                                                           record_hash=record_hash,
                                                           datatype_id=datatype_id,
                                                           dataset_id=dataset_id, 
+                                                          location_id=location_id,
+                                                          core_id=core_id,
+                                                          core_segment_id=core_segment_id,
                                                           output_format=output_format)
             results[numeric_type] = iteration_results
     results = {f"data_harmonized_{x}": y for x, y in results.items()}

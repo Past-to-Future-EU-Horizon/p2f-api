@@ -56,6 +56,9 @@ def list_harm_numerical(
     ] = None,
     datatype_id: Optional[uuid.UUID] = None,
     dataset_id: Optional[uuid.UUID] = None,
+    location_id: Optional[uuid.UUID] = None,
+    core_id: Optional[uuid.UUID] = None,
+    core_segment_id: Optional[uuid.UUID] = None,
 ) -> HARM_Float | HARM_Float_Confidence | HARM_Int | HARM_Int_Confidence | List[HARM_Float] | List[HARM_Float_Confidence] | List[HARM_Int] | List[HARM_Int_Confidence] | Return_HARM_Numerical:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
     logger.debug(f"Received params: {locals()}")
@@ -65,18 +68,32 @@ def list_harm_numerical(
                                                         record_hash=record_hash,
                                                         datatype_id=datatype_id,
                                                         dataset_id=dataset_id,
+                                                        location_id=location_id,
+                                                        core_id=core_id,
+                                                        core_segment_id=core_segment_id,
                                                         output_format=output_format)
     else:
         return harm_numerical.list_numerics_type_iterator(record_hash=record_hash,
                                                           dataset_id=dataset_id,
                                                           datatype_id=datatype_id, 
+                                                          location_id=location_id,
+                                                          core_id=core_id, 
+                                                          core_segment_id=core_segment_id,
                                                           output_format=output_format)
     
 @router.get("/statistics", operation_id="numeric-statistics")
 def get_numeric_statistics(datatype_id: uuid.UUID | None = None,
-                           dataset_id: uuid.UUID | None = None,) -> Numerical_Table_Statistics:
+                           dataset_id: uuid.UUID | None = None,
+                           record_hash: str | None = None, 
+                           location_id: uuid.UUID | None = None, 
+                           core_id: uuid.UUID | None = None, 
+                           core_segment_id: uuid.UUID | None = None) -> Numerical_Table_Statistics:
     return harm_numerical.get_numeric_types_stats(dataset_id=dataset_id,
-                                                  datatype_id=datatype_id)
+                                                  datatype_id=datatype_id,
+                                                  record_hash=record_hash,
+                                                  location_id=location_id,
+                                                  core_id=core_id,
+                                                  core_segment_id=core_segment_id)
 
 # Get Single
 @router.get("/{numeric_id}", operation_id="numeric-get")

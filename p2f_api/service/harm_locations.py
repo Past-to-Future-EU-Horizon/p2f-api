@@ -34,12 +34,6 @@ def list_harm_metadata_location(
     output_format: shared_execution.mimes = "application/json",
 ) -> List[HARM_Location]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
-    # if dataset_id is not None:
-    #     logger.debug(f"•  Dataset_id is not None: {dataset_id}")
-    #     data_record_list = list_harm_data_record(dataset=dataset_id)
-    #     logger.debug(f"•• Data records found for dataset_id: {data_record_list}")
-    #     data_record_list = [x.record_hash for x in data_record_list]
-    #     logger.debug(f"•• Reformatted records list: {data_record_list}")
     with Session(engine) as session:
         logger.debug("•  Created session")
         stmt = select(harm_locations)

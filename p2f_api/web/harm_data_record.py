@@ -37,11 +37,18 @@ HARM Data Records have the following attributes:
 @router.get("/", operation_id="record-list")
 def list_harm_data_records(
     auth: api_token_annotation,
-    dataset: Optional[str] = None,
-    # data_type: Optional[int]=None, ### Disabled for now, see note in service
+    dataset_id: Optional[uuid.UUID] = None,
+    datatype_id: Optional[uuid.UUID] = None, 
+    location_id: Optional[uuid.UUID] = None,
+    core_id: Optional[uuid.UUID] = None,
+    core_segment_id: Optional[uuid.UUID] = None,
 ) -> List[HARM_Data_Record]:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
-    return harm_data_record.list_harm_data_record(dataset=dataset)
+    return harm_data_record.list_harm_data_record(dataset_id=dataset_id,
+                                                  datatype_id=datatype_id,
+                                                  location_id=location_id,
+                                                  core_id=core_id,
+                                                  core_segment_id=core_segment_id)
 
 
 # Get Single

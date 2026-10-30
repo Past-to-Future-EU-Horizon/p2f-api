@@ -6,19 +6,52 @@ from inspect import stack
 # Third Party Libraries
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, delete, update
+from sqlalchemy import union
 
 # Local libraries
 from p2f_api.apilogs import logger, fa
 from service import shared_execution
 from ..data.db_connection import engine
-from ..data.harm_reference import harm_reference, harm_reference_to_record
+from ..data.harm_reference import harm_reference, harm_reference_to_record, harm_reference_to_dataset
+from ..data.harm_data_record import harm_data_record
+from ..data.harm_data_numerical import harmonized_int, harmonized_int_confidence
+from ..data.harm_data_numerical import harmonized_float, harmonized_float_confidence
+from ..data.harm_locations import harm_location_to_rec, harm_location_to_ds
 from p2f_pydantic.harm_reference import HARM_Reference
 
 # List
-def list_references(output_format: shared_execution.mimes = "application/json",) -> List[HARM_Reference]:
+def list_references(dataset_id: UUID | None = None,
+                    record_hash: str | None = None, 
+                    datatype_id: UUID | None = None,
+                    location_id: UUID | None = None,
+                    output_format: shared_execution.mimes = "application/json",) -> List[HARM_Reference]:
     logger.debug(f"{fa.service}{fa.list} {__name__} {stack()[0][3]}()")
     with Session(engine) as session:
         stmt = select(harm_reference)
+        if dataset_id is not None:
+            subqry_ds_recs = select(harm_data_record.record_hash).distinct().where(harm_data_record.fk_dataset == dataset_id)
+            subqry_ds_recs_refs = select(harm_reference_to_record.fk_harm_reference).distinct().where(harm_reference_to_record.fk_record_hash.in_(subqry_ds_recs))
+            subqry_ds_refs = select(harm_reference_to_dataset.fk_harm_reference).distinct().where(harm_reference_to_dataset.fk_dataset_id == dataset_id)
+            subqry_ds_union = union(subqry_ds_recs_refs, subqry_ds_refs)
+            stmt = stmt.where(harm_reference.reference_id.in_(subqry_ds_union))
+        if record_hash is not None:
+            subqry_rec_refs = select(harm_reference_to_record.fk_harm_reference).distinct().where(harm_reference_to_record.fk_record_hash == record_hash)
+            stmt = stmt.where(harm_reference.reference_id.in_(subqry_rec_refs))
+        if datatype_id is not None:
+            subqry_i = select(harmonized_int.fk_data_record).distinct().where(harmonized_int.fk_data_type == datatype_id)
+            subqry_ic = select(harmonized_int_confidence.fk_data_record).distinct().where(harmonized_int_confidence.fk_data_type == datatype_id)
+            subqry_f = select(harmonized_float.fk_data_record).distinct().where(harmonized_float.fk_data_type == datatype_id)
+            subqry_fc = select(harmonized_float_confidence.fk_data_record).distinct().where(harmonized_float_confidence.fk_data_type == datatype_id)
+            subqry_u = union(subqry_i, subqry_ic, subqry_f, subqry_fc)
+            subqry_dt_rec_refs = select(harm_reference_to_record.fk_harm_reference).distinct().where(harm_reference_to_record.fk_record_hash.in_(subqry_u))
+            stmt = stmt.where(subqry_dt_rec_refs)
+        if location_id is not None:
+            subqry_loc_rec = select(harm_location_to_rec.fk_data_record).distinct().where(harm_location_to_rec.fk_harm_location == location_id)
+            subqry_loc_ds = select(harm_location_to_ds.fk_dataset_id).distinct().where(harm_location_to_ds.fk_harm_location == location_id)
+            subqry_loc_rec_refs = select(harm_reference_to_record.fk_record_hash).distinct().where(harm_reference_to_record.fk_record_hash.in_(subqry_loc_rec))
+            subqry_loc_ds_refs = select(harm_reference_to_dataset.fk_harm_reference).distinct().where(harm_reference_to_dataset.fk_dataset_id.in_(subqry_loc_ds))
+            subqry_loc_u = union(subqry_loc_rec_refs, subqry_loc_ds_refs)
+            stmt = stmt.where(harm_reference.reference_id.in_(subqry_loc_u))
         results = shared_execution.list(stmt=stmt,
                                         pydantic_object=HARM_Reference,
                                         session_object=session,

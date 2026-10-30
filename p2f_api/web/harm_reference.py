@@ -34,9 +34,16 @@ HARM References have the following attributes:
 
 # List
 @router.get("/", operation_id="reference-list")
-def list_references(auth: api_token_annotation) -> List[HARM_Reference]:
+def list_references(auth: api_token_annotation,
+                    dataset_id: uuid.UUID | None = None,
+                    record_hash: str | None = None, 
+                    datatype_id: uuid.UUID | None = None, 
+                    location_id: uuid.UUID | None = None) -> List[HARM_Reference]:
     logger.debug(f"{fa.web}{fa.list} {__name__} {stack()[0][3]}()")
-    return harm_reference.list_references()
+    return harm_reference.list_references(datatype_id=datatype_id,
+                                          dataset_id=dataset_id,
+                                          record_hash=record_hash, 
+                                          location_id=location_id)
 
 
 # Get Single
