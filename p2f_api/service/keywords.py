@@ -97,8 +97,10 @@ def delete_general_keyword(dataset_id: uuid.UUID,
 def assign_taxon_to_dataset(taxdict_id: str, dataset_id: uuid):
     with Session(engine) as session:
         stmt = insert(taxonomic_keyword)
-        stmt = stmt.values(fk_dataset_id=dataset_id, 
-                           fk_taxdict_id=taxdict_id)
+        stmt = stmt.values(
+            fk_taxdict_id=taxdict_id,
+            fk_dataset_id=dataset_id
+        )
         session.execute(stmt)
         session.commit()
 
